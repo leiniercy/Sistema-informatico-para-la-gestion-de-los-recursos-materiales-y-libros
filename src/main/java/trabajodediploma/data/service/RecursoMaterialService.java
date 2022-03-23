@@ -1,28 +1,28 @@
 package trabajodediploma.data.service;
 
-import trabajodediploma.data.repository.GrupoRepository;
+import trabajodediploma.data.repository.RecursoMaterialRepository;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import trabajodediploma.data.entity.Grupo;
+import trabajodediploma.data.entity.RecursoMaterial;
 
 @Service
-public class GrupoService {
+public class RecursoMaterialService {
 
-    private final GrupoRepository repository;
+    private final RecursoMaterialRepository repository;
 
-    public GrupoService(@Autowired GrupoRepository repository) {
+    public RecursoMaterialService(@Autowired RecursoMaterialRepository repository) {
         this.repository = repository;
     }
 
-    public Optional<Grupo> get(UUID id) {
+    public Optional<RecursoMaterial> get(UUID id) {
         return repository.findById(id);
     }
 
-    public Grupo update(Grupo entity) {
+    public RecursoMaterial update(RecursoMaterial entity) {
         return repository.save(entity);
     }
 
@@ -30,7 +30,7 @@ public class GrupoService {
         repository.deleteById(id);
     }
 
-    public Page<Grupo> list(Pageable pageable) {
+    public Page<RecursoMaterial> list(Pageable pageable) {
         return repository.findAll(pageable);
     }
 

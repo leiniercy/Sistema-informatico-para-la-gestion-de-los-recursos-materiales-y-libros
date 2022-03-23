@@ -1,9 +1,10 @@
-package trabajodediploma.views.grupo;
+package trabajodediploma.views.tarjetaprestamo;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
@@ -11,47 +12,47 @@ import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.splitlayout.SplitLayout;
-import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import java.util.Optional;
 import java.util.UUID;
+import javax.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-import trabajodediploma.data.entity.Grupo;
-import trabajodediploma.data.service.GrupoService;
+import trabajodediploma.data.entity.TarjetaPrestamoEstudiante;
+import trabajodediploma.data.service.TarjetaPrestamoEstudianteService;
 import trabajodediploma.views.MainLayout;
 
-@PageTitle("Grupo")
-@Route(value = "Grupo/:grupoID?/:action?(edit)", layout = MainLayout.class)
-@AnonymousAllowed
-public class GrupoView extends Div implements BeforeEnterObserver {
+@PageTitle("Tarjeta Prestamo")
+@Route(value = "tarjeta-prestamo/:tarjetaPrestamoEstudianteID?/:action?(edit)", layout = MainLayout.class)
+@RolesAllowed("ADMIN")
+public class TarjetaPrestamoView extends Div implements BeforeEnterObserver {
 
-    private final String GRUPO_ID = "grupoID";
-    private final String GRUPO_EDIT_ROUTE_TEMPLATE = "Grupo/%s/edit";
+    private final String TARJETAPRESTAMOESTUDIANTE_ID = "tarjetaPrestamoEstudianteID";
+    private final String TARJETAPRESTAMOESTUDIANTE_EDIT_ROUTE_TEMPLATE = "tarjeta-prestamo/%s/edit";
 
-    private Grid<Grupo> grid = new Grid<>(Grupo.class, false);
+    private Grid<TarjetaPrestamoEstudiante> grid = new Grid<>(TarjetaPrestamoEstudiante.class, false);
 
-    private TextField numero;
+    private DatePicker fechaPrestamo;
+    private DatePicker fechaDevolucion;
 
     private Button cancel = new Button("Cancel");
     private Button save = new Button("Save");
 
-    private BeanValidationBinder<Grupo> binder;
+    private BeanValidationBinder<TarjetaPrestamoEstudiante> binder;
 
-    private Grupo grupo;
+    private TarjetaPrestamoEstudiante tarjetaPrestamoEstudiante;
 
-    private GrupoService grupoService;
+    private TarjetaPrestamoEstudianteService tarjetaPrestamoEstudianteService;
 
-    public GrupoView(@Autowired GrupoService grupoService) {
-        this.grupoService = grupoService;
-        addClassNames("grupo-view");
+    public TarjetaPrestamoView(@Autowired TarjetaPrestamoEstudianteService tarjetaPrestamoEstudianteService) {
+        this.tarjetaPrestamoEstudianteService = tarjetaPrestamoEstudianteService;
+        addClassNames("tarjeta-prestamo-view");
 
         // Create UI
         SplitLayout splitLayout = new SplitLayout();
@@ -62,8 +63,9 @@ public class GrupoView extends Div implements BeforeEnterObserver {
         add(splitLayout);
 
         // Configure Grid
-        grid.addColumn("numero").setAutoWidth(true);
-        grid.setItems(query -> grupoService.list(
+        grid.addColumn("fechaPrestamo").setAutoWidth(true);
+        grid.addColumn("fechaDevolucion").setAutoWidth(true);
+        grid.setItems(query -> tarjetaPrestamoEstudianteService.list(
                 PageRequest.of(query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort(query)))
                 .stream());
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
@@ -71,15 +73,16 @@ public class GrupoView extends Div implements BeforeEnterObserver {
         // when a row is selected or deselected, populate form
         grid.asSingleSelect().addValueChangeListener(event -> {
             if (event.getValue() != null) {
-                UI.getCurrent().navigate(String.format(GRUPO_EDIT_ROUTE_TEMPLATE, event.getValue().getId()));
+                UI.getCurrent().navigate(
+                        String.format(TARJETAPRESTAMOESTUDIANTE_EDIT_ROUTE_TEMPLATE, event.getValue().getId()));
             } else {
                 clearForm();
-                UI.getCurrent().navigate(GrupoView.class);
+                UI.getCurrent().navigate(TarjetaPrestamoView.class);
             }
         });
 
         // Configure Form
-        binder = new BeanValidationBinder<>(Grupo.class);
+        binder = new BeanValidationBinder<>(TarjetaPrestamoEstudiante.class);
 
         // Bind fields. This is where you'd define e.g. validation rules
 
@@ -92,18 +95,18 @@ public class GrupoView extends Div implements BeforeEnterObserver {
 
         save.addClickListener(e -> {
             try {
-                if (this.grupo == null) {
-                    this.grupo = new Grupo();
+                if (this.tarjetaPrestamoEstudiante == null) {
+                    this.tarjetaPrestamoEstudiante = new TarjetaPrestamoEstudiante();
                 }
-                binder.writeBean(this.grupo);
+                binder.writeBean(this.tarjetaPrestamoEstudiante);
 
-                grupoService.update(this.grupo);
+                tarjetaPrestamoEstudianteService.update(this.tarjetaPrestamoEstudiante);
                 clearForm();
                 refreshGrid();
-                Notification.show("Grupo details stored.");
-                UI.getCurrent().navigate(GrupoView.class);
+                Notification.show("TarjetaPrestamoEstudiante details stored.");
+                UI.getCurrent().navigate(TarjetaPrestamoView.class);
             } catch (ValidationException validationException) {
-                Notification.show("An exception happened while trying to store the grupo details.");
+                Notification.show("An exception happened while trying to store the tarjetaPrestamoEstudiante details.");
             }
         });
 
@@ -111,18 +114,20 @@ public class GrupoView extends Div implements BeforeEnterObserver {
 
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
-        Optional<UUID> grupoId = event.getRouteParameters().get(GRUPO_ID).map(UUID::fromString);
-        if (grupoId.isPresent()) {
-            Optional<Grupo> grupoFromBackend = grupoService.get(grupoId.get());
-            if (grupoFromBackend.isPresent()) {
-                populateForm(grupoFromBackend.get());
+        Optional<UUID> tarjetaPrestamoEstudianteId = event.getRouteParameters().get(TARJETAPRESTAMOESTUDIANTE_ID)
+                .map(UUID::fromString);
+        if (tarjetaPrestamoEstudianteId.isPresent()) {
+            Optional<TarjetaPrestamoEstudiante> tarjetaPrestamoEstudianteFromBackend = tarjetaPrestamoEstudianteService
+                    .get(tarjetaPrestamoEstudianteId.get());
+            if (tarjetaPrestamoEstudianteFromBackend.isPresent()) {
+                populateForm(tarjetaPrestamoEstudianteFromBackend.get());
             } else {
-                Notification.show(String.format("The requested grupo was not found, ID = %s", grupoId.get()), 3000,
-                        Notification.Position.BOTTOM_START);
+                Notification.show(String.format("The requested tarjetaPrestamoEstudiante was not found, ID = %s",
+                        tarjetaPrestamoEstudianteId.get()), 3000, Notification.Position.BOTTOM_START);
                 // when a row is selected but the data is no longer available,
                 // refresh grid
                 refreshGrid();
-                event.forwardTo(GrupoView.class);
+                event.forwardTo(TarjetaPrestamoView.class);
             }
         }
     }
@@ -136,8 +141,9 @@ public class GrupoView extends Div implements BeforeEnterObserver {
         editorLayoutDiv.add(editorDiv);
 
         FormLayout formLayout = new FormLayout();
-        numero = new TextField("Numero");
-        Component[] fields = new Component[]{numero};
+        fechaPrestamo = new DatePicker("Fecha Prestamo");
+        fechaDevolucion = new DatePicker("Fecha Devolucion");
+        Component[] fields = new Component[]{fechaPrestamo, fechaDevolucion};
 
         formLayout.add(fields);
         editorDiv.add(formLayout);
@@ -171,9 +177,9 @@ public class GrupoView extends Div implements BeforeEnterObserver {
         populateForm(null);
     }
 
-    private void populateForm(Grupo value) {
-        this.grupo = value;
-        binder.readBean(this.grupo);
+    private void populateForm(TarjetaPrestamoEstudiante value) {
+        this.tarjetaPrestamoEstudiante = value;
+        binder.readBean(this.tarjetaPrestamoEstudiante);
 
     }
 }

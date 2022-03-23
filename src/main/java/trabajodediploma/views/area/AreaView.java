@@ -18,10 +18,10 @@ import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import java.util.Optional;
 import java.util.UUID;
-import javax.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import trabajodediploma.data.entity.Area;
@@ -30,7 +30,7 @@ import trabajodediploma.views.MainLayout;
 
 @PageTitle("Area")
 @Route(value = "area/:areaID?/:action?(edit)", layout = MainLayout.class)
-@RolesAllowed("ADMIN")
+@AnonymousAllowed
 public class AreaView extends Div implements BeforeEnterObserver {
 
     private final String AREA_ID = "areaID";

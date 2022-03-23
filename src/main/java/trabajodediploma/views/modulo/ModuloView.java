@@ -1,4 +1,4 @@
-package trabajodediploma.views.grupo;
+package trabajodediploma.views.modulo;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
@@ -14,44 +14,45 @@ import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.ValidationException;
+import com.vaadin.flow.data.converter.StringToIntegerConverter;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import java.util.Optional;
 import java.util.UUID;
+import javax.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-import trabajodediploma.data.entity.Grupo;
-import trabajodediploma.data.service.GrupoService;
+import trabajodediploma.data.entity.Modulo;
+import trabajodediploma.data.service.ModuloService;
 import trabajodediploma.views.MainLayout;
 
-@PageTitle("Grupo")
-@Route(value = "Grupo/:grupoID?/:action?(edit)", layout = MainLayout.class)
-@AnonymousAllowed
-public class GrupoView extends Div implements BeforeEnterObserver {
+@PageTitle("Modulo")
+@Route(value = "modulo-view/:moduloID?/:action?(edit)", layout = MainLayout.class)
+@RolesAllowed("ADMIN")
+public class ModuloView extends Div implements BeforeEnterObserver {
 
-    private final String GRUPO_ID = "grupoID";
-    private final String GRUPO_EDIT_ROUTE_TEMPLATE = "Grupo/%s/edit";
+    private final String MODULO_ID = "moduloID";
+    private final String MODULO_EDIT_ROUTE_TEMPLATE = "modulo-view/%s/edit";
 
-    private Grid<Grupo> grid = new Grid<>(Grupo.class, false);
+    private Grid<Modulo> grid = new Grid<>(Modulo.class, false);
 
-    private TextField numero;
+    private TextField anno_academico;
 
     private Button cancel = new Button("Cancel");
     private Button save = new Button("Save");
 
-    private BeanValidationBinder<Grupo> binder;
+    private BeanValidationBinder<Modulo> binder;
 
-    private Grupo grupo;
+    private Modulo modulo;
 
-    private GrupoService grupoService;
+    private ModuloService moduloService;
 
-    public GrupoView(@Autowired GrupoService grupoService) {
-        this.grupoService = grupoService;
-        addClassNames("grupo-view");
+    public ModuloView(@Autowired ModuloService moduloService) {
+        this.moduloService = moduloService;
+        addClassNames("modulo-view");
 
         // Create UI
         SplitLayout splitLayout = new SplitLayout();
@@ -62,8 +63,8 @@ public class GrupoView extends Div implements BeforeEnterObserver {
         add(splitLayout);
 
         // Configure Grid
-        grid.addColumn("numero").setAutoWidth(true);
-        grid.setItems(query -> grupoService.list(
+        grid.addColumn("anno_academico").setAutoWidth(true);
+        grid.setItems(query -> moduloService.list(
                 PageRequest.of(query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort(query)))
                 .stream());
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
@@ -71,17 +72,19 @@ public class GrupoView extends Div implements BeforeEnterObserver {
         // when a row is selected or deselected, populate form
         grid.asSingleSelect().addValueChangeListener(event -> {
             if (event.getValue() != null) {
-                UI.getCurrent().navigate(String.format(GRUPO_EDIT_ROUTE_TEMPLATE, event.getValue().getId()));
+                UI.getCurrent().navigate(String.format(MODULO_EDIT_ROUTE_TEMPLATE, event.getValue().getId()));
             } else {
                 clearForm();
-                UI.getCurrent().navigate(GrupoView.class);
+                UI.getCurrent().navigate(ModuloView.class);
             }
         });
 
         // Configure Form
-        binder = new BeanValidationBinder<>(Grupo.class);
+        binder = new BeanValidationBinder<>(Modulo.class);
 
         // Bind fields. This is where you'd define e.g. validation rules
+        binder.forField(anno_academico).withConverter(new StringToIntegerConverter("Only numbers are allowed"))
+                .bind("anno_academico");
 
         binder.bindInstanceFields(this);
 
@@ -92,18 +95,18 @@ public class GrupoView extends Div implements BeforeEnterObserver {
 
         save.addClickListener(e -> {
             try {
-                if (this.grupo == null) {
-                    this.grupo = new Grupo();
+                if (this.modulo == null) {
+                    this.modulo = new Modulo();
                 }
-                binder.writeBean(this.grupo);
+                binder.writeBean(this.modulo);
 
-                grupoService.update(this.grupo);
+                moduloService.update(this.modulo);
                 clearForm();
                 refreshGrid();
-                Notification.show("Grupo details stored.");
-                UI.getCurrent().navigate(GrupoView.class);
+                Notification.show("Modulo details stored.");
+                UI.getCurrent().navigate(ModuloView.class);
             } catch (ValidationException validationException) {
-                Notification.show("An exception happened while trying to store the grupo details.");
+                Notification.show("An exception happened while trying to store the modulo details.");
             }
         });
 
@@ -111,18 +114,18 @@ public class GrupoView extends Div implements BeforeEnterObserver {
 
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
-        Optional<UUID> grupoId = event.getRouteParameters().get(GRUPO_ID).map(UUID::fromString);
-        if (grupoId.isPresent()) {
-            Optional<Grupo> grupoFromBackend = grupoService.get(grupoId.get());
-            if (grupoFromBackend.isPresent()) {
-                populateForm(grupoFromBackend.get());
+        Optional<UUID> moduloId = event.getRouteParameters().get(MODULO_ID).map(UUID::fromString);
+        if (moduloId.isPresent()) {
+            Optional<Modulo> moduloFromBackend = moduloService.get(moduloId.get());
+            if (moduloFromBackend.isPresent()) {
+                populateForm(moduloFromBackend.get());
             } else {
-                Notification.show(String.format("The requested grupo was not found, ID = %s", grupoId.get()), 3000,
+                Notification.show(String.format("The requested modulo was not found, ID = %s", moduloId.get()), 3000,
                         Notification.Position.BOTTOM_START);
                 // when a row is selected but the data is no longer available,
                 // refresh grid
                 refreshGrid();
-                event.forwardTo(GrupoView.class);
+                event.forwardTo(ModuloView.class);
             }
         }
     }
@@ -136,8 +139,8 @@ public class GrupoView extends Div implements BeforeEnterObserver {
         editorLayoutDiv.add(editorDiv);
 
         FormLayout formLayout = new FormLayout();
-        numero = new TextField("Numero");
-        Component[] fields = new Component[]{numero};
+        anno_academico = new TextField("Anno_academico");
+        Component[] fields = new Component[]{anno_academico};
 
         formLayout.add(fields);
         editorDiv.add(formLayout);
@@ -171,9 +174,9 @@ public class GrupoView extends Div implements BeforeEnterObserver {
         populateForm(null);
     }
 
-    private void populateForm(Grupo value) {
-        this.grupo = value;
-        binder.readBean(this.grupo);
+    private void populateForm(Modulo value) {
+        this.modulo = value;
+        binder.readBean(this.modulo);
 
     }
 }

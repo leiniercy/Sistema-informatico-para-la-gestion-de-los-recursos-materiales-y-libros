@@ -9,6 +9,7 @@ public class Estudiante extends AbstractEntity {
     private String nombre;
     private String apellidos;
     private String ci;
+    private String solapin;
     private Integer anno_academico;
     private String facultad;
 
@@ -29,6 +30,12 @@ public class Estudiante extends AbstractEntity {
     }
     public void setCi(String ci) {
         this.ci = ci;
+    }
+    public String getSolapin() {
+        return solapin;
+    }
+    public void setSolapin(String solapin) {
+        this.solapin = solapin;
     }
     public Integer getAnno_academico() {
         return anno_academico;

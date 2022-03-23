@@ -1,5 +1,6 @@
 package trabajodediploma.data.service;
 
+import trabajodediploma.data.repository.LibroRepository;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;

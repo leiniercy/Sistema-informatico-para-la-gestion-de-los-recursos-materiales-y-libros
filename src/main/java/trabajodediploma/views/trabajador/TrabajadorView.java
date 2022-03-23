@@ -29,12 +29,12 @@ import trabajodediploma.data.service.TrabajadorService;
 import trabajodediploma.views.MainLayout;
 
 @PageTitle("Trabajador")
-@Route(value = "trabajador/:trabajadorID?/:action?(edit)", layout = MainLayout.class)
+@Route(value = "trabajador-view/:trabajadorID?/:action?(edit)", layout = MainLayout.class)
 @AnonymousAllowed
 public class TrabajadorView extends Div implements BeforeEnterObserver {
 
     private final String TRABAJADOR_ID = "trabajadorID";
-    private final String TRABAJADOR_EDIT_ROUTE_TEMPLATE = "trabajador/%s/edit";
+    private final String TRABAJADOR_EDIT_ROUTE_TEMPLATE = "trabajador-view/%s/edit";
 
     private Grid<Trabajador> grid = new Grid<>(Trabajador.class, false);
 
@@ -43,6 +43,7 @@ public class TrabajadorView extends Div implements BeforeEnterObserver {
     private TextField ci;
     private TextField solapin;
     private TextField categoria;
+    private TextField area;
 
     private Button cancel = new Button("Cancel");
     private Button save = new Button("Save");
@@ -71,6 +72,7 @@ public class TrabajadorView extends Div implements BeforeEnterObserver {
         grid.addColumn("ci").setAutoWidth(true);
         grid.addColumn("solapin").setAutoWidth(true);
         grid.addColumn("categoria").setAutoWidth(true);
+        grid.addColumn("area").setAutoWidth(true);
         grid.setItems(query -> trabajadorService.list(
                 PageRequest.of(query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort(query)))
                 .stream());
@@ -149,7 +151,8 @@ public class TrabajadorView extends Div implements BeforeEnterObserver {
         ci = new TextField("Ci");
         solapin = new TextField("Solapin");
         categoria = new TextField("Categoria");
-        Component[] fields = new Component[]{nombre, apellidos, ci, solapin, categoria};
+        area = new TextField("Area");
+        Component[] fields = new Component[]{nombre, apellidos, ci, solapin, categoria, area};
 
         formLayout.add(fields);
         editorDiv.add(formLayout);

@@ -19,10 +19,10 @@ import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import java.util.Optional;
 import java.util.UUID;
-import javax.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import trabajodediploma.data.entity.Estudiante;
@@ -30,18 +30,19 @@ import trabajodediploma.data.service.EstudianteService;
 import trabajodediploma.views.MainLayout;
 
 @PageTitle("Estudiante")
-@Route(value = "estudiante/:estudianteID?/:action?(edit)", layout = MainLayout.class)
-@RolesAllowed("ADMIN")
+@Route(value = "estudiante-view/:estudianteID?/:action?(edit)", layout = MainLayout.class)
+@AnonymousAllowed
 public class EstudianteView extends Div implements BeforeEnterObserver {
 
     private final String ESTUDIANTE_ID = "estudianteID";
-    private final String ESTUDIANTE_EDIT_ROUTE_TEMPLATE = "estudiante/%s/edit";
+    private final String ESTUDIANTE_EDIT_ROUTE_TEMPLATE = "estudiante-view/%s/edit";
 
     private Grid<Estudiante> grid = new Grid<>(Estudiante.class, false);
 
     private TextField nombre;
     private TextField apellidos;
     private TextField ci;
+    private TextField solapin;
     private TextField anno_academico;
     private TextField facultad;
 
@@ -70,6 +71,7 @@ public class EstudianteView extends Div implements BeforeEnterObserver {
         grid.addColumn("nombre").setAutoWidth(true);
         grid.addColumn("apellidos").setAutoWidth(true);
         grid.addColumn("ci").setAutoWidth(true);
+        grid.addColumn("solapin").setAutoWidth(true);
         grid.addColumn("anno_academico").setAutoWidth(true);
         grid.addColumn("facultad").setAutoWidth(true);
         grid.setItems(query -> estudianteService.list(
@@ -150,9 +152,10 @@ public class EstudianteView extends Div implements BeforeEnterObserver {
         nombre = new TextField("Nombre");
         apellidos = new TextField("Apellidos");
         ci = new TextField("Ci");
+        solapin = new TextField("Solapin");
         anno_academico = new TextField("Anno_academico");
         facultad = new TextField("Facultad");
-        Component[] fields = new Component[]{nombre, apellidos, ci, anno_academico, facultad};
+        Component[] fields = new Component[]{nombre, apellidos, ci, solapin, anno_academico, facultad};
 
         formLayout.add(fields);
         editorDiv.add(formLayout);

@@ -13,6 +13,8 @@ import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.splitlayout.SplitLayout;
+import com.vaadin.flow.component.textfield.IntegerField;
+import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
@@ -37,6 +39,7 @@ import org.springframework.web.util.UriUtils;
 import trabajodediploma.data.entity.Libro;
 import trabajodediploma.data.service.LibroService;
 import trabajodediploma.views.MainLayout;
+import trabajodediploma.views.footer.MyFooter;
 
 @PageTitle("Libros")
 @Route(value = "libro-view/:libroID?/:action?(edit)", layout = MainLayout.class)
@@ -48,15 +51,15 @@ public class LibrosView extends Div implements BeforeEnterObserver {
 
     private Grid<Libro> grid = new Grid<>(Libro.class, false);
 
-    private Upload image;
-    private Image imagePreview;
+    private Upload imagen;
+    private Image imagenPreview;
     private TextField titulo;
     private TextField autor;
-    private TextField volumen;
-    private TextField tomo;
-    private TextField parte;
-    private TextField cantidad;
-    private TextField precio;
+    private IntegerField volumen;
+    private IntegerField tomo;
+    private IntegerField parte;
+    private IntegerField cantidad;
+    private NumberField precio;
 
     private Button cancel = new Button("Cancel");
     private Button save = new Button("Save");
@@ -66,6 +69,8 @@ public class LibrosView extends Div implements BeforeEnterObserver {
     private Libro libro;
 
     private LibroService libroService;
+    
+    private MyFooter myFooter;
 
     public LibrosView(@Autowired LibroService libroService) {
         this.libroService = libroService;
@@ -76,13 +81,15 @@ public class LibrosView extends Div implements BeforeEnterObserver {
 
         createGridLayout(splitLayout);
         createEditorLayout(splitLayout);
-
-        add(splitLayout);
+        
+        myFooter = new MyFooter();
+        
+        add(splitLayout,myFooter);
 
         // Configure Grid
-        LitRenderer<Libro> imageRenderer = LitRenderer.<Libro>of("<img style='height: 64px' src=${item.image} />")
-                .withProperty("image", Libro::getImage);
-        grid.addColumn(imageRenderer).setHeader("Image").setWidth("68px").setFlexGrow(0);
+        LitRenderer<Libro> imagenRenderer = LitRenderer.<Libro>of("<img style='height: 64px' src=${item.imagen} />")
+                .withProperty("imagen", Libro::getImagen);
+        grid.addColumn(imagenRenderer).setHeader("Imagen").setWidth("68px").setFlexGrow(0);
 
         grid.addColumn("titulo").setAutoWidth(true);
         grid.addColumn("autor").setAutoWidth(true);
@@ -109,18 +116,9 @@ public class LibrosView extends Div implements BeforeEnterObserver {
         // Configure Form
         binder = new BeanValidationBinder<>(Libro.class);
 
-        // Bind fields. This is where you'd define e.g. validation rules
-        binder.forField(volumen).withConverter(new StringToIntegerConverter("Only numbers are allowed"))
-                .bind("volumen");
-        binder.forField(tomo).withConverter(new StringToIntegerConverter("Only numbers are allowed")).bind("tomo");
-        binder.forField(parte).withConverter(new StringToIntegerConverter("Only numbers are allowed")).bind("parte");
-        binder.forField(cantidad).withConverter(new StringToIntegerConverter("Only numbers are allowed"))
-                .bind("cantidad");
-        binder.forField(precio).withConverter(new StringToIntegerConverter("Only numbers are allowed")).bind("precio");
-
         binder.bindInstanceFields(this);
 
-        attachImageUpload(image, imagePreview);
+        attachImageUpload(imagen, imagenPreview);
 
         cancel.addClickListener(e -> {
             clearForm();
@@ -133,7 +131,7 @@ public class LibrosView extends Div implements BeforeEnterObserver {
                     this.libro = new Libro();
                 }
                 binder.writeBean(this.libro);
-                this.libro.setImage(imagePreview.getSrc());
+                this.libro.setImagen(imagenPreview.getSrc());
 
                 libroService.update(this.libro);
                 clearForm();
@@ -174,20 +172,77 @@ public class LibrosView extends Div implements BeforeEnterObserver {
         editorLayoutDiv.add(editorDiv);
 
         FormLayout formLayout = new FormLayout();
-        Label imageLabel = new Label("Image");
-        imagePreview = new Image();
-        imagePreview.setWidth("100%");
-        image = new Upload();
-        image.getStyle().set("box-sizing", "border-box");
-        image.getElement().appendChild(imagePreview.getElement());
-        titulo = new TextField("Titulo");
-        autor = new TextField("Autor");
-        volumen = new TextField("Volumen");
-        tomo = new TextField("Tomo");
-        parte = new TextField("Parte");
-        cantidad = new TextField("Cantidad");
-        precio = new TextField("Precio");
-        Component[] fields = new Component[]{imageLabel, image, titulo, autor, volumen, tomo, parte, cantidad, precio};
+        Label imagenLabel = new Label("Imagen");
+
+        imagenPreview = new Image();
+        imagenPreview.setWidth("100%");
+        imagen = new Upload();
+        imagen.getStyle().set("box-sizing", "border-box");
+        imagen.getElement().appendChild(imagenPreview.getElement());
+
+        titulo = new TextField();
+        titulo.setLabel("Título");
+        titulo.setRequired(true);
+        titulo.setMinLength(2);
+        titulo.setMaxLength(255);
+        titulo.addValueChangeListener(event -> {
+            event.getSource().setHelperText(event.getValue().length() + "/" + 255);
+        });
+
+        autor = new TextField();
+        autor.setLabel("Autor");
+        autor.setRequired(true);
+        autor.setMinLength(2);
+        autor.setMaxLength(100);
+        autor.addValueChangeListener(event -> {
+            event.getSource().setHelperText(event.getValue().length() + "/" + 100);
+        });
+
+        volumen = new IntegerField("Vólumen");
+        volumen.setValue(0);
+        volumen.setHasControls(true);
+        volumen.setMin(0);
+        volumen.setMax(10);
+        volumen.setHelperText("Máximo 10");
+        
+        tomo = new IntegerField("Tomo");
+        tomo.setValue(0);
+        tomo.setHasControls(true);
+        tomo.setMin(0);
+        tomo.setMax(10);
+        tomo.setHelperText("Máximo 10");
+        
+        
+        parte = new IntegerField("Parte");
+        parte.setValue(0);
+        parte.setHasControls(true);
+        parte.setMin(0);
+        parte.setMax(10);
+        parte.setHelperText("Máximo 10");
+        
+        cantidad = new IntegerField("Cantidad");
+        cantidad.setValue(1);
+        cantidad.setRequiredIndicatorVisible(true);
+        cantidad.setHasControls(true);
+        cantidad.setMin(1);
+        cantidad.setHelperText("Míximo 1");
+        
+
+        precio = new NumberField("Precio");
+        Div dollarPrefix = new Div();
+        dollarPrefix.setText("$");
+        precio.setPrefixComponent(dollarPrefix);
+        Div cupSuffix = new Div();
+        cupSuffix.setText("cup");
+        precio.setSuffixComponent(cupSuffix);
+        precio.setRequiredIndicatorVisible(true);
+        precio.setHasControls(true);
+        precio.setStep(0.5);
+        precio.setMin(0);
+        
+
+        Component[] fields = new Component[]{imagenLabel, imagen, titulo, autor, volumen, tomo, parte, cantidad,
+            precio};
 
         formLayout.add(fields);
         editorDiv.add(formLayout);
@@ -242,12 +297,13 @@ public class LibrosView extends Div implements BeforeEnterObserver {
     private void populateForm(Libro value) {
         this.libro = value;
         binder.readBean(this.libro);
-        this.imagePreview.setVisible(value != null);
+        this.imagenPreview.setVisible(value != null);
         if (value == null) {
-            this.imagePreview.setSrc("");
+            this.imagenPreview.setSrc("");
         } else {
-            this.imagePreview.setSrc(value.getImage());
+            this.imagenPreview.setSrc(value.getImagen());
         }
 
     }
 }
+

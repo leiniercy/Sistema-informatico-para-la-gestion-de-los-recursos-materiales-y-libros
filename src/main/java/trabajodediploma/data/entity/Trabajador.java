@@ -11,6 +11,7 @@ public class Trabajador extends AbstractEntity {
     private String ci;
     private String solapin;
     private String categoria;
+    private String area;
 
     public String getNombre() {
         return nombre;
@@ -41,6 +42,12 @@ public class Trabajador extends AbstractEntity {
     }
     public void setCategoria(String categoria) {
         this.categoria = categoria;
+    }
+    public String getArea() {
+        return area;
+    }
+    public void setArea(String area) {
+        this.area = area;
     }
 
 }

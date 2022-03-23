@@ -11,7 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Component;
 import trabajodediploma.data.entity.User;
-import trabajodediploma.data.service.UserRepository;
+import trabajodediploma.data.repository.UserRepository;
 
 @Component
 public class AuthenticatedUser {

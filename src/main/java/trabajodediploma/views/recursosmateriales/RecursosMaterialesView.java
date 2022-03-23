@@ -1,4 +1,4 @@
-package trabajodediploma.views.grupo;
+package trabajodediploma.views.recursosmateriales;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
@@ -14,44 +14,48 @@ import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.ValidationException;
+import com.vaadin.flow.data.converter.StringToIntegerConverter;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import java.util.Optional;
 import java.util.UUID;
+import javax.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-import trabajodediploma.data.entity.Grupo;
-import trabajodediploma.data.service.GrupoService;
+import trabajodediploma.data.entity.RecursoMaterial;
+import trabajodediploma.data.service.RecursoMaterialService;
 import trabajodediploma.views.MainLayout;
 
-@PageTitle("Grupo")
-@Route(value = "Grupo/:grupoID?/:action?(edit)", layout = MainLayout.class)
-@AnonymousAllowed
-public class GrupoView extends Div implements BeforeEnterObserver {
+@PageTitle("Recursos Materiales ")
+@Route(value = "recurso-material-view/:recursoMaterialID?/:action?(edit)", layout = MainLayout.class)
+@RolesAllowed("ADMIN")
+public class RecursosMaterialesView extends Div implements BeforeEnterObserver {
 
-    private final String GRUPO_ID = "grupoID";
-    private final String GRUPO_EDIT_ROUTE_TEMPLATE = "Grupo/%s/edit";
+    private final String RECURSOMATERIAL_ID = "recursoMaterialID";
+    private final String RECURSOMATERIAL_EDIT_ROUTE_TEMPLATE = "recurso-material-view/%s/edit";
 
-    private Grid<Grupo> grid = new Grid<>(Grupo.class, false);
+    private Grid<RecursoMaterial> grid = new Grid<>(RecursoMaterial.class, false);
 
-    private TextField numero;
+    private TextField codigo;
+    private TextField descripcion;
+    private TextField unidadMedida;
+    private TextField cantidad;
 
     private Button cancel = new Button("Cancel");
     private Button save = new Button("Save");
 
-    private BeanValidationBinder<Grupo> binder;
+    private BeanValidationBinder<RecursoMaterial> binder;
 
-    private Grupo grupo;
+    private RecursoMaterial recursoMaterial;
 
-    private GrupoService grupoService;
+    private RecursoMaterialService recursoMaterialService;
 
-    public GrupoView(@Autowired GrupoService grupoService) {
-        this.grupoService = grupoService;
-        addClassNames("grupo-view");
+    public RecursosMaterialesView(@Autowired RecursoMaterialService recursoMaterialService) {
+        this.recursoMaterialService = recursoMaterialService;
+        addClassNames("recursos-materiales-view");
 
         // Create UI
         SplitLayout splitLayout = new SplitLayout();
@@ -62,8 +66,11 @@ public class GrupoView extends Div implements BeforeEnterObserver {
         add(splitLayout);
 
         // Configure Grid
-        grid.addColumn("numero").setAutoWidth(true);
-        grid.setItems(query -> grupoService.list(
+        grid.addColumn("codigo").setAutoWidth(true);
+        grid.addColumn("descripcion").setAutoWidth(true);
+        grid.addColumn("unidadMedida").setAutoWidth(true);
+        grid.addColumn("cantidad").setAutoWidth(true);
+        grid.setItems(query -> recursoMaterialService.list(
                 PageRequest.of(query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort(query)))
                 .stream());
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
@@ -71,17 +78,19 @@ public class GrupoView extends Div implements BeforeEnterObserver {
         // when a row is selected or deselected, populate form
         grid.asSingleSelect().addValueChangeListener(event -> {
             if (event.getValue() != null) {
-                UI.getCurrent().navigate(String.format(GRUPO_EDIT_ROUTE_TEMPLATE, event.getValue().getId()));
+                UI.getCurrent().navigate(String.format(RECURSOMATERIAL_EDIT_ROUTE_TEMPLATE, event.getValue().getId()));
             } else {
                 clearForm();
-                UI.getCurrent().navigate(GrupoView.class);
+                UI.getCurrent().navigate(RecursosMaterialesView.class);
             }
         });
 
         // Configure Form
-        binder = new BeanValidationBinder<>(Grupo.class);
+        binder = new BeanValidationBinder<>(RecursoMaterial.class);
 
         // Bind fields. This is where you'd define e.g. validation rules
+        binder.forField(cantidad).withConverter(new StringToIntegerConverter("Only numbers are allowed"))
+                .bind("cantidad");
 
         binder.bindInstanceFields(this);
 
@@ -92,18 +101,18 @@ public class GrupoView extends Div implements BeforeEnterObserver {
 
         save.addClickListener(e -> {
             try {
-                if (this.grupo == null) {
-                    this.grupo = new Grupo();
+                if (this.recursoMaterial == null) {
+                    this.recursoMaterial = new RecursoMaterial();
                 }
-                binder.writeBean(this.grupo);
+                binder.writeBean(this.recursoMaterial);
 
-                grupoService.update(this.grupo);
+                recursoMaterialService.update(this.recursoMaterial);
                 clearForm();
                 refreshGrid();
-                Notification.show("Grupo details stored.");
-                UI.getCurrent().navigate(GrupoView.class);
+                Notification.show("RecursoMaterial details stored.");
+                UI.getCurrent().navigate(RecursosMaterialesView.class);
             } catch (ValidationException validationException) {
-                Notification.show("An exception happened while trying to store the grupo details.");
+                Notification.show("An exception happened while trying to store the recursoMaterial details.");
             }
         });
 
@@ -111,18 +120,19 @@ public class GrupoView extends Div implements BeforeEnterObserver {
 
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
-        Optional<UUID> grupoId = event.getRouteParameters().get(GRUPO_ID).map(UUID::fromString);
-        if (grupoId.isPresent()) {
-            Optional<Grupo> grupoFromBackend = grupoService.get(grupoId.get());
-            if (grupoFromBackend.isPresent()) {
-                populateForm(grupoFromBackend.get());
+        Optional<UUID> recursoMaterialId = event.getRouteParameters().get(RECURSOMATERIAL_ID).map(UUID::fromString);
+        if (recursoMaterialId.isPresent()) {
+            Optional<RecursoMaterial> recursoMaterialFromBackend = recursoMaterialService.get(recursoMaterialId.get());
+            if (recursoMaterialFromBackend.isPresent()) {
+                populateForm(recursoMaterialFromBackend.get());
             } else {
-                Notification.show(String.format("The requested grupo was not found, ID = %s", grupoId.get()), 3000,
-                        Notification.Position.BOTTOM_START);
+                Notification.show(
+                        String.format("The requested recursoMaterial was not found, ID = %s", recursoMaterialId.get()),
+                        3000, Notification.Position.BOTTOM_START);
                 // when a row is selected but the data is no longer available,
                 // refresh grid
                 refreshGrid();
-                event.forwardTo(GrupoView.class);
+                event.forwardTo(RecursosMaterialesView.class);
             }
         }
     }
@@ -136,8 +146,11 @@ public class GrupoView extends Div implements BeforeEnterObserver {
         editorLayoutDiv.add(editorDiv);
 
         FormLayout formLayout = new FormLayout();
-        numero = new TextField("Numero");
-        Component[] fields = new Component[]{numero};
+        codigo = new TextField("Codigo");
+        descripcion = new TextField("Descripcion");
+        unidadMedida = new TextField("Unidad Medida");
+        cantidad = new TextField("Cantidad");
+        Component[] fields = new Component[]{codigo, descripcion, unidadMedida, cantidad};
 
         formLayout.add(fields);
         editorDiv.add(formLayout);
@@ -171,9 +184,9 @@ public class GrupoView extends Div implements BeforeEnterObserver {
         populateForm(null);
     }
 
-    private void populateForm(Grupo value) {
-        this.grupo = value;
-        binder.readBean(this.grupo);
+    private void populateForm(RecursoMaterial value) {
+        this.recursoMaterial = value;
+        binder.readBean(this.recursoMaterial);
 
     }
 }

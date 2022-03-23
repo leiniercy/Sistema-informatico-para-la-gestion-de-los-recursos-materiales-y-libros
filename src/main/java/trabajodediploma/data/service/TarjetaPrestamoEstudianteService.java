@@ -1,28 +1,28 @@
 package trabajodediploma.data.service;
 
-import trabajodediploma.data.repository.GrupoRepository;
+import trabajodediploma.data.repository.TarjetaPrestamoEstudianteRepository;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import trabajodediploma.data.entity.Grupo;
+import trabajodediploma.data.entity.TarjetaPrestamoEstudiante;
 
 @Service
-public class GrupoService {
+public class TarjetaPrestamoEstudianteService {
 
-    private final GrupoRepository repository;
+    private final TarjetaPrestamoEstudianteRepository repository;
 
-    public GrupoService(@Autowired GrupoRepository repository) {
+    public TarjetaPrestamoEstudianteService(@Autowired TarjetaPrestamoEstudianteRepository repository) {
         this.repository = repository;
     }
 
-    public Optional<Grupo> get(UUID id) {
+    public Optional<TarjetaPrestamoEstudiante> get(UUID id) {
         return repository.findById(id);
     }
 
-    public Grupo update(Grupo entity) {
+    public TarjetaPrestamoEstudiante update(TarjetaPrestamoEstudiante entity) {
         return repository.save(entity);
     }
 
@@ -30,7 +30,7 @@ public class GrupoService {
         repository.deleteById(id);
     }
 
-    public Page<Grupo> list(Pageable pageable) {
+    public Page<TarjetaPrestamoEstudiante> list(Pageable pageable) {
         return repository.findAll(pageable);
     }
 

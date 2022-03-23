@@ -16,6 +16,8 @@ import com.vaadin.flow.component.html.ListItem;
 import com.vaadin.flow.component.html.Nav;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.html.UnorderedList;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.server.auth.AccessAnnotationChecker;
@@ -23,11 +25,15 @@ import java.util.Optional;
 import trabajodediploma.data.entity.User;
 import trabajodediploma.security.AuthenticatedUser;
 import trabajodediploma.views.area.AreaView;
+import trabajodediploma.views.catalogo.CatalogoView;
 import trabajodediploma.views.destinofinal.DestinoFinalView;
 import trabajodediploma.views.estudiante.EstudianteView;
 import trabajodediploma.views.grupo.GrupoView;
 import trabajodediploma.views.inicio.InicioView;
 import trabajodediploma.views.libros.LibrosView;
+import trabajodediploma.views.modulo.ModuloView;
+import trabajodediploma.views.recursosmateriales.RecursosMaterialesView;
+import trabajodediploma.views.tarjetaprestamo.TarjetaPrestamoView;
 import trabajodediploma.views.trabajador.TrabajadorView;
 
 /**
@@ -65,6 +71,7 @@ public class MainLayout extends AppLayout {
          */
         @NpmPackage(value = "line-awesome", version = "1.3.0")
         public static class LineAwesomeIcon extends Span {
+
             public LineAwesomeIcon(String lineawesomeClassnames) {
                 addClassNames("menu-item-icon");
                 if (!lineawesomeClassnames.isEmpty()) {
@@ -91,24 +98,60 @@ public class MainLayout extends AppLayout {
 
     private Component createHeaderContent() {
         DrawerToggle toggle = new DrawerToggle();
-        toggle.addClassNames("view-toggle");
+        toggle.addClassName("text-secondary");
         toggle.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
         toggle.getElement().setAttribute("aria-label", "Menu toggle");
 
         viewTitle = new H1();
-        viewTitle.addClassNames("view-title");
+        viewTitle.addClassNames("m-0", "text-l");
+        viewTitle.getStyle()
+                .set("font-size", "var(--lumo-font-size-l)")
+                .set("margin", "0");
 
-        Header header = new Header(toggle, viewTitle);
-        header.addClassNames("view-header");
+        HorizontalLayout layout = new HorizontalLayout();
+        layout.addClassNames("flex", "items-center", "my-s", "px-m", "py-xs");
+        Optional<User> maybeUser = authenticatedUser.get();
+        if (maybeUser.isPresent()) {
+            User user = maybeUser.get();
+
+            Avatar avatar = new Avatar(user.getUsername(), user.getProfilePictureUrl());
+            avatar.addClassNames("me-xs");
+
+            ContextMenu userMenu = new ContextMenu(avatar);
+            userMenu.setOpenOnClick(true);
+            userMenu.addItem("Cerrar sesión", e -> {
+                authenticatedUser.logout();
+            });
+
+            Span name = new Span(user.getName());
+            name.addClassNames("font-medium", "text-s", "text-secondary");
+            layout.add(avatar, name);
+
+        } else {
+
+            Anchor loginLink = new Anchor(/*"login", "Sign in"*/);
+            loginLink.setHref("login");
+            loginLink.add(new Span("Acceder"));
+            layout.add(loginLink);
+            layout.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.BASELINE);
+            layout.addClassNames("bg-base", "border-b", "border-contrast-10", "box-border");
+        }
+
+        HorizontalLayout header = new HorizontalLayout(toggle, viewTitle, layout);
+        header.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
+        header.setWidth("100%");
+        header.expand(viewTitle);
+        header.addClassNames("bg-base", "border-b", "border-contrast-10", "box-border", "flex", "py-0", "px-m");
+
         return header;
     }
 
     private Component createDrawerContent() {
-        H2 appName = new H2("SCDRM");
+        H2 appName = new H2("Menú");
         appName.addClassNames("app-name");
 
         com.vaadin.flow.component.html.Section section = new com.vaadin.flow.component.html.Section(appName,
-                createNavigation(), createFooter());
+                createNavigation());
         section.addClassNames("drawer-section");
         return section;
     }
@@ -134,52 +177,23 @@ public class MainLayout extends AppLayout {
 
     private MenuItemInfo[] createMenuItems() {
         return new MenuItemInfo[]{ //
-                new MenuItemInfo("Inicio", "la la-home", InicioView.class), //
+            new MenuItemInfo("Inicio", "la la-home", InicioView.class), //
 
-                new MenuItemInfo("Area", "la la-columns", AreaView.class), //
+            new MenuItemInfo("Catalogo", "la la-th-list", CatalogoView.class), //
 
-                new MenuItemInfo("Grupo", "la la-columns", GrupoView.class), //
+            new MenuItemInfo("Libros", "la la-book", LibrosView.class), //
 
-                new MenuItemInfo("Libros", "la la-columns", LibrosView.class), //
+            new MenuItemInfo("Recursos Materiales ", "la la-columns", RecursosMaterialesView.class), //
 
-                new MenuItemInfo("Destino Final", "la la-columns", DestinoFinalView.class), //
+            new MenuItemInfo("Tarjeta Prestamo", "la la-columns", TarjetaPrestamoView.class), //
 
-                new MenuItemInfo("Estudiante", "la la-columns", EstudianteView.class), //
+            new MenuItemInfo("Modulo", "la la-columns", ModuloView.class), //
 
-                new MenuItemInfo("Trabajador", "la la-columns", TrabajadorView.class), //
-
+            new MenuItemInfo("Destino Final", "la la-columns", DestinoFinalView.class), //
         };
     }
 
-    private Footer createFooter() {
-        Footer layout = new Footer();
-        layout.addClassNames("footer");
-
-        Optional<User> maybeUser = authenticatedUser.get();
-        if (maybeUser.isPresent()) {
-            User user = maybeUser.get();
-
-            Avatar avatar = new Avatar(user.getName(), user.getProfilePictureUrl());
-            avatar.addClassNames("me-xs");
-
-            ContextMenu userMenu = new ContextMenu(avatar);
-            userMenu.setOpenOnClick(true);
-            userMenu.addItem("Logout", e -> {
-                authenticatedUser.logout();
-            });
-
-            Span name = new Span(user.getName());
-            name.addClassNames("font-medium", "text-s", "text-secondary");
-
-            layout.add(avatar, name);
-        } else {
-            Anchor loginLink = new Anchor("login", "Sign in");
-            layout.add(loginLink);
-        }
-
-        return layout;
-    }
-
+ 
     @Override
     protected void afterNavigation() {
         super.afterNavigation();
