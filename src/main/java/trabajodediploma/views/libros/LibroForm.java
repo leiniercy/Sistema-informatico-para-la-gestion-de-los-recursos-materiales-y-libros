@@ -35,12 +35,12 @@ import trabajodediploma.data.entity.Libro;
  *
  * @author leinier
  */
-public class LibrosForm extends FormLayout {
+public class LibroForm extends FormLayout {
 
     private Libro libro;
 
-    Upload imagen;
-    Image imagenPreview;
+//    Upload imagen;
+//    Image imagenPreview;
     TextField titulo;
     TextField autor;
     IntegerField volumen;
@@ -54,7 +54,7 @@ public class LibrosForm extends FormLayout {
 
     BeanValidationBinder<Libro> binder;
 
-    public LibrosForm() {
+    public LibroForm() {
 
         addClassName("libro-form");
 
@@ -63,14 +63,12 @@ public class LibrosForm extends FormLayout {
 
         binder.bindInstanceFields(this);
 
-        //attachImageUpload(imagen, imagenPreview);
-
         Label imagenLabel = new Label("Imagen");
-        imagenPreview = new Image();
-        imagenPreview.setWidth("100%");
-        imagen = new Upload();
-        imagen.getStyle().set("box-sizing", "border-box");
-        imagen.getElement().appendChild(imagenPreview.getElement());
+//        imagenPreview = new Image();
+//        imagenPreview.setWidth("100%");
+//        imagen = new Upload();
+//        imagen.getStyle().set("box-sizing", "border-box");
+//        imagen.getElement().appendChild(imagenPreview.getElement());
 
         titulo = new TextField();
         titulo.setLabel("Título");
@@ -131,7 +129,7 @@ public class LibrosForm extends FormLayout {
         precio.setMin(0);
 
         add(
-                imagenLabel, imagen, titulo, autor,
+                imagenLabel, /*imagen,*/ titulo, autor,
                 volumen, tomo, parte, cantidad, precio,
                 createButtonsLayout()
         );
@@ -160,58 +158,19 @@ public class LibrosForm extends FormLayout {
 
     private void validateAndSave() {
         try {
-            if (this.libro == null) {
-                this.libro = new Libro();
-            }
             binder.writeBean(libro);
-            this.libro.setImagen(imagenPreview.getSrc());
             fireEvent(new SaveEvent(this, libro));
-            clearForm();
         } catch (ValidationException e) {
             Notification.show("Ocurrio un problema al intentar guardad el libro.");
         }
     }
 
-    private void clearForm() {
-        populateForm(null);
-    }
-
-    private void populateForm(Libro value) {
-        this.libro = value;
-        binder.readBean(this.libro);
-        this.imagenPreview.setVisible(value != null);
-        if (value == null) {
-            this.imagenPreview.setSrc("");
-        } else {
-            this.imagenPreview.setSrc(value.getImagen());
-        }
-
-    }
-
-    private void attachImageUpload(Upload upload, Image preview) {
-        ByteArrayOutputStream uploadBuffer = new ByteArrayOutputStream();
-        upload.setAcceptedFileTypes("image/*");
-        upload.setReceiver((fileName, mimeType) -> {
-            return uploadBuffer;
-        });
-        upload.addSucceededListener(e -> {
-            String mimeType = e.getMIMEType();
-            String base64ImageData = Base64.getEncoder().encodeToString(uploadBuffer.toByteArray());
-            String dataUrl = "data:" + mimeType + ";base64,"
-                    + UriUtils.encodeQuery(base64ImageData, StandardCharsets.UTF_8);
-            upload.getElement().setPropertyJson("files", Json.createArray());
-            preview.setSrc(dataUrl);
-            uploadBuffer.reset();
-        });
-        preview.setVisible(false);
-    }
-
     // Events
-    public static abstract class LibroFormEvent extends ComponentEvent<LibrosForm> {
+    public static abstract class LibroFormEvent extends ComponentEvent<LibroForm> {
 
         private Libro libro1;
 
-        protected LibroFormEvent(LibrosForm source, Libro libro) {
+        protected LibroFormEvent(LibroForm source, Libro libro) {
             super(source, false);
             this.libro1 = libro;
         }
@@ -223,14 +182,14 @@ public class LibrosForm extends FormLayout {
 
     public static class SaveEvent extends LibroFormEvent {
 
-        SaveEvent(LibrosForm source, Libro libro) {
+        SaveEvent(LibroForm source, Libro libro) {
             super(source, libro);
         }
     }
 
     public static class DeleteEvent extends LibroFormEvent {
 
-        DeleteEvent(LibrosForm source, Libro libro) {
+        DeleteEvent(LibroForm source, Libro libro) {
             super(source, libro);
         }
 
@@ -238,7 +197,7 @@ public class LibrosForm extends FormLayout {
 
     public static class CloseEvent extends LibroFormEvent {
 
-        CloseEvent(LibrosForm source) {
+        CloseEvent(LibroForm source) {
             super(source, null);
         }
     }

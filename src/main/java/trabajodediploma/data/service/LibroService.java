@@ -1,13 +1,13 @@
 package trabajodediploma.data.service;
 
-import trabajodediploma.data.repository.LibroRepository;
-import java.util.Optional;
+import java.util.List;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.vaadin.crudui.crud.CrudListener;
 import trabajodediploma.data.entity.Libro;
+import lombok.RequiredArgsConstructor;
+import trabajodediploma.data.repository.LibroRepository;
 
 @Service
 public class LibroService {
@@ -18,24 +18,29 @@ public class LibroService {
         this.repository = repository;
     }
 
-    public Optional<Libro> get(UUID id) {
-        return repository.findById(id);
+    public List<Libro> findAll() {
+        return repository.findAll();
+    }
+    
+    public Libro findById(UUID id){
+     return repository.findById(id).get();
+    }
+    
+    public Libro add(Libro libro) {
+        return repository.save(libro);
     }
 
-    public Libro update(Libro entity) {
-        return repository.save(entity);
+    
+    public Libro update(Libro libro) {
+        return repository.save(libro);
     }
 
-    public void delete(UUID id) {
-        repository.deleteById(id);
+    public void delete(Libro libro) {
+        repository.delete(libro);
     }
-
-    public Page<Libro> list(Pageable pageable) {
-        return repository.findAll(pageable);
-    }
-
-    public int count() {
-        return (int) repository.count();
+    
+    public long count(){
+      return repository.count();
     }
 
 }

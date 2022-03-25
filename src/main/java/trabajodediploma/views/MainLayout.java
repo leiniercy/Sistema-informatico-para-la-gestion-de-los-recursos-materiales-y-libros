@@ -30,7 +30,7 @@ import trabajodediploma.views.destinofinal.DestinoFinalView;
 import trabajodediploma.views.estudiante.EstudianteView;
 import trabajodediploma.views.grupo.GrupoView;
 import trabajodediploma.views.inicio.InicioView;
-import trabajodediploma.views.libros.LibrosView;
+import trabajodediploma.views.libros.LibroView;
 import trabajodediploma.views.modulo.ModuloView;
 import trabajodediploma.views.recursosmateriales.RecursosMaterialesView;
 import trabajodediploma.views.tarjetaprestamo.TarjetaPrestamoView;
@@ -181,7 +181,7 @@ public class MainLayout extends AppLayout {
 
             new MenuItemInfo("Catalogo", "la la-th-list", CatalogoView.class), //
 
-            new MenuItemInfo("Libros", "la la-book", LibrosView.class), //
+            new MenuItemInfo("Libros", "la la-book", LibroView.class), //
 
             new MenuItemInfo("Recursos Materiales ", "la la-columns", RecursosMaterialesView.class), //
 
