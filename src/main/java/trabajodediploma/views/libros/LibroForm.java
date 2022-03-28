@@ -45,6 +45,7 @@ public class LibroForm extends FormLayout {
 
     private Libro libro;
 
+    private Image imagePreview;
     Upload imagen = new Upload();
     TextField titulo = new TextField();
     TextField autor = new TextField();
@@ -66,21 +67,22 @@ public class LibroForm extends FormLayout {
 
         //Config form
         //imagen
-        
 //        Button uploadButton = new Button("Imágen");
 //        uploadButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 //        imagen.setUploadButton(uploadButton);
-      
-
         //int maxFileSizeInBytes = 10 * 1024 * 1024; // 10MB
         Label imageSize = new Label("Tamaño maximo: 400kb");
         imageSize.getStyle().set("color", "var(--lumo-secondary-text-color)");
         imagen.setMaxFileSize(400 * 1024); // 400kb
 
-        MemoryBuffer buffer = new MemoryBuffer();
-        imagen = new Upload(buffer);
-        imagen.setDropAllowed(true);
+        //MemoryBuffer buffer = new MemoryBuffer();
+        imagePreview = new Image();
+        imagePreview.setWidth("100%");
+        imagen = new Upload();
         imagen.getStyle().set("box-sizing", "border-box");
+        imagen.getElement().appendChild(imagePreview.getElement());
+        imagen.setDropAllowed(true);
+
         imagen.setAcceptedFileTypes("image/tiff", ".png", ".jpg");
         imagen.addFileRejectedListener(event -> {
             String errorMessage = event.getErrorMessage();
@@ -93,7 +95,7 @@ public class LibroForm extends FormLayout {
 
             notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
         });
-        
+
         configuracionErroresImagen();
 
         //titulo
@@ -159,6 +161,8 @@ public class LibroForm extends FormLayout {
         precio.setStep(0.5);
         precio.setMin(0);
 
+        attachImageUpload(imagen, imagePreview);
+
         add(
                 imageSize,
                 imagen,
@@ -194,14 +198,27 @@ public class LibroForm extends FormLayout {
     public void setLibro(Libro libro) {
         this.libro = libro;
         binder.readBean(libro);
+        this.imagePreview.setVisible(libro != null);
+        if (libro == null) {
+            this.imagePreview.setSrc("");
+        } else {
+            this.imagePreview.setSrc(libro.getImagen());
+        }
     }
 
     private void validateAndSave() {
         try {
             binder.writeBean(libro);
+            this.libro.setImagen(imagePreview.getSrc());
             fireEvent(new SaveEvent(this, libro));
         } catch (ValidationException e) {
             e.printStackTrace();
+            Notification notification = Notification.show(
+                    "Ocurrió un problema al intentar almacenar el libro",
+                    5000,
+                    Notification.Position.MIDDLE
+            );
+            notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
         }
     }
 
@@ -220,7 +237,7 @@ public class LibroForm extends FormLayout {
 
     private void attachImageUpload(Upload upload, Image preview) {
         ByteArrayOutputStream uploadBuffer = new ByteArrayOutputStream();
-        upload.setAcceptedFileTypes("image/tiff", ".png", ".jpg");
+        upload.setAcceptedFileTypes("image/*");
         upload.setReceiver((fileName, mimeType) -> {
             return uploadBuffer;
         });

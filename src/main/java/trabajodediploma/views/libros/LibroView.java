@@ -23,6 +23,7 @@ import com.vaadin.flow.component.orderedlayout.*;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.component.contextmenu.MenuItem;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
@@ -76,9 +77,13 @@ public class LibroView extends VerticalLayout {
         add(menuBar(), getContent(), myFooter);
         updateList();
         closeEditor();
-        grid.asSingleSelect().addValueChangeListener(event
-                -> editLibro(event.getValue())
-        );
+        grid.asSingleSelect().addValueChangeListener(event -> {
+            if (event.getValue() != null) {
+                editLibro(event.getValue());
+            } else {
+                form.setLibro(null);
+            }
+        });
 
     }
 
@@ -98,7 +103,7 @@ public class LibroView extends VerticalLayout {
     private void configureGrid() {
         LitRenderer<Libro> imagenRenderer = LitRenderer.<Libro>of("<img style='height: 64px' src=${item.imagen} />")
                 .withProperty("imagen", Libro::getImagen);
-        imagenColumn = grid.addColumn(Libro::getImagen).setHeader("Imagen").setAutoWidth(true);
+        imagenColumn = grid.addColumn(imagenRenderer).setHeader("Imagen").setAutoWidth(true);
         tituloColumn = grid.addColumn(Libro::getTitulo).setHeader("Título").setAutoWidth(true).setSortable(true);
         autorColumn = grid.addColumn(Libro::getAutor).setHeader("Autor").setAutoWidth(true).setSortable(true);
         volumenColumn = grid.addColumn(Libro::getVolumen).setHeader("Vólumen").setAutoWidth(true).setSortable(true);
@@ -350,7 +355,23 @@ public class LibroView extends VerticalLayout {
         if (listLibros.size() != 0) {
             dialog.open();
         } else {
-            libroService.save(event.getLibro());
+            if (event.getLibro().getId() == null) {
+                libroService.save(event.getLibro());
+                Notification notification = Notification.show(
+                        "Libro añadido",
+                        5000,
+                        Notification.Position.BOTTOM_START
+                );
+                notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+            } else {
+                libroService.update(event.getLibro());
+                Notification notification = Notification.show(
+                        "Libro modificado",
+                        5000,
+                        Notification.Position.BOTTOM_START
+                );
+                notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+            }
             toolbar.remove(total);
             total = new Html("<span>Total: <b>" + libroService.count() + "</b> libros</span>");
             toolbar.addComponentAtIndex(1, total);

@@ -133,7 +133,7 @@ public class DataGenerator {
             libroRepositoryGenerator.setData(Libro::setParte, DataType.NUMBER_UP_TO_10);
             libroRepositoryGenerator.setData(Libro::setCantidad, DataType.NUMBER_UP_TO_1000);
            // libroRepositoryGenerator.setData(Libro::setPrecio, DataType.NUMBER_UP_TO_1000);
-            libroRepository.saveAll(libroRepositoryGenerator.create(0, seed));
+            libroRepository.saveAll(libroRepositoryGenerator.create(5, seed));
 
             logger.info("... generating 100 Destino Final entities...");
             ExampleDataGenerator<DestinoFinal> destinoFinalRepositoryGenerator = new ExampleDataGenerator<>(
