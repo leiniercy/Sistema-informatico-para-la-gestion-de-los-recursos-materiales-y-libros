@@ -3,7 +3,6 @@ package trabajodediploma.views.libros;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Html;
-import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
@@ -33,7 +32,6 @@ import java.util.stream.Collectors;
 import javax.annotation.security.RolesAllowed;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.vaadin.crudui.crud.impl.GridCrud;
 import trabajodediploma.data.entity.Libro;
 import trabajodediploma.data.service.LibroService;
 import trabajodediploma.views.MainLayout;
@@ -59,36 +57,44 @@ public class LibroView extends VerticalLayout {
     Grid.Column<Libro> precioColumn;
     Grid.Column<Libro> editColumn;
 
-    private MyFooter myFooter;
+    MyFooter myFooter;
+
+    LibroForm form;
 
     private Html total;
     private HorizontalLayout toolbar;
+    private HorizontalLayout buttons;
 
     public LibroView(@Autowired LibroService libroService) {
         this.libroService = libroService;
         addClassNames("libros-view");
         setSizeFull();
         configureGrid();
-
+        configureForm();
         myFooter = new MyFooter();
 
-        // Create UI
-        SplitLayout splitLayout = new SplitLayout();
+        add(menuBar(), getContent(), myFooter);
+        updateList();
+        closeEditor();
+        grid.asSingleSelect().addValueChangeListener(event
+                -> editLibro(event.getValue())
+        );
 
-        createGridLayout(splitLayout);
-        //   createEditorLayout(splitLayout);
-        add(splitLayout, myFooter);
     }
 
-    //Añadiendo la tabla al splitLayout
-    private void createGridLayout(SplitLayout splitLayout) {
-        Div wrapper = new Div();
-        wrapper.setClassName("grid-wrapper");
-        splitLayout.addToPrimary(wrapper);
-        wrapper.add(menuBar(), grid);
+    /*Contenido de la vista*/
+    private HorizontalLayout getContent() {
+        HorizontalLayout content = new HorizontalLayout(grid, form);
+        content.setFlexGrow(2, grid);
+        content.setFlexGrow(1, form);
+        content.addClassNames("content");
+        content.setSizeFull();
+        return content;
     }
 
-    //Configuracion de la tabla
+
+    /*Tabla*/
+ /*Configuracion de la tabla*/
     private void configureGrid() {
         LitRenderer<Libro> imagenRenderer = LitRenderer.<Libro>of("<img style='height: 64px' src=${item.imagen} />")
                 .withProperty("imagen", Libro::getImagen);
@@ -115,24 +121,22 @@ public class LibroView extends VerticalLayout {
         headerRow.getCell(precioColumn).setComponent(FiltrarPrecio());
 
         gridListDataView = grid.setItems(libroService.findAll());
-        grid.addClassNames("area-grid");
         grid.setAllRowsVisible(true);
         grid.setSizeFull();
         grid.setWidthFull();
         grid.setHeightFull();
-        grid.setSelectionMode(Grid.SelectionMode.MULTI);
+        // grid.setSelectionMode(Grid.SelectionMode.MULTI);
         grid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS);
         grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         grid.addThemeVariants(GridVariant.LUMO_WRAP_CELL_CONTENT);
 
-        grid.addSelectionListener(selection -> {
-            // System.out.printf("Number of selected people: %s%n", selection.getAllSelectedItems().size());
-
-        });
-
+//        grid.addSelectionListener(selection -> {
+//            // System.out.printf("Number of selected people: %s%n", selection.getAllSelectedItems().size());
+//
+//        });
     }
 
-    //Filtros
+    /*Filtros*/
     private Component FiltrarAuthor() {
 
         TextField filterAuthor = new TextField();
@@ -237,13 +241,17 @@ public class LibroView extends VerticalLayout {
         return precioFilter;
     }
 
-    //Barra de menu
+    /*Fin-Filtros*/
+
+ /*Barra de menu*/
     private HorizontalLayout menuBar() {
-        HorizontalLayout buttons = new HorizontalLayout();
+        buttons = new HorizontalLayout();
         Button refreshButton = new Button(VaadinIcon.REFRESH.create());
+        refreshButton.addClickListener(click -> refreshGrid());
         Button deleteButton = new Button(VaadinIcon.TRASH.create());
         Button editButton = new Button(VaadinIcon.EDIT.create());
         Button addButton = new Button(VaadinIcon.PLUS.create());
+        addButton.addClickListener(click -> addLibro());
         buttons.add(refreshButton, watchColumns(), deleteButton, editButton, addButton);
 
         total = new Html("<span>Total: <b>" + libroService.count() + "</b> libros</span>");
@@ -258,7 +266,9 @@ public class LibroView extends VerticalLayout {
         return toolbar;
     }
 
-    //Menu de Columnas
+    /*Fin-Barra de menu*/
+
+ /*Menu de Columnas*/
     private Button watchColumns() {
         Button menuButton = new Button(/*"Mostar/Ocultar Columnas"*/VaadinIcon.EYE.create());
 
@@ -292,9 +302,94 @@ public class LibroView extends VerticalLayout {
         }
     }
 
-    // Creacion del formulario
-    private void createEditorLayout(SplitLayout splitLayout) {
+    /*Fin-Menu de Columnas*/
+
+ /*Fin-Tabla*/
+ /*Formulario*/
+    private void configureForm() {
+        form = new LibroForm();
+        form.setWidth("25em");
+        form.addListener(LibroForm.SaveEvent.class, this::saveLibro);
+        form.addListener(LibroForm.CloseEvent.class, e -> closeEditor());
+    }
+
+    private void saveLibro(LibroForm.SaveEvent event) {
+
+        List<Libro> listLibros = libroService.findAll();
+
+        listLibros = listLibros.parallelStream()
+                .filter(lib -> event.getLibro().getTitulo().equals(lib.getTitulo())
+                && event.getLibro().getAutor().equals(lib.getAutor())
+                && event.getLibro().getVolumen().equals(lib.getVolumen())
+                && event.getLibro().getTomo().equals(lib.getTomo())
+                && event.getLibro().getParte().equals(lib.getParte())
+                && event.getLibro().getCantidad().equals(lib.getCantidad())
+                && event.getLibro().getPrecio().equals(lib.getPrecio())
+                )
+                .collect(Collectors.toList());
+
+        ConfirmDialog dialog = new ConfirmDialog();
+        Icon icon = new Icon(VaadinIcon.WARNING);
+        icon.setColor("red");
+        icon.getStyle().set("width", "var(--lumo-icon-size-l)");
+        icon.getStyle().set("height", "var(--lumo-icon-size-xl)");
+
+        HorizontalLayout ly = new HorizontalLayout(icon, new H1("Error:"));
+        ly.setDefaultVerticalComponentAlignment(Alignment.BASELINE);
+        dialog.setHeader(ly);
+        dialog.setText(new H3("El libro ya existe"));
+        dialog.setConfirmText("Aceptar");
+        dialog.setConfirmButtonTheme("error primary");
+        dialog.addConfirmListener(new ComponentEventListener<ConfirmDialog.ConfirmEvent>() {
+            @Override
+            public void onComponentEvent(ConfirmDialog.ConfirmEvent event) {
+                LibroView.this.refreshGrid();
+            }
+        });
+
+        if (listLibros.size() != 0) {
+            dialog.open();
+        } else {
+            libroService.save(event.getLibro());
+            toolbar.remove(total);
+            total = new Html("<span>Total: <b>" + libroService.count() + "</b> libros</span>");
+            toolbar.addComponentAtIndex(1, total);
+            toolbar.setFlexGrow(1, buttons);
+            updateList();
+            closeEditor();
+        }
 
     }
 
+    public void editLibro(Libro libro) {
+        if (libro == null) {
+            closeEditor();
+        } else {
+            form.setLibro(libro);
+            form.setVisible(true);
+            addClassName("editing");
+        }
+    }
+
+    private void refreshGrid() {
+        grid.setVisible(true);
+        grid.setItems(libroService.findAll());
+    }
+
+    void addLibro() {
+        grid.asSingleSelect().clear();
+        editLibro(new Libro());
+    }
+
+    private void closeEditor() {
+        form.setLibro(null);
+        form.setVisible(false);
+        removeClassName("editing");
+    }
+
+    private void updateList() {
+        grid.setItems(libroService.findAll());
+    }
+
+    /*Fin-Formulario*/
 }
