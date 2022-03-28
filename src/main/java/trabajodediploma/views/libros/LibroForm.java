@@ -35,6 +35,7 @@ import java.util.Base64;
 import org.springframework.web.util.UriUtils;
 
 import java.io.InputStream;
+import trabajodediploma.data.tools.MyUploadI18n;
 
 /**
  *
@@ -65,17 +66,24 @@ public class LibroForm extends FormLayout {
 
         //Config form
         //imagen
-        Button uploadButton = new Button("Imágen");
-        uploadButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        imagen.setUploadButton(uploadButton);
-        imagen.setDropLabel(new Span("Arrastra la imagen aquí"));
+        
+//        Button uploadButton = new Button("Imágen");
+//        uploadButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+//        imagen.setUploadButton(uploadButton);
+      
+
+        //int maxFileSizeInBytes = 10 * 1024 * 1024; // 10MB
+        Label imageSize = new Label("Tamaño maximo: 400kb");
+        imageSize.getStyle().set("color", "var(--lumo-secondary-text-color)");
+        imagen.setMaxFileSize(400 * 1024); // 400kb
 
         MemoryBuffer buffer = new MemoryBuffer();
         imagen = new Upload(buffer);
+        imagen.setDropAllowed(true);
         imagen.getStyle().set("box-sizing", "border-box");
         imagen.setAcceptedFileTypes("image/tiff", ".png", ".jpg");
         imagen.addFileRejectedListener(event -> {
-            String errorMessage = "El archivo seleccionado no tiene el formato correcto";
+            String errorMessage = event.getErrorMessage();
 
             Notification notification = Notification.show(
                     errorMessage,
@@ -85,6 +93,8 @@ public class LibroForm extends FormLayout {
 
             notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
         });
+        
+        configuracionErroresImagen();
 
         //titulo
         titulo.setLabel("Título");
@@ -150,6 +160,7 @@ public class LibroForm extends FormLayout {
         precio.setMin(0);
 
         add(
+                imageSize,
                 imagen,
                 titulo,
                 autor,
@@ -192,6 +203,19 @@ public class LibroForm extends FormLayout {
         } catch (ValidationException e) {
             e.printStackTrace();
         }
+    }
+
+    private void configuracionErroresImagen() {
+
+        MyUploadI18n i18n = new MyUploadI18n();
+        i18n.getAddFiles().setOne("Cargar Imágen...");
+        i18n.getDropFiles().setOne("Arrastra la imágen aquí");
+
+        i18n.getError()
+                .setFileIsTooBig("El archivo excede el tamaño máximo permitido de 400 Kb.")
+                .setIncorrectFileType("El archivo seleccionado no es una imágen.");;
+        imagen.setI18n(i18n);
+
     }
 
     private void attachImageUpload(Upload upload, Image preview) {
