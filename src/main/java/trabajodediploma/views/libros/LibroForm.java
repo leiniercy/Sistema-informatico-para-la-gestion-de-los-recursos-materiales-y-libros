@@ -67,36 +67,14 @@ public class LibroForm extends FormLayout {
 
         //Config form
         //imagen
-//        Button uploadButton = new Button("Imágen");
-//        uploadButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-//        imagen.setUploadButton(uploadButton);
         //int maxFileSizeInBytes = 10 * 1024 * 1024; // 10MB
         Label imageSize = new Label("Tamaño maximo: 400kb");
         imageSize.getStyle().set("color", "var(--lumo-secondary-text-color)");
-        imagen.setMaxFileSize(400 * 1024); // 400kb
-
-        //MemoryBuffer buffer = new MemoryBuffer();
         imagePreview = new Image();
         imagePreview.setWidth("100%");
         imagen = new Upload();
         imagen.getStyle().set("box-sizing", "border-box");
         imagen.getElement().appendChild(imagePreview.getElement());
-        imagen.setDropAllowed(true);
-
-        imagen.setAcceptedFileTypes("image/tiff", ".png", ".jpg");
-        imagen.addFileRejectedListener(event -> {
-            String errorMessage = event.getErrorMessage();
-
-            Notification notification = Notification.show(
-                    errorMessage,
-                    5000,
-                    Notification.Position.MIDDLE
-            );
-
-            notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
-        });
-
-        configuracionErroresImagen();
 
         //titulo
         titulo.setLabel("Título");
@@ -237,10 +215,23 @@ public class LibroForm extends FormLayout {
 
     private void attachImageUpload(Upload upload, Image preview) {
         ByteArrayOutputStream uploadBuffer = new ByteArrayOutputStream();
-        upload.setAcceptedFileTypes("image/*");
+        upload.setAcceptedFileTypes("image/tiff", ".png", ".jpg");
         upload.setReceiver((fileName, mimeType) -> {
             return uploadBuffer;
         });
+        upload.setMaxFileSize(400 * 1024);
+        upload.addFileRejectedListener(event -> {
+            String errorMessage = event.getErrorMessage();
+
+            Notification notification = Notification.show(
+                    errorMessage,
+                    5000,
+                    Notification.Position.MIDDLE
+            );
+
+            notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+        });
+        configuracionErroresImagen();
         upload.addSucceededListener(e -> {
             String mimeType = e.getMIMEType();
             String base64ImageData = Base64.getEncoder().encodeToString(uploadBuffer.toByteArray());

@@ -1,3 +1,11 @@
+
+@media all and (max-width : 1100px){
+    list-view.editing .toolbar,
+    list-view.editing .libro-grid{
+        display: none;
+    }
+}
+
 .libros-view {
     display: flex;
     flex-direction: column;

@@ -28,7 +28,9 @@ import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.shared.Registration;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.security.RolesAllowed;
 import org.apache.commons.lang3.StringUtils;
@@ -77,13 +79,13 @@ public class LibroView extends VerticalLayout {
         add(menuBar(), getContent(), myFooter);
         updateList();
         closeEditor();
-        grid.asSingleSelect().addValueChangeListener(event -> {
-            if (event.getValue() != null) {
-                editLibro(event.getValue());
-            } else {
-                form.setLibro(null);
-            }
-        });
+//        grid.asSingleSelect().addValueChangeListener(event -> {
+//            if (event.getValue() != null) {
+//                editLibro(event.getValue());
+//            } else {
+//                form.setLibro(null);
+//            }
+//        });
 
     }
 
@@ -111,6 +113,11 @@ public class LibroView extends VerticalLayout {
         parteColumn = grid.addColumn(Libro::getParte).setHeader("Parte").setAutoWidth(true).setSortable(true);
         cantidadColumn = grid.addColumn(Libro::getCantidad).setHeader("Cantidad").setAutoWidth(true).setSortable(true);
         precioColumn = grid.addColumn(Libro::getPrecio).setHeader("Precio").setAutoWidth(true).setSortable(true);
+        editColumn = grid.addComponentColumn(libro -> {
+            Button editButton = new Button(VaadinIcon.EDIT.create());
+            editButton.addClickListener(e -> this.editLibro(libro));
+            return editButton;
+        }).setFlexGrow(0);
 
         volumenColumn.setVisible(false);
         tomoColumn.setVisible(false);
@@ -130,15 +137,18 @@ public class LibroView extends VerticalLayout {
         grid.setSizeFull();
         grid.setWidthFull();
         grid.setHeightFull();
-        // grid.setSelectionMode(Grid.SelectionMode.MULTI);
+        grid.setSelectionMode(Grid.SelectionMode.MULTI);
         grid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS);
         grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         grid.addThemeVariants(GridVariant.LUMO_WRAP_CELL_CONTENT);
 
-//        grid.addSelectionListener(selection -> {
-//            // System.out.printf("Number of selected people: %s%n", selection.getAllSelectedItems().size());
-//
-//        });
+    }
+
+    private void refreshGrid() {
+        grid.setVisible(true);
+        grid.select(null);
+        grid.getLazyDataView().refreshAll();
+        grid.setItems(libroService.findAll());
     }
 
     /*Filtros*/
@@ -254,10 +264,10 @@ public class LibroView extends VerticalLayout {
         Button refreshButton = new Button(VaadinIcon.REFRESH.create());
         refreshButton.addClickListener(click -> refreshGrid());
         Button deleteButton = new Button(VaadinIcon.TRASH.create());
-        Button editButton = new Button(VaadinIcon.EDIT.create());
+        deleteButton.addClickListener(click -> deleteLibro());
         Button addButton = new Button(VaadinIcon.PLUS.create());
         addButton.addClickListener(click -> addLibro());
-        buttons.add(refreshButton, watchColumns(), deleteButton, editButton, addButton);
+        buttons.add(refreshButton, watchColumns(), deleteButton, addButton);
 
         total = new Html("<span>Total: <b>" + libroService.count() + "</b> libros</span>");
 
@@ -272,8 +282,25 @@ public class LibroView extends VerticalLayout {
     }
 
     /*Fin-Barra de menu*/
+    private void deleteLibro() {
 
- /*Menu de Columnas*/
+        try {
+
+            if (grid.asMultiSelect().isEmpty()) {
+                Notification notification = Notification.show("Debe elegir al menos un campo", 5000, Notification.Position.MIDDLE);
+                notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+            } else {
+
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Notification notification = Notification.show("Ocurrió un problema al intentar eliminar el libro", 5000, Notification.Position.MIDDLE);;
+            notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+        }
+    }
+
+    /*Menu de Columnas*/
     private Button watchColumns() {
         Button menuButton = new Button(/*"Mostar/Ocultar Columnas"*/VaadinIcon.EYE.create());
 
@@ -323,7 +350,8 @@ public class LibroView extends VerticalLayout {
         List<Libro> listLibros = libroService.findAll();
 
         listLibros = listLibros.parallelStream()
-                .filter(lib -> event.getLibro().getTitulo().equals(lib.getTitulo())
+                .filter(lib ->  event.getLibro().getImagen().equals(lib.getImagen())
+                &&  event.getLibro().getTitulo().equals(lib.getTitulo())
                 && event.getLibro().getAutor().equals(lib.getAutor())
                 && event.getLibro().getVolumen().equals(lib.getVolumen())
                 && event.getLibro().getTomo().equals(lib.getTomo())
@@ -333,38 +361,25 @@ public class LibroView extends VerticalLayout {
                 )
                 .collect(Collectors.toList());
 
-        ConfirmDialog dialog = new ConfirmDialog();
-        Icon icon = new Icon(VaadinIcon.WARNING);
-        icon.setColor("red");
-        icon.getStyle().set("width", "var(--lumo-icon-size-l)");
-        icon.getStyle().set("height", "var(--lumo-icon-size-xl)");
-
-        HorizontalLayout ly = new HorizontalLayout(icon, new H1("Error:"));
-        ly.setDefaultVerticalComponentAlignment(Alignment.BASELINE);
-        dialog.setHeader(ly);
-        dialog.setText(new H3("El libro ya existe"));
-        dialog.setConfirmText("Aceptar");
-        dialog.setConfirmButtonTheme("error primary");
-        dialog.addConfirmListener(new ComponentEventListener<ConfirmDialog.ConfirmEvent>() {
-            @Override
-            public void onComponentEvent(ConfirmDialog.ConfirmEvent event) {
-                LibroView.this.refreshGrid();
-            }
-        });
-
+       
         if (listLibros.size() != 0) {
-            dialog.open();
+            Notification notification = Notification.show(
+                         "El libro ya existe",
+                         5000,
+                         Notification.Position.MIDDLE
+                 );
+                 notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
         } else {
-            if (event.getLibro().getId() == null) {
-                libroService.save(event.getLibro());
-                Notification notification = Notification.show(
-                        "Libro añadido",
-                        5000,
-                        Notification.Position.BOTTOM_START
-                );
-                notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-            } else {
-                libroService.update(event.getLibro());
+             if (event.getLibro().getId() == null) {
+                 libroService.save(event.getLibro());
+                 Notification notification = Notification.show(
+                         "Libro añadido",
+                         5000,
+                         Notification.Position.BOTTOM_START
+                 );
+                 notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+             } else {
+                 libroService.update(event.getLibro());
                 Notification notification = Notification.show(
                         "Libro modificado",
                         5000,
@@ -392,14 +407,11 @@ public class LibroView extends VerticalLayout {
         }
     }
 
-    private void refreshGrid() {
-        grid.setVisible(true);
-        grid.setItems(libroService.findAll());
-    }
-
     void addLibro() {
-        grid.asSingleSelect().clear();
-        editLibro(new Libro());
+        grid.asMultiSelect().clear();
+        Libro b = new Libro();
+        b.setImagen("");
+        editLibro(b);
     }
 
     private void closeEditor() {
