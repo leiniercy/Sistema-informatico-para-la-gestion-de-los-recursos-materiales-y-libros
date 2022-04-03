@@ -29,11 +29,14 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.shared.Registration;
+
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.security.RolesAllowed;
+
 import org.apache.commons.lang3.StringUtils;
+import org.aspectj.weaver.ast.Not;
 import org.springframework.beans.factory.annotation.Autowired;
 import trabajodediploma.data.entity.Libro;
 import trabajodediploma.data.service.LibroService;
@@ -101,7 +104,7 @@ public class LibroView extends VerticalLayout {
 
 
     /*Tabla*/
- /*Configuracion de la tabla*/
+    /*Configuracion de la tabla*/
     private void configureGrid() {
         LitRenderer<Libro> imagenRenderer = LitRenderer.<Libro>of("<img style='height: 64px' src=${item.imagen} />")
                 .withProperty("imagen", Libro::getImagen);
@@ -146,8 +149,6 @@ public class LibroView extends VerticalLayout {
 
     private void refreshGrid() {
         grid.setVisible(true);
-        grid.select(null);
-        grid.getLazyDataView().refreshAll();
         grid.setItems(libroService.findAll());
     }
 
@@ -258,7 +259,7 @@ public class LibroView extends VerticalLayout {
 
     /*Fin-Filtros*/
 
- /*Barra de menu*/
+    /*Barra de menu*/
     private HorizontalLayout menuBar() {
         buttons = new HorizontalLayout();
         Button refreshButton = new Button(VaadinIcon.REFRESH.create());
@@ -290,14 +291,32 @@ public class LibroView extends VerticalLayout {
                 Notification notification = Notification.show("Debe elegir al menos un campo", 5000, Notification.Position.MIDDLE);
                 notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
             } else {
+                deleteItems(grid.getSelectedItems().size(), grid.getSelectedItems());
+                refreshGrid();
+                toolbar.remove(total);
+                total = new Html("<span>Total: <b>" + libroService.count() + "</b> libros</span>");
+                toolbar.addComponentAtIndex(1, total);
+                toolbar.setFlexGrow(1, buttons);
 
             }
 
         } catch (Exception e) {
             e.printStackTrace();
-            Notification notification = Notification.show("Ocurrió un problema al intentar eliminar el libro", 5000, Notification.Position.MIDDLE);;
+            Notification notification = Notification.show("Ocurrió un problema al intentar eliminar el libro", 5000, Notification.Position.MIDDLE);
+            ;
             notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
         }
+    }
+
+    private void deleteItems(int cantidad, Set<Libro> libros){
+        Notification notification;
+        libroService.deleteAll(libros);
+        if(cantidad == 1){
+            notification = Notification.show("El libro ha sido eliminado", 5000, Notification.Position.BOTTOM_START);
+        }else{
+            notification = Notification.show("Han sido eliminados" + cantidad + " libros", 5000, Notification.Position.BOTTOM_START);
+        }
+        notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
     }
 
     /*Menu de Columnas*/
@@ -336,8 +355,8 @@ public class LibroView extends VerticalLayout {
 
     /*Fin-Menu de Columnas*/
 
- /*Fin-Tabla*/
- /*Formulario*/
+    /*Fin-Tabla*/
+    /*Formulario*/
     private void configureForm() {
         form = new LibroForm();
         form.setWidth("25em");
@@ -350,36 +369,36 @@ public class LibroView extends VerticalLayout {
         List<Libro> listLibros = libroService.findAll();
 
         listLibros = listLibros.parallelStream()
-                .filter(lib ->  event.getLibro().getImagen().equals(lib.getImagen())
-                &&  event.getLibro().getTitulo().equals(lib.getTitulo())
-                && event.getLibro().getAutor().equals(lib.getAutor())
-                && event.getLibro().getVolumen().equals(lib.getVolumen())
-                && event.getLibro().getTomo().equals(lib.getTomo())
-                && event.getLibro().getParte().equals(lib.getParte())
-                && event.getLibro().getCantidad().equals(lib.getCantidad())
-                && event.getLibro().getPrecio().equals(lib.getPrecio())
+                .filter(lib -> event.getLibro().getImagen().equals(lib.getImagen())
+                        && event.getLibro().getTitulo().equals(lib.getTitulo())
+                        && event.getLibro().getAutor().equals(lib.getAutor())
+                        && event.getLibro().getVolumen().equals(lib.getVolumen())
+                        && event.getLibro().getTomo().equals(lib.getTomo())
+                        && event.getLibro().getParte().equals(lib.getParte())
+                        && event.getLibro().getCantidad().equals(lib.getCantidad())
+                        && event.getLibro().getPrecio().equals(lib.getPrecio())
                 )
                 .collect(Collectors.toList());
 
-       
+
         if (listLibros.size() != 0) {
             Notification notification = Notification.show(
-                         "El libro ya existe",
-                         5000,
-                         Notification.Position.MIDDLE
-                 );
-                 notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+                    "El libro ya existe",
+                    5000,
+                    Notification.Position.MIDDLE
+            );
+            notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
         } else {
-             if (event.getLibro().getId() == null) {
-                 libroService.save(event.getLibro());
-                 Notification notification = Notification.show(
-                         "Libro añadido",
-                         5000,
-                         Notification.Position.BOTTOM_START
-                 );
-                 notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-             } else {
-                 libroService.update(event.getLibro());
+            if (event.getLibro().getId() == null) {
+                libroService.save(event.getLibro());
+                Notification notification = Notification.show(
+                        "Libro añadido",
+                        5000,
+                        Notification.Position.BOTTOM_START
+                );
+                notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+            } else {
+                libroService.update(event.getLibro());
                 Notification notification = Notification.show(
                         "Libro modificado",
                         5000,

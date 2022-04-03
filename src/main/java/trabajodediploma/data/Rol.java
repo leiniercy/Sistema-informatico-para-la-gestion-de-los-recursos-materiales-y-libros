@@ -1,5 +1,5 @@
 package trabajodediploma.data;
 
-public enum Role {
+public enum Rol {
     USER, ADMIN;
 }

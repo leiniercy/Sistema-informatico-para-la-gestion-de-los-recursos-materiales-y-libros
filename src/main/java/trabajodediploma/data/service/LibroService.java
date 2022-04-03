@@ -1,6 +1,7 @@
 package trabajodediploma.data.service;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,6 +39,8 @@ public class LibroService {
     public void delete(Libro libro) {
         repository.delete(libro);
     }
+
+    public void deleteAll(Set<Libro>libros){repository.deleteAll(libros);}
     
     public long count(){
       return repository.count();

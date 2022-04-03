@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <!-- Project from https://start.vaadin.com/project/1454067b-fb2a-4dec-93ad-4087e6f6d820 -->
     <groupId>trabajodediploma</groupId>
@@ -44,7 +45,7 @@
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
-        </repository>        
+        </repository>
     </repositories>
 
     <pluginRepositories>
@@ -97,9 +98,15 @@
             <version>4.1.2</version>
         </dependency>
 
-        <dependency>
+        <!--<dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
+            <scope>runtime</scope>
+        </dependency>-->
+
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
         </dependency>
 
@@ -165,7 +172,7 @@
             <artifactId>lombok</artifactId>
             <type>jar</type>
         </dependency>
-        
+
     </dependencies>
 
     <build>

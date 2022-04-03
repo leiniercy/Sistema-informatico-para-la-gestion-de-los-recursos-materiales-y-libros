@@ -10,7 +10,7 @@ import javax.persistence.FetchType;
 import javax.persistence.Lob;
 import javax.persistence.Table;
 import trabajodediploma.data.AbstractEntity;
-import trabajodediploma.data.Role;
+import trabajodediploma.data.Rol;
 
 @Entity
 @Table(name = "ApplicationUser")
@@ -22,7 +22,7 @@ public class User extends AbstractEntity {
     private String hashedPassword;
     @Enumerated(EnumType.STRING)
     @ElementCollection(fetch = FetchType.EAGER)
-    private Set<Role> roles;
+    private Set<Rol> roles;
     @Lob
     private String profilePictureUrl;
 
@@ -44,10 +44,10 @@ public class User extends AbstractEntity {
     public void setHashedPassword(String hashedPassword) {
         this.hashedPassword = hashedPassword;
     }
-    public Set<Role> getRoles() {
+    public Set<Rol> getRoles() {
         return roles;
     }
-    public void setRoles(Set<Role> roles) {
+    public void setRoles(Set<Rol> roles) {
         this.roles = roles;
     }
     public String getProfilePictureUrl() {

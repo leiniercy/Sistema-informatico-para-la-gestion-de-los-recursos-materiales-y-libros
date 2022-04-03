@@ -82,41 +82,41 @@ public class LibroForm extends FormLayout {
         titulo.setRequired(true);
         titulo.setMinLength(2);
         titulo.setMaxLength(255);
-        titulo.setErrorMessage("Solo letras, mínimo 2 caracteres y máximo 100");
+        titulo.setErrorMessage("Solo letras, mínimo 2 caracteres y máximo 255");
         titulo.addValueChangeListener(event -> {
             event.getSource().setHelperText(event.getValue().length() + "/" + 255);
         });
 
         //autor
         autor.setLabel("Autor");
-        autor.getElement().setAttribute("autor", "Ejemplo:Perez Diaz");
+        autor.getElement().setAttribute("autor", "Ejemplo: Jose Diaz Perez");
         autor.setAutofocus(true);
         autor.setRequired(true);
         autor.setMinLength(2);
-        autor.setMaxLength(250);
-        autor.setErrorMessage("Solo letras, mínimo 3 caracteres y máximo 250");
+        autor.setMaxLength(255);
+        autor.setErrorMessage("Solo letras, mínimo 2 caracteres y máximo 255");
         autor.addValueChangeListener(event -> {
-            event.getSource().setHelperText(event.getValue().length() + "/" + 250);
+            event.getSource().setHelperText(event.getValue().length() + "/" + 255);
         });
         //volumen
         volumen.setLabel("Vólumen");
-        volumen.setValue(0);
+        volumen.setValue(1);
         volumen.setHasControls(true);
-        volumen.setMin(0);
+        volumen.setMin(1);
         volumen.setMax(10);
         volumen.setHelperText("Máximo 10");
         //tomo
         tomo.setLabel("Tomo");
-        tomo.setValue(0);
+        tomo.setValue(1);
         tomo.setHasControls(true);
-        tomo.setMin(0);
+        tomo.setMin(1);
         tomo.setMax(10);
         tomo.setHelperText("Máximo 10");
         //parte
         parte.setLabel("Parte");
-        parte.setValue(0);
+        parte.setValue(1);
         parte.setHasControls(true);
-        parte.setMin(0);
+        parte.setMin(1);
         parte.setMax(10);
         parte.setHelperText("Máximo 10");
         //cantidad
@@ -136,8 +136,10 @@ public class LibroForm extends FormLayout {
         precio.setSuffixComponent(cupSuffix);
         precio.setRequiredIndicatorVisible(true);
         precio.setHasControls(true);
-        precio.setStep(0.5);
+        precio.setValue(0.0);
         precio.setMin(0);
+        precio.setStep(0.5);
+
 
         attachImageUpload(imagen, imagePreview);
 
