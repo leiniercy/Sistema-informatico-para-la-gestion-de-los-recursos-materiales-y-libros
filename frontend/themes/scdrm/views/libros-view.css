@@ -6,6 +6,20 @@
     }
 }
 
+@media (min-width: 1200px) {
+    list-view.editing .toolbar,
+    list-view.editing .libro-grid{
+        display: none;
+    }
+}
+
+@media all and (max-width : 375px){
+    list-view.editing .toolbar,
+    list-view.editing .libro-grid{
+        display: none;
+    }
+}
+
 .libros-view {
     display: flex;
     flex-direction: column;

@@ -106,6 +106,7 @@ public class LibroView extends VerticalLayout {
     /*Tabla*/
     /*Configuracion de la tabla*/
     private void configureGrid() {
+        grid.setClassName("libro-grid");
         LitRenderer<Libro> imagenRenderer = LitRenderer.<Libro>of("<img style='height: 64px' src=${item.imagen} />")
                 .withProperty("imagen", Libro::getImagen);
         imagenColumn = grid.addColumn(imagenRenderer).setHeader("Imagen").setAutoWidth(true);
@@ -273,6 +274,7 @@ public class LibroView extends VerticalLayout {
         total = new Html("<span>Total: <b>" + libroService.count() + "</b> libros</span>");
 
         toolbar = new HorizontalLayout(buttons, total);
+        toolbar.addClassName("toolbar");
         toolbar.setAlignItems(FlexComponent.Alignment.CENTER);
         toolbar.setWidth("100%");
         toolbar.setFlexGrow(1, buttons);
