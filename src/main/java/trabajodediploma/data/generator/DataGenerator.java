@@ -19,7 +19,7 @@ import trabajodediploma.data.entity.Grupo;
 import trabajodediploma.data.entity.Libro;
 import trabajodediploma.data.entity.Modulo;
 import trabajodediploma.data.entity.RecursoMaterial;
-import trabajodediploma.data.entity.TarjetaPrestamoEstudiante;
+import trabajodediploma.data.entity.TarjetaPrestamo;
 import trabajodediploma.data.entity.Trabajador;
 import trabajodediploma.data.entity.User;
 import trabajodediploma.data.repository.AreaRepository;
@@ -29,9 +29,9 @@ import trabajodediploma.data.repository.GrupoRepository;
 import trabajodediploma.data.repository.LibroRepository;
 import trabajodediploma.data.repository.ModuloRepository;
 import trabajodediploma.data.repository.RecursoMaterialRepository;
-import trabajodediploma.data.repository.TarjetaPrestamoEstudianteRepository;
 import trabajodediploma.data.repository.TrabajadorRepository;
 import trabajodediploma.data.repository.UserRepository;
+import trabajodediploma.data.repository.TarjetaPrestamoRepository;
 
 //@SpringComponent
 public class DataGenerator {

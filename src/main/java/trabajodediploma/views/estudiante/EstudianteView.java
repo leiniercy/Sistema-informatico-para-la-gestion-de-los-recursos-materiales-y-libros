@@ -32,7 +32,7 @@ import trabajodediploma.views.MainLayout;
 @PageTitle("Estudiante")
 @Route(value = "estudiante-view/:estudianteID?/:action?(edit)", layout = MainLayout.class)
 @AnonymousAllowed
-public class EstudianteView extends Div implements BeforeEnterObserver {
+public class EstudianteView extends Div  {
 
     private final String ESTUDIANTE_ID = "estudianteID";
     private final String ESTUDIANTE_EDIT_ROUTE_TEMPLATE = "estudiante-view/%s/edit";
@@ -74,9 +74,7 @@ public class EstudianteView extends Div implements BeforeEnterObserver {
         grid.addColumn("solapin").setAutoWidth(true);
         grid.addColumn("anno_academico").setAutoWidth(true);
         grid.addColumn("facultad").setAutoWidth(true);
-        grid.setItems(query -> estudianteService.list(
-                PageRequest.of(query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort(query)))
-                .stream());
+        
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
 
         // when a row is selected or deselected, populate form
@@ -122,23 +120,7 @@ public class EstudianteView extends Div implements BeforeEnterObserver {
 
     }
 
-    @Override
-    public void beforeEnter(BeforeEnterEvent event) {
-        Optional<UUID> estudianteId = event.getRouteParameters().get(ESTUDIANTE_ID).map(UUID::fromString);
-        if (estudianteId.isPresent()) {
-            Optional<Estudiante> estudianteFromBackend = estudianteService.get(estudianteId.get());
-            if (estudianteFromBackend.isPresent()) {
-                populateForm(estudianteFromBackend.get());
-            } else {
-                Notification.show(String.format("The requested estudiante was not found, ID = %s", estudianteId.get()),
-                        3000, Notification.Position.BOTTOM_START);
-                // when a row is selected but the data is no longer available,
-                // refresh grid
-                refreshGrid();
-                event.forwardTo(EstudianteView.class);
-            }
-        }
-    }
+  
 
     private void createEditorLayout(SplitLayout splitLayout) {
         Div editorLayoutDiv = new Div();

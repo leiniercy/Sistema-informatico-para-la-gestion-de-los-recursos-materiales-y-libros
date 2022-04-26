@@ -249,22 +249,22 @@ public class LibroForm extends FormLayout {
     // Events
     public static abstract class LibroFormEvent extends ComponentEvent<LibroForm> {
 
-        private Libro estudiante;
+        private Libro libro1;
 
         protected LibroFormEvent(LibroForm source, Libro libro) {
             super(source, false);
-            this.estudiante = libro;
+            this.libro1 = libro;
         }
 
         public Libro getLibro() {
-            return estudiante;
+            return libro1;
         }
     }
 
     public static class SaveEvent extends LibroFormEvent {
 
-        SaveEvent(LibroForm source, Libro estudiante) {
-            super(source, estudiante);
+        SaveEvent(LibroForm source, Libro libro) {
+            super(source, libro);
         }
     }
 

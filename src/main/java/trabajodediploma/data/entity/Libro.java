@@ -2,7 +2,10 @@ package trabajodediploma.data.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
 import javax.validation.constraints.*;
 
 import trabajodediploma.data.AbstractEntity;
@@ -65,5 +68,10 @@ public class Libro extends AbstractEntity {
     @Min(message = "Mínimo 0", value = 0)
     @Column
     private Double precio;
+    
+    @NotNull(message = "debe elegir un campo")
+    @JoinColumn(name = "tarjeta_id",nullable = false, updatable = false )
+    @ManyToOne(optional = false,fetch = FetchType.EAGER)
+    private TarjetaPrestamo tarjeta;
 
 }
