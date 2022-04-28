@@ -1,6 +1,7 @@
 package trabajodediploma.views.tarjetaprestamo;
 
 import com.vaadin.flow.component.Html;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.HeaderRow;
@@ -19,6 +20,7 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouterLink;
+import com.vaadin.flow.shared.Registration;
 import javax.annotation.security.RolesAllowed;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +40,8 @@ import trabajodediploma.views.libros.LibroView;
 public class TarjetaPrestamoView extends Div {
 
     private Grid<Estudiante> gridEstudiantes = new Grid<>(Estudiante.class, false);
-    
+
+    TarjetaPrestamoEstudianteView tarjetaEstudiante;
     TarjetaPrestamoService prestamoService;
     EstudianteService estudianteService;
     LibroService libroService;
@@ -47,7 +50,6 @@ public class TarjetaPrestamoView extends Div {
     Grid.Column<Estudiante> nombreColumn;
     Grid.Column<Estudiante> apellidosColumn;
     Grid.Column<Estudiante> tarjetaColumn;
-    
 
     MyFooter myFooter;
 
@@ -62,11 +64,9 @@ public class TarjetaPrestamoView extends Div {
     private Tab profesor;
     private Tab tarjeta;
 
-    
     private TextField nombreFilter;
     private TextField apellidosFilter;
-    
-    
+
     public TarjetaPrestamoView(
             @Autowired TarjetaPrestamoService prestamoService,
             @Autowired EstudianteService estudianteService,
@@ -117,20 +117,17 @@ public class TarjetaPrestamoView extends Div {
         gridEstudiantes.setClassName("tarjera-prestamo-grid");
         nombreColumn = gridEstudiantes.addColumn(Estudiante::getNombre).setHeader("Nombre").setAutoWidth(true).setSortable(true);
         apellidosColumn = gridEstudiantes.addColumn(Estudiante::getApellidos).setHeader("Apellidos").setAutoWidth(true).setSortable(true);
-        tarjetaColumn = gridEstudiantes.addComponentColumn(event->{
-            RouterLink link = new RouterLink();
-            Span sp = new Span("Tarjeta");    
-            // Demo has no routes
-            link.add(sp);
-            link.setRoute(InicioView.class);
-            return link;
+        tarjetaColumn = gridEstudiantes.addComponentColumn(event -> {
+            Button cardButton = new Button("Tarjeta");
+            cardButton.addClickListener(e -> this.editCard(event));
+            return cardButton;
         }).setAutoWidth(true);
-        
+
         Filters();
         HeaderRow headerRow = gridEstudiantes.appendHeaderRow();
         headerRow.getCell(nombreColumn).setComponent(nombreFilter);
         headerRow.getCell(apellidosColumn).setComponent(apellidosFilter);
-        
+
         gridListDataView = gridEstudiantes.setItems(estudianteService.findAll());
         gridEstudiantes.setAllRowsVisible(true);
         gridEstudiantes.setSizeFull();
@@ -141,8 +138,8 @@ public class TarjetaPrestamoView extends Div {
         gridEstudiantes.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         gridEstudiantes.addThemeVariants(GridVariant.LUMO_WRAP_CELL_CONTENT);
     }
-    
-    private void Filters(){
+
+    private void Filters() {
         nombreFilter = new TextField();
         nombreFilter.setPlaceholder("Filtrar");
         nombreFilter.setPrefixComponent(VaadinIcon.SEARCH.create());
@@ -163,6 +160,13 @@ public class TarjetaPrestamoView extends Div {
                 event -> gridListDataView
                         .addFilter(estudiante -> StringUtils.containsIgnoreCase(estudiante.getApellidos(), apellidosFilter.getValue()))
         );
+    }
+
+    private void editCard(Estudiante e) {
+        content.removeAll();
+        tarjetaEstudiante = new TarjetaPrestamoEstudianteView(e,libroService.findAll(),prestamoService.findAll());
+        tarjetaEstudiante.setWidth("500px");
+        content.add(tarjetaEstudiante);
     }
 
 }

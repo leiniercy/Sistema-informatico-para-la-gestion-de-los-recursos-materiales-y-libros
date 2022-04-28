@@ -6,6 +6,8 @@ import javax.persistence.CascadeType;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
@@ -32,9 +34,9 @@ public class TarjetaPrestamo extends AbstractEntity {
     private LocalDate fechaPrestamo;
     private LocalDate fechaDevolucion;
 
-    @OneToMany(mappedBy = "tarjeta",cascade = CascadeType.ALL)
-    @ElementCollection(fetch = FetchType.EAGER)
-    List<Libro> libros;
+    @JoinColumn(name = "libro_id", nullable = false, updatable = false)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
+    Libro libro;
     
     @OneToOne
     Estudiante estudiante;
