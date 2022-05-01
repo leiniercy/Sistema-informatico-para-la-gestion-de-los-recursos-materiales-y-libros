@@ -1,5 +1,6 @@
 package trabajodediploma.data.entity;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -20,11 +21,17 @@ public class Estudiante extends AbstractEntity {
 
     @EqualsAndHashCode.Include
     @ToString.Include
+    @Column
     private String nombre;
+    @Column
     private String apellidos;
+    @Column
     private String ci;
+    @Column
     private String solapin;
+    @Column
     private Integer anno_academico;
+    @Column
     private String facultad;
     
     

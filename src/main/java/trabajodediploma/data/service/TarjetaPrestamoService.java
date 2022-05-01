@@ -28,20 +28,20 @@ public class TarjetaPrestamoService {
      return repository.findById(id).get();
     }
     
-    public TarjetaPrestamo save(TarjetaPrestamo libro) {
-        return repository.save(libro);
+    public TarjetaPrestamo save(TarjetaPrestamo tarjeta) {
+        return repository.save(tarjeta);
     }
 
     
-    public TarjetaPrestamo update(TarjetaPrestamo libro) {
-        return repository.save(libro);
+    public TarjetaPrestamo update(TarjetaPrestamo tarjeta) {
+        return repository.save(tarjeta);
     }
 
-    public void delete(TarjetaPrestamo libro) {
-        repository.delete(libro);
+    public void delete(TarjetaPrestamo tarjeta) {
+        repository.delete(tarjeta);
     }
 
-    public void deleteAll(Set<TarjetaPrestamo>libros){repository.deleteAll(libros);}
+    public void deleteAll(Set<TarjetaPrestamo>tarjeta){repository.deleteAll(tarjeta);}
     
     public long count(){
       return repository.count();

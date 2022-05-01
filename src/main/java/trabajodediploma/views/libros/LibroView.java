@@ -1,18 +1,13 @@
 package trabajodediploma.views.libros;
 
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Html;
-import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.contextmenu.ContextMenu;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
-import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -20,15 +15,12 @@ import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.orderedlayout.*;
-import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
-import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.shared.Registration;
 
 import java.util.List;
 import java.util.Set;
@@ -36,7 +28,6 @@ import java.util.stream.Collectors;
 import javax.annotation.security.RolesAllowed;
 
 import org.apache.commons.lang3.StringUtils;
-import org.aspectj.weaver.ast.Not;
 import org.springframework.beans.factory.annotation.Autowired;
 import trabajodediploma.data.entity.Libro;
 import trabajodediploma.data.service.LibroService;
@@ -78,18 +69,9 @@ public class LibroView extends VerticalLayout {
         configureGrid();
         configureForm();
         myFooter = new MyFooter();
-
         add(menuBar(), getContent(), myFooter);
         updateList();
         closeEditor();
-//        grid.asSingleSelect().addValueChangeListener(event -> {
-//            if (event.getValue() != null) {
-//                editLibro(event.getValue());
-//            } else {
-//                form.setLibro(null);
-//            }
-//        });
-
     }
 
     /*Contenido de la vista*/
@@ -102,9 +84,8 @@ public class LibroView extends VerticalLayout {
         return content;
     }
 
-
     /*Tabla*/
-    /*Configuracion de la tabla*/
+ /*Configuracion de la tabla*/
     private void configureGrid() {
         grid.setClassName("libro-grid");
         LitRenderer<Libro> imagenRenderer = LitRenderer.<Libro>of("<img style='height: 64px' src=${item.imagen} />")
@@ -260,7 +241,7 @@ public class LibroView extends VerticalLayout {
 
     /*Fin-Filtros*/
 
-    /*Barra de menu*/
+ /*Barra de menu*/
     private HorizontalLayout menuBar() {
         buttons = new HorizontalLayout();
         Button refreshButton = new Button(VaadinIcon.REFRESH.create());
@@ -310,12 +291,12 @@ public class LibroView extends VerticalLayout {
         }
     }
 
-    private void deleteItems(int cantidad, Set<Libro> libros){
+    private void deleteItems(int cantidad, Set<Libro> libros) {
         Notification notification;
         libroService.deleteAll(libros);
-        if(cantidad == 1){
+        if (cantidad == 1) {
             notification = Notification.show("El libro ha sido eliminado", 5000, Notification.Position.BOTTOM_START);
-        }else{
+        } else {
             notification = Notification.show("Han sido eliminados" + cantidad + " libros", 5000, Notification.Position.BOTTOM_START);
         }
         notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
@@ -357,8 +338,8 @@ public class LibroView extends VerticalLayout {
 
     /*Fin-Menu de Columnas*/
 
-    /*Fin-Tabla*/
-    /*Formulario*/
+ /*Fin-Tabla*/
+ /*Formulario*/
     private void configureForm() {
         form = new LibroForm();
         form.setWidth("25em");
@@ -372,16 +353,15 @@ public class LibroView extends VerticalLayout {
 
         listLibros = listLibros.parallelStream()
                 .filter(lib -> event.getLibro().getImagen().equals(lib.getImagen())
-                        && event.getLibro().getTitulo().equals(lib.getTitulo())
-                        && event.getLibro().getAutor().equals(lib.getAutor())
-                        && event.getLibro().getVolumen().equals(lib.getVolumen())
-                        && event.getLibro().getTomo().equals(lib.getTomo())
-                        && event.getLibro().getParte().equals(lib.getParte())
-                        && event.getLibro().getCantidad().equals(lib.getCantidad())
-                        && event.getLibro().getPrecio().equals(lib.getPrecio())
+                && event.getLibro().getTitulo().equals(lib.getTitulo())
+                && event.getLibro().getAutor().equals(lib.getAutor())
+                && event.getLibro().getVolumen().equals(lib.getVolumen())
+                && event.getLibro().getTomo().equals(lib.getTomo())
+                && event.getLibro().getParte().equals(lib.getParte())
+                && event.getLibro().getCantidad().equals(lib.getCantidad())
+                && event.getLibro().getPrecio().equals(lib.getPrecio())
                 )
                 .collect(Collectors.toList());
-
 
         if (listLibros.size() != 0) {
             Notification notification = Notification.show(

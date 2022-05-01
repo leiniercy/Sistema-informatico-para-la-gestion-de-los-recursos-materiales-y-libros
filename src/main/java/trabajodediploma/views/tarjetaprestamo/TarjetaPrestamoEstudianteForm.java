@@ -14,14 +14,14 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.listbox.ListBox;
-import com.vaadin.flow.component.listbox.MultiSelectListBox;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.shared.Registration;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 import trabajodediploma.data.entity.Estudiante;
 import trabajodediploma.data.entity.Libro;
@@ -31,39 +31,40 @@ import trabajodediploma.data.entity.TarjetaPrestamo;
  *
  * @author leinier
  */
-public class TarjetaPrestamoForm extends FormLayout {
+public class TarjetaPrestamoEstudianteForm extends FormLayout {
 
     private TarjetaPrestamo tarjetaPrestamo;
 
-    ComboBox<Estudiante> estudiante;
-    ComboBox<Libro> libros;
-    DatePicker fechaPrestamo;
-    DatePicker fechaDevolucion;
+    ComboBox<Estudiante> estudiante = new ComboBox<>("Estudiante");
+    ComboBox<Libro> libro = new ComboBox<>("Libro");
+    DatePicker fechaPrestamo = new DatePicker("Fecha Prestamo");
+    DatePicker fechaDevolucion = new DatePicker("Fecha Devolucion");
 
     Button save = new Button("Añadir", VaadinIcon.PLUS.create());
     Button close = new Button("Cancelar", VaadinIcon.ERASER.create());
 
     BeanValidationBinder<TarjetaPrestamo> binder = new BeanValidationBinder<>(TarjetaPrestamo.class);
 
-    public TarjetaPrestamoForm(List<Estudiante> listEstudiantes,List<Libro> listLibros) {
+    public TarjetaPrestamoEstudianteForm(Estudiante est, List<Libro> listLibros) {
 
         addClassNames("tarjeta-estudiante-form");
         binder.bindInstanceFields(this);
+        
         /*Config form*/
+        
         /*Estudiante*/
-        estudiante = new ComboBox<>("Estudiante");
-        estudiante.setItems(listEstudiantes);
+        estudiante.setItems(est);
         estudiante.setItemLabelGenerator(Estudiante::getNombreApellidos);
+        estudiante.setValue(est);
         /*Libros*/
-        libros = new  ComboBox<>();
-        libros.setItems(listLibros);
-        libros.setItemLabelGenerator(Libro::getTitulo);
+        libro.setItems(listLibros);
+        libro.setItemLabelGenerator(Libro::getTitulo);
         /*fecha de prestamo*/
-        fechaPrestamo = new DatePicker("Fecha Prestamo");
+        fechaPrestamo.setMin(LocalDate.now(ZoneId.systemDefault()));
         /*fecha de devolucion*/
-        fechaDevolucion = new DatePicker("Fecha Devolucion");
+        fechaDevolucion.setMin(LocalDate.now(ZoneId.systemDefault()));
 
-        add(estudiante,libros,fechaPrestamo, fechaDevolucion, createButtonsLayout());
+        add(estudiante, libro, fechaPrestamo, fechaDevolucion, createButtonsLayout());
 
     }
 
@@ -75,12 +76,11 @@ public class TarjetaPrestamoForm extends FormLayout {
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         save.addClickShortcut(Key.ENTER);
 
-        close.addClickListener(event -> fireEvent(new TarjetaPrestamoForm.CloseEvent(this)));
+        close.addClickListener(event -> fireEvent(new TarjetaPrestamoEstudianteForm.CloseEvent(this)));
         close.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         close.addClickShortcut(Key.ESCAPE);
 
-        binder.addStatusChangeListener(e -> save.setEnabled(binder.isValid()));
-
+        //binder.addStatusChangeListener(e -> save.setEnabled(binder.isValid()));
         buttonlayout.add(save, close);
 
         return buttonlayout;
@@ -94,7 +94,7 @@ public class TarjetaPrestamoForm extends FormLayout {
     private void validateAndSave() {
         try {
             binder.writeBean(tarjetaPrestamo);
-            fireEvent(new TarjetaPrestamoForm.SaveEvent(this, tarjetaPrestamo));
+            fireEvent(new TarjetaPrestamoEstudianteForm.SaveEvent(this, tarjetaPrestamo));
         } catch (ValidationException e) {
             e.printStackTrace();
             Notification notification = Notification.show(
@@ -107,11 +107,11 @@ public class TarjetaPrestamoForm extends FormLayout {
     }
 
     // Events
-    public static abstract class TarjetaPrestamoFormEvent extends ComponentEvent<TarjetaPrestamoForm> {
+    public static abstract class TarjetaPrestamoEstudianteFormEvent extends ComponentEvent<TarjetaPrestamoEstudianteForm> {
 
         private TarjetaPrestamo tarjetaPrestamo;
 
-        protected TarjetaPrestamoFormEvent(TarjetaPrestamoForm source, TarjetaPrestamo tarjetaPrestamo) {
+        protected TarjetaPrestamoEstudianteFormEvent(TarjetaPrestamoEstudianteForm source, TarjetaPrestamo tarjetaPrestamo) {
             super(source, false);
             this.tarjetaPrestamo = tarjetaPrestamo;
         }
@@ -121,24 +121,24 @@ public class TarjetaPrestamoForm extends FormLayout {
         }
     }
 
-    public static class SaveEvent extends TarjetaPrestamoFormEvent {
+    public static class SaveEvent extends TarjetaPrestamoEstudianteFormEvent {
 
-        SaveEvent(TarjetaPrestamoForm source, TarjetaPrestamo tarjetaPrestamo) {
+        SaveEvent(TarjetaPrestamoEstudianteForm source, TarjetaPrestamo tarjetaPrestamo) {
             super(source, tarjetaPrestamo);
         }
     }
 
-    public static class DeleteEvent extends TarjetaPrestamoFormEvent {
+    public static class DeleteEvent extends TarjetaPrestamoEstudianteFormEvent {
 
-        DeleteEvent(TarjetaPrestamoForm source, TarjetaPrestamo tarjetaPrestamo) {
+        DeleteEvent(TarjetaPrestamoEstudianteForm source, TarjetaPrestamo tarjetaPrestamo) {
             super(source, tarjetaPrestamo);
         }
 
     }
 
-    public static class CloseEvent extends TarjetaPrestamoFormEvent {
+    public static class CloseEvent extends TarjetaPrestamoEstudianteFormEvent {
 
-        CloseEvent(TarjetaPrestamoForm source) {
+        CloseEvent(TarjetaPrestamoEstudianteForm source) {
             super(source, null);
         }
     }

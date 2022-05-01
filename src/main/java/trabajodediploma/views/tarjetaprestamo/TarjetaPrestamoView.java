@@ -53,7 +53,7 @@ public class TarjetaPrestamoView extends Div {
 
     MyFooter myFooter;
 
-    TarjetaPrestamoForm form;
+    TarjetaPrestamoEstudianteForm form;
 
     private Html total;
     private HorizontalLayout toolbar;
@@ -106,7 +106,7 @@ public class TarjetaPrestamoView extends Div {
     private void setContent(Tab tab) {
         content.removeAll();
         if (tab.equals(estudiante)) {
-            content.add(new Paragraph("This is the Estudiante tab"));
+            content.add(gridEstudiantes);
         } else if (tab.equals(profesor)) {
             content.add(new Paragraph("This is the profesor tab"));
         }
@@ -164,8 +164,8 @@ public class TarjetaPrestamoView extends Div {
 
     private void editCard(Estudiante e) {
         content.removeAll();
-        tarjetaEstudiante = new TarjetaPrestamoEstudianteView(e,libroService.findAll(),prestamoService.findAll());
-        tarjetaEstudiante.setWidth("500px");
+        tarjetaEstudiante = new TarjetaPrestamoEstudianteView(e,libroService.findAll(),prestamoService);
+        tarjetaEstudiante.setWidthFull();
         content.add(tarjetaEstudiante);
     }
 

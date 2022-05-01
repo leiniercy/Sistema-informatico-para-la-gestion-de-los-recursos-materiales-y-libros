@@ -1,15 +1,14 @@
 package trabajodediploma.data.entity;
 
 import java.time.LocalDate;
-import java.util.List;
 import javax.persistence.CascadeType;
-import javax.persistence.ElementCollection;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.validation.constraints.NotNull;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -30,18 +29,22 @@ public class TarjetaPrestamo extends AbstractEntity {
 
     @EqualsAndHashCode.Include
     @ToString.Include
-    
-    private LocalDate fechaPrestamo;
-    private LocalDate fechaDevolucion;
 
+    @NotNull(message = "El campo no debe estar vacío")
+    @OneToOne(optional = false)
+    private Estudiante estudiante;
+
+    @NotNull(message = "El campo no debe estar vacío")
     @JoinColumn(name = "libro_id", nullable = false, updatable = false)
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
-    Libro libro;
-    
-    @OneToOne
-    Estudiante estudiante;
-    @OneToOne
-    Trabajador trabajador;
-    
+    private Libro libro;
 
+    @NotNull(message = "El campo no debe estar vacío")
+    @Column(name = "fechaPrestamo")
+    private LocalDate fechaPrestamo;
+    @Column(name = "fechaDevolucion")
+    private LocalDate fechaDevolucion;
+
+//    @OneToOne
+//    Trabajador trabajador;
 }
