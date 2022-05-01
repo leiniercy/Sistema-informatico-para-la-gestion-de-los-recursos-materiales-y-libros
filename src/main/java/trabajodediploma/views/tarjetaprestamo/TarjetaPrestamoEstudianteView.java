@@ -7,6 +7,7 @@ package trabajodediploma.views.tarjetaprestamo;
 
 import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.grid.Grid;
@@ -14,11 +15,17 @@ import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Image;
+import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.LocalDateRenderer;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -29,8 +36,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import trabajodediploma.data.entity.Estudiante;
 import trabajodediploma.data.entity.Libro;
 import trabajodediploma.data.entity.TarjetaPrestamo;
+import trabajodediploma.data.service.EstudianteService;
+import trabajodediploma.data.service.LibroService;
 import trabajodediploma.data.service.TarjetaPrestamoService;
-import trabajodediploma.views.footer.MyFooter;
 
 /**
  *
@@ -45,12 +53,14 @@ public class TarjetaPrestamoEstudianteView extends Div {
     Grid.Column<TarjetaPrestamo> fechaDevolucionColumn;
     Grid.Column<TarjetaPrestamo> editColumn;
 
+    EstudianteGrid estudianteGrid;
     Estudiante estudiante;
     List<Libro> libros;
     List<TarjetaPrestamo> prestamos;
     TarjetaPrestamoService prestamoService;
+    EstudianteService estudianteService;
+    LibroService libroService;
 
-    MyFooter myFooter;
     TarjetaPrestamoEstudianteForm form;
 
     private ComboBox<Libro> libroFilter;
@@ -58,20 +68,28 @@ public class TarjetaPrestamoEstudianteView extends Div {
     private DatePicker devolucionFilter;
 
     private Html total;
-    private HorizontalLayout toolbar;
-    private HorizontalLayout buttons;
+    private HorizontalLayout info;
+    private Div content;
 
-    public TarjetaPrestamoEstudianteView(Estudiante estudiante, List<Libro> libros,@Autowired TarjetaPrestamoService prestamoService) {
+    public TarjetaPrestamoEstudianteView(
+            Estudiante estudiante, 
+            @Autowired TarjetaPrestamoService prestamoService, 
+            @Autowired EstudianteService estudianteService,
+            @Autowired LibroService libroService) {
+        
         addClassName("tarjeta-estudiante");
         this.estudiante = estudiante;
-        this.libros = libros;
         this.prestamoService = prestamoService;
-        this.prestamos  = prestamoService.findAll();
+        this.estudianteService = estudianteService;
+        this.libroService = libroService;
+        this.libros = libroService.findAll();
+        this.prestamos = prestamoService.findAll();
+        
         configureGrid();
         configureForm();
-        myFooter = new MyFooter();
-
-        add(menuBar(),getContent(), myFooter);
+        content = new Div(getGridContent());
+        
+        add(content);
         updateList();
         closeEditor();
     }
@@ -86,11 +104,35 @@ public class TarjetaPrestamoEstudianteView extends Div {
         return content;
     }
 
+    private HorizontalLayout informacionTabla() {
+        info = new HorizontalLayout();
+        total = new Html("<span>Total: <b>" + prestamos.size() + "</b> libros</span>");
+        info.add(total);
+        return info;
+    }
+
+    private VerticalLayout getGridContent() {
+        VerticalLayout nuevo = new VerticalLayout();
+        nuevo.add(menuBar(), getContent(), informacionTabla());
+        return nuevo;
+    }
+
     /*Tabla*/
-   /*Configuracion de la tabla*/
+ /*Configuracion de la tabla*/
     private void configureGrid() {
         grid.setClassName("tarjeta-estudiante-grid");
-        libroColumn = grid.addColumn(tarjeta -> tarjeta.getLibro().getTitulo()).setHeader("Libro").setAutoWidth(true).setSortable(true);
+        libroColumn = grid.addColumn(new ComponentRenderer<>(tarjeta -> {
+            HorizontalLayout hl = new HorizontalLayout();
+            hl.setAlignItems(Alignment.CENTER);
+            Image img = new Image(tarjeta.getLibro().getImagen(), "");
+            img.setHeight("3.5rem");
+            Span span = new Span();
+            span.setClassName("name");
+            span.setText(tarjeta.getLibro().getTitulo());
+            hl.add(img, span);
+            return hl;
+        })).setHeader("Libro").setAutoWidth(true).setSortable(true);
+
         fechaEntregaColumn = grid.addColumn(new LocalDateRenderer<>(tarjeta -> tarjeta.getFechaPrestamo(), DateTimeFormatter.ofPattern("dd/MM/yyyy"))).setComparator(tarjeta -> tarjeta.getFechaPrestamo()).setHeader("Fecha de Prestamo").setAutoWidth(true).setSortable(true);
         fechaDevolucionColumn = grid.addColumn(new LocalDateRenderer<>(tarjeta -> tarjeta.getFechaDevolucion(), DateTimeFormatter.ofPattern("dd/MM/yyyy"))).setComparator(tarjeta -> tarjeta.getFechaDevolucion()).setHeader("Fecha de Devolución").setAutoWidth(true).setSortable(true);
         editColumn = grid.addComponentColumn(libro -> {
@@ -117,7 +159,7 @@ public class TarjetaPrestamoEstudianteView extends Div {
         grid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS);
         grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         grid.addThemeVariants(GridVariant.LUMO_WRAP_CELL_CONTENT);
-
+       
     }
 
     private void refreshGrid() {
@@ -127,7 +169,7 @@ public class TarjetaPrestamoEstudianteView extends Div {
 
     /*Filtros*/
     private void Filtros() {
-        
+
         libroFilter = new ComboBox<>();
         libroFilter.setItems(libros);
         libroFilter.setItemLabelGenerator(Libro::getTitulo);
@@ -198,18 +240,22 @@ public class TarjetaPrestamoEstudianteView extends Div {
 
  /*Barra de menu*/
     private HorizontalLayout menuBar() {
-        buttons = new HorizontalLayout();
-        Button refreshButton = new Button(VaadinIcon.REFRESH.create());
-        refreshButton.addClickListener(click -> refreshGrid());
-        Button deleteButton = new Button(VaadinIcon.TRASH.create());
-        deleteButton.addClickListener(click -> deleteLibro());
-        Button addButton = new Button(VaadinIcon.PLUS.create());
-        addButton.addClickListener(click -> addLibro());
+        HorizontalLayout buttons = new HorizontalLayout();
+        Button refreshButton = new Button(VaadinIcon.REFRESH.create(),click -> refreshGrid());
+        refreshButton.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
+        Button deleteButton = new Button(VaadinIcon.TRASH.create(),click -> deleteLibro());
+        deleteButton.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
+        Button addButton = new Button(VaadinIcon.PLUS.create(),click -> addLibro());
+        addButton.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
         buttons.add(refreshButton, deleteButton, addButton);
 
-        total = new Html("<span>Total: <b>" + prestamos.size() + "</b> libros</span>");
-
-        toolbar = new HorizontalLayout(buttons, total);
+        Button salirButton = new Button(estudiante.getNombreApellidos(),new Icon(VaadinIcon.ARROW_RIGHT),click ->volverAtras());
+        salirButton.setIconAfterText(true);
+        salirButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+        HorizontalLayout personalInfo = new HorizontalLayout(salirButton);
+        personalInfo.setAlignItems(FlexComponent.Alignment.CENTER);
+        
+        HorizontalLayout toolbar = new HorizontalLayout(buttons, personalInfo);
         toolbar.addClassName("toolbar");
         toolbar.setAlignItems(FlexComponent.Alignment.CENTER);
         toolbar.setWidth("100%");
@@ -218,6 +264,12 @@ public class TarjetaPrestamoEstudianteView extends Div {
                 .set("padding", "var(--lumo-space-wide-m)");
 
         return toolbar;
+    }
+    
+    public void volverAtras(){
+    estudianteGrid = new EstudianteGrid(prestamoService, estudianteService, libroService);
+    content.removeAll();
+    content.add(estudianteGrid);
     }
 
     private void deleteLibro() {
@@ -230,11 +282,9 @@ public class TarjetaPrestamoEstudianteView extends Div {
             } else {
                 deleteItems(grid.getSelectedItems().size(), grid.getSelectedItems());
                 refreshGrid();
-                toolbar.remove(total);
+                info.remove(total);
                 total = new Html("<span>Total: <b>" + libros.size() + "</b> libros</span>");
-                toolbar.addComponentAtIndex(1, total);
-                toolbar.setFlexGrow(1, buttons);
-
+                info.add(total);
             }
 
         } catch (Exception e) {
@@ -298,10 +348,9 @@ public class TarjetaPrestamoEstudianteView extends Div {
                 );
                 notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
             }
-            toolbar.remove(total);
+            info.remove(total);
             total = new Html("<span>Total: <b>" + libros.size() + "</b> libros</span>");
-            toolbar.addComponentAtIndex(1, total);
-            toolbar.setFlexGrow(1, buttons);
+            info.add(total);
             updateList();
             closeEditor();
         }
@@ -312,7 +361,7 @@ public class TarjetaPrestamoEstudianteView extends Div {
         if (tarjeta == null) {
             closeEditor();
         } else {
-           // tarjeta.setEstudiante(estudiante);
+            // tarjeta.setEstudiante(estudiante);
             form.setTarjetaPrestamo(tarjeta);
             form.setVisible(true);
             addClassName("editing");
@@ -320,8 +369,8 @@ public class TarjetaPrestamoEstudianteView extends Div {
     }
 
     void addLibro() {
-       grid.asMultiSelect().clear();
-       editLibro( new TarjetaPrestamo());
+        grid.asMultiSelect().clear();
+        editLibro(new TarjetaPrestamo());
     }
 
     private void closeEditor() {
