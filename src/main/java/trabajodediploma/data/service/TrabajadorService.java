@@ -1,11 +1,10 @@
 package trabajodediploma.data.service;
 
+import java.util.List;
 import trabajodediploma.data.repository.TrabajadorRepository;
-import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import trabajodediploma.data.entity.Trabajador;
 
@@ -18,24 +17,32 @@ public class TrabajadorService {
         this.repository = repository;
     }
 
-    public Optional<Trabajador> get(UUID id) {
-        return repository.findById(id);
+    public List<Trabajador> findAll() {
+        return repository.findAll();
+    }
+    
+    public Trabajador findById(UUID id){
+     return repository.findById(id).get();
+    }
+    
+    public Trabajador save(Trabajador trabajador) {
+        return repository.save(trabajador);
     }
 
-    public Trabajador update(Trabajador entity) {
-        return repository.save(entity);
+    
+    public Trabajador update(Trabajador trabajador) {
+        return repository.save(trabajador);
     }
 
-    public void delete(UUID id) {
-        repository.deleteById(id);
+    public void delete(Trabajador trabajador) {
+        repository.delete(trabajador);
     }
 
-    public Page<Trabajador> list(Pageable pageable) {
-        return repository.findAll(pageable);
+    public void deleteAll(Set<Trabajador>trabajadors){repository.deleteAll(trabajadors);}
+    
+    public long count(){
+      return repository.count();
     }
-
-    public int count() {
-        return (int) repository.count();
-    }
+    
 
 }

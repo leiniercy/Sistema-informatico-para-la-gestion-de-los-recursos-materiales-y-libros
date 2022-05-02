@@ -30,8 +30,7 @@ public class TarjetaPrestamo extends AbstractEntity {
     @EqualsAndHashCode.Include
     @ToString.Include
 
-    @NotNull(message = "El campo no debe estar vacío")
-    @OneToOne(optional = false)
+    @OneToOne()
     private Estudiante estudiante;
 
     @NotNull(message = "El campo no debe estar vacío")
@@ -45,6 +44,6 @@ public class TarjetaPrestamo extends AbstractEntity {
     @Column(name = "fechaDevolucion")
     private LocalDate fechaDevolucion;
 
-//    @OneToOne
-//    Trabajador trabajador;
+    @OneToOne()
+    Trabajador trabajador;
 }

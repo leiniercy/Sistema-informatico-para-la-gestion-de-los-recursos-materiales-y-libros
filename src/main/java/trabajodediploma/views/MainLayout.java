@@ -8,10 +8,8 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.contextmenu.ContextMenu;
 import com.vaadin.flow.component.dependency.NpmPackage;
 import com.vaadin.flow.component.html.Anchor;
-import com.vaadin.flow.component.html.Footer;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.html.Header;
 import com.vaadin.flow.component.html.ListItem;
 import com.vaadin.flow.component.html.Nav;
 import com.vaadin.flow.component.html.Span;
@@ -24,17 +22,13 @@ import com.vaadin.flow.server.auth.AccessAnnotationChecker;
 import java.util.Optional;
 import trabajodediploma.data.entity.User;
 import trabajodediploma.security.AuthenticatedUser;
-import trabajodediploma.views.area.AreaView;
 import trabajodediploma.views.catalogo.CatalogoView;
 import trabajodediploma.views.destinofinal.DestinoFinalView;
-import trabajodediploma.views.estudiante.EstudianteView;
-import trabajodediploma.views.grupo.GrupoView;
 import trabajodediploma.views.inicio.InicioView;
 import trabajodediploma.views.libros.LibroView;
 import trabajodediploma.views.modulo.ModuloView;
 import trabajodediploma.views.recursosmateriales.RecursosMaterialesView;
 import trabajodediploma.views.tarjetaprestamo.TarjetaPrestamoView;
-import trabajodediploma.views.trabajador.TrabajadorView;
 
 /**
  * The main view is a top-level placeholder for other views.

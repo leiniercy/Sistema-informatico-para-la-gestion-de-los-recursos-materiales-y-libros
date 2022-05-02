@@ -1,53 +1,41 @@
 package trabajodediploma.data.entity;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import trabajodediploma.data.AbstractEntity;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(onlyExplicitlyIncluded = true)
 @Entity
 public class Trabajador extends AbstractEntity {
 
+    @EqualsAndHashCode.Include
+    @ToString.Include
+    @Column
     private String nombre;
+    @Column
     private String apellidos;
+    @Column
     private String ci;
+    @Column
     private String solapin;
+    @Column
     private String categoria;
+    @Column
     private String area;
 
-    public String getNombre() {
-        return nombre;
-    }
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-    public String getApellidos() {
-        return apellidos;
-    }
-    public void setApellidos(String apellidos) {
-        this.apellidos = apellidos;
-    }
-    public String getCi() {
-        return ci;
-    }
-    public void setCi(String ci) {
-        this.ci = ci;
-    }
-    public String getSolapin() {
-        return solapin;
-    }
-    public void setSolapin(String solapin) {
-        this.solapin = solapin;
-    }
-    public String getCategoria() {
-        return categoria;
-    }
-    public void setCategoria(String categoria) {
-        this.categoria = categoria;
-    }
-    public String getArea() {
-        return area;
-    }
-    public void setArea(String area) {
-        this.area = area;
+     public String getNombreApellidos(){
+        return nombre+" "+apellidos;
     }
 
 }

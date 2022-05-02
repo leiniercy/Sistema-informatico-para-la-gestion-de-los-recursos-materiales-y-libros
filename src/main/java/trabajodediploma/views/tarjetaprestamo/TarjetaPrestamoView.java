@@ -25,6 +25,7 @@ import trabajodediploma.data.entity.Estudiante;
 import trabajodediploma.data.service.EstudianteService;
 import trabajodediploma.data.service.LibroService;
 import trabajodediploma.data.service.TarjetaPrestamoService;
+import trabajodediploma.data.service.TrabajadorService;
 import trabajodediploma.views.MainLayout;
 import trabajodediploma.views.footer.MyFooter;
 
@@ -38,21 +39,24 @@ public class TarjetaPrestamoView extends VerticalLayout {
 
     TarjetaPrestamoEstudianteForm form;
     EstudianteGrid estudianteGrid;
+    TabajadorGrid trabajadorGrid;
 
     private Div content;
     private Tab estudiante;
-    private Tab profesor;
+    private Tab trabajador;
 
     public TarjetaPrestamoView(
             @Autowired TarjetaPrestamoService prestamoService,
             @Autowired EstudianteService estudianteService,
-            @Autowired LibroService libroService
+            @Autowired LibroService libroService,
+            @Autowired TrabajadorService trabajadorService
     ) {
         addClassNames("tarjeta-prestamo-view");
         myFooter = new MyFooter();
         estudianteGrid = new EstudianteGrid(prestamoService, estudianteService, libroService);
-        
+        trabajadorGrid = new TabajadorGrid(prestamoService, trabajadorService, libroService);
         content = new Div();
+        content.addClassName("content");
         content.add(estudianteGrid);
 
         add(MenuBar(), content, myFooter);
@@ -69,8 +73,8 @@ public class TarjetaPrestamoView extends VerticalLayout {
     private Tabs getSecondaryNavigation() {
         Tabs tabs = new Tabs();
         estudiante = new Tab("Estudiante");
-        profesor = new Tab("Profesor");
-        tabs.add(estudiante, profesor);
+        trabajador = new Tab("Trabajador");
+        tabs.add(estudiante, trabajador);
         tabs.addThemeVariants(TabsVariant.LUMO_MINIMAL);
         tabs.addSelectedChangeListener(event
                 -> setContent(event.getSelectedTab())
@@ -82,8 +86,8 @@ public class TarjetaPrestamoView extends VerticalLayout {
         content.removeAll();
         if (tab.equals(estudiante)) {
             content.add(estudianteGrid);
-        } else if (tab.equals(profesor)) {
-            content.add(new Paragraph("This is the profesor tab"));
+        } else if (tab.equals(trabajador)) {
+            content.add(trabajadorGrid);
         }
     }
 
