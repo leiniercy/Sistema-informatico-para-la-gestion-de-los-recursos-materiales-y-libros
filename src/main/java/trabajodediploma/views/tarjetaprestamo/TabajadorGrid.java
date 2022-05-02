@@ -58,7 +58,7 @@ public class TabajadorGrid extends Div {
 
     private void configureGrid() {
 
-        gridTrabajador.setClassName("tarjera-prestamo-grid");
+        gridTrabajador.setClassName("tarjera-prestamo-trabajador-grid");
         nombreColumn = gridTrabajador.addColumn(Trabajador::getNombre).setHeader("Nombre").setAutoWidth(true).setSortable(true);
         apellidosColumn = gridTrabajador.addColumn(Trabajador::getApellidos).setHeader("Apellidos").setAutoWidth(true).setSortable(true);
         tarjetaColumn = gridTrabajador.addComponentColumn(event -> {
@@ -77,7 +77,6 @@ public class TabajadorGrid extends Div {
         gridTrabajador.setSizeFull();
         gridTrabajador.setWidthFull();
         gridTrabajador.setHeightFull();
-        gridTrabajador.setSelectionMode(Grid.SelectionMode.MULTI);
         gridTrabajador.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS);
         gridTrabajador.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         gridTrabajador.addThemeVariants(GridVariant.LUMO_WRAP_CELL_CONTENT);
@@ -92,7 +91,7 @@ public class TabajadorGrid extends Div {
         nombreFilter.setValueChangeMode(ValueChangeMode.LAZY);
         nombreFilter.addValueChangeListener(
                 event -> gridListDataView
-                        .addFilter(estudiante -> StringUtils.containsIgnoreCase(estudiante.getNombre(), nombreFilter.getValue()))
+                        .addFilter(trabajador -> StringUtils.containsIgnoreCase(trabajador.getNombre(), nombreFilter.getValue()))
         );
         apellidosFilter = new TextField();
         apellidosFilter.setPlaceholder("Filtrar");
@@ -102,7 +101,7 @@ public class TabajadorGrid extends Div {
         apellidosFilter.setValueChangeMode(ValueChangeMode.LAZY);
         apellidosFilter.addValueChangeListener(
                 event -> gridListDataView
-                        .addFilter(estudiante -> StringUtils.containsIgnoreCase(estudiante.getApellidos(), apellidosFilter.getValue()))
+                        .addFilter(trabajador -> StringUtils.containsIgnoreCase(trabajador.getApellidos(), apellidosFilter.getValue()))
         );
     }
 

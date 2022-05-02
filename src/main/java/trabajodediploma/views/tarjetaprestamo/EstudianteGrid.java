@@ -58,7 +58,7 @@ public class EstudianteGrid extends Div {
 
     private void configureGrid() {
 
-        gridEstudiantes.setClassName("tarjera-prestamo-grid");
+        gridEstudiantes.setClassName("tarjera-prestamo-estudiante-grid");
         nombreColumn = gridEstudiantes.addColumn(Estudiante::getNombre).setHeader("Nombre").setAutoWidth(true).setSortable(true);
         apellidosColumn = gridEstudiantes.addColumn(Estudiante::getApellidos).setHeader("Apellidos").setAutoWidth(true).setSortable(true);
         tarjetaColumn = gridEstudiantes.addComponentColumn(event -> {
@@ -77,7 +77,6 @@ public class EstudianteGrid extends Div {
         gridEstudiantes.setSizeFull();
         gridEstudiantes.setWidthFull();
         gridEstudiantes.setHeightFull();
-        gridEstudiantes.setSelectionMode(Grid.SelectionMode.MULTI);
         gridEstudiantes.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS);
         gridEstudiantes.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         gridEstudiantes.addThemeVariants(GridVariant.LUMO_WRAP_CELL_CONTENT);

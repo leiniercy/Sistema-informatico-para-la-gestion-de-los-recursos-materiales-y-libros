@@ -78,7 +78,7 @@ public class TarjetaPrestamoTrabajadorView extends Div {
             @Autowired TrabajadorService trabajadorService,
             @Autowired LibroService libroService) {
 
-        addClassName("tarjeta-estudiante");
+        addClassName("tarjeta-trabajador");
         this.trabajador = trabajador;
         this.prestamoService = prestamoService;
         this.trabajadorService = trabajadorService;
@@ -121,7 +121,7 @@ public class TarjetaPrestamoTrabajadorView extends Div {
     /*Tabla*/
  /*Configuracion de la tabla*/
     private void configureGrid() {
-        grid.setClassName("tarjeta-estudiante-grid");
+        grid.setClassName("tarjeta-trabajador-grid");
         libroColumn = grid.addColumn(new ComponentRenderer<>(tarjeta -> {
             HorizontalLayout hl = new HorizontalLayout();
             hl.setAlignItems(FlexComponent.Alignment.CENTER);
@@ -138,7 +138,7 @@ public class TarjetaPrestamoTrabajadorView extends Div {
         fechaDevolucionColumn = grid.addColumn(new LocalDateRenderer<>(tarjeta -> tarjeta.getFechaDevolucion(), DateTimeFormatter.ofPattern("dd/MM/yyyy"))).setComparator(tarjeta -> tarjeta.getFechaDevolucion()).setHeader("Fecha de Devolución").setAutoWidth(true).setSortable(true);
         editColumn = grid.addComponentColumn(libro -> {
             Button editButton = new Button(VaadinIcon.EDIT.create());
-            editButton.addClickListener(e -> this.editLibro(libro));
+            editButton.addClickListener(event -> this.editLibro(libro));
             return editButton;
         }).setFlexGrow(0);
 
@@ -150,7 +150,7 @@ public class TarjetaPrestamoTrabajadorView extends Div {
         headerRow.getCell(fechaDevolucionColumn).setComponent(devolucionFilter);
 
         gridListDataView = grid.setItems(
-                prestamos.parallelStream().filter(event -> event.getTrabajador().equals(trabajador)).collect(Collectors.toList())
+                prestamos.parallelStream().filter(t -> t.getTrabajador().equals(trabajador)).collect(Collectors.toList())
         );
         grid.setAllRowsVisible(true);
         grid.setSizeFull();
@@ -179,7 +179,7 @@ public class TarjetaPrestamoTrabajadorView extends Div {
         libroFilter.setWidth("100%");
         libroFilter.addValueChangeListener(event -> {
             if (libroFilter.getValue() == null) {
-                gridListDataView = grid.setItems(prestamos.parallelStream().filter(e -> e.getTrabajador().equals(trabajador)).collect(Collectors.toList()));
+                gridListDataView = grid.setItems(prestamos.parallelStream().filter(t -> t.getTrabajador().equals(trabajador)).collect(Collectors.toList()));
             } else {
                 gridListDataView.addFilter(tarjeta -> areLibroEqual(tarjeta, libroFilter));
             }
@@ -191,7 +191,7 @@ public class TarjetaPrestamoTrabajadorView extends Div {
         entregaFilter.setWidth("100%");
         entregaFilter.addValueChangeListener(event -> {
             if (entregaFilter.getValue() == null) {
-                gridListDataView = grid.setItems(prestamos.parallelStream().filter(e -> e.getTrabajador().equals(trabajador)).collect(Collectors.toList()));
+                gridListDataView = grid.setItems(prestamos.parallelStream().filter(t -> t.getTrabajador().equals(trabajador)).collect(Collectors.toList()));
             } else {
                 gridListDataView.addFilter(tarjeta -> areFechaInicioEqual(tarjeta, entregaFilter));
             }
@@ -203,7 +203,7 @@ public class TarjetaPrestamoTrabajadorView extends Div {
         devolucionFilter.setWidth("100%");
         devolucionFilter.addValueChangeListener(event -> {
             if (devolucionFilter.getValue() == null) {
-                gridListDataView = grid.setItems(prestamos.parallelStream().filter(e -> e.getTrabajador().equals(trabajador)).collect(Collectors.toList()));
+                gridListDataView = grid.setItems(prestamos.parallelStream().filter(t -> t.getTrabajador().equals(trabajador)).collect(Collectors.toList()));
             } else {
                 gridListDataView.addFilter(tarjeta -> areFechaFinEqual(tarjeta, devolucionFilter));
             }
@@ -288,8 +288,8 @@ public class TarjetaPrestamoTrabajadorView extends Div {
                 info.add(total);
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception event) {
+            event.printStackTrace();
             Notification notification = Notification.show("Ocurrió un problema al intentar eliminar el libro", 5000, Notification.Position.MIDDLE);
             ;
             notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
@@ -310,15 +310,15 @@ public class TarjetaPrestamoTrabajadorView extends Div {
     private void configureForm() {
         form = new TarjetaPrestamoTrabajadorForm(trabajador, libros);
         form.setWidth("25em");
-        form.addListener(TarjetaPrestamoEstudianteForm.SaveEvent.class, this::saveLibro);
-        form.addListener(TarjetaPrestamoEstudianteForm.CloseEvent.class, e -> closeEditor());
+        form.addListener(TarjetaPrestamoTrabajadorForm.SaveEvent.class, this::saveLibro);
+        form.addListener(TarjetaPrestamoTrabajadorForm.CloseEvent.class, event -> closeEditor());
     }
 
-    private void saveLibro(TarjetaPrestamoEstudianteForm.SaveEvent event) {
+    private void saveLibro(TarjetaPrestamoTrabajadorForm.SaveEvent event) {
 
         prestamos = prestamos.parallelStream()
                 .filter(lib -> event.getTarjetaPrestamo().getLibro().equals(lib.getLibro())
-                && event.getTarjetaPrestamo().getEstudiante().equals(lib.getEstudiante())
+                && event.getTarjetaPrestamo().getTrabajador().equals(lib.getTrabajador())
                 && event.getTarjetaPrestamo().getFechaPrestamo().equals(lib.getFechaPrestamo())
                 && event.getTarjetaPrestamo().getFechaDevolucion().equals(lib.getFechaDevolucion())
                 )
@@ -362,7 +362,6 @@ public class TarjetaPrestamoTrabajadorView extends Div {
         if (tarjeta == null) {
             closeEditor();
         } else {
-            // tarjeta.setEstudiante(estudiante);
             form.setTarjetaPrestamo(tarjeta);
             form.setVisible(true);
             addClassName("editing");
@@ -381,7 +380,7 @@ public class TarjetaPrestamoTrabajadorView extends Div {
     }
 
     private void updateList() {
-        grid.setItems(prestamoService.findAll().parallelStream().filter(e -> e.getTrabajador().equals(trabajador)).collect(Collectors.toList()));
+        grid.setItems(prestamoService.findAll().parallelStream().filter(event -> event.getTrabajador().equals(trabajador)).collect(Collectors.toList()));
     }
     /*Fin-Barra de menu*/
 
