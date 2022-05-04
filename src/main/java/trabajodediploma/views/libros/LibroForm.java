@@ -61,7 +61,7 @@ public class LibroForm extends FormLayout {
     BeanValidationBinder<Libro> binder = new BeanValidationBinder<>(Libro.class);
 
     public LibroForm() {
-        addClassNames("libro-form","content-stretch");
+        addClassName("libro-form");
 
         binder.bindInstanceFields(this);
 

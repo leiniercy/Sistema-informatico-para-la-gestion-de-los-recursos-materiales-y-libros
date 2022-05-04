@@ -8,6 +8,7 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -75,11 +76,17 @@ public class LibroView extends VerticalLayout {
     }
 
     /*Contenido de la vista*/
-    private HorizontalLayout getContent() {
-        HorizontalLayout content = new HorizontalLayout(grid, form);
-        content.setFlexGrow(2, grid);
-        content.setFlexGrow(1, form);
-        content.addClassNames("content");
+    private Div getContent() {
+        
+        Div formContent = new Div(form);
+        formContent.addClassName("form-content");
+        Div gridContent = new Div(grid);
+        gridContent.addClassName("grid-content");
+        
+        Div content = new Div(gridContent,formContent);        
+        //content.setFlexGrow(2, grid);
+        //content.setFlexGrow(1, form);
+        content.addClassName("content");
         content.setSizeFull();
         return content;
     }
