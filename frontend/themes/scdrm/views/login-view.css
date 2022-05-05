@@ -1,0 +1,45 @@
+/*Header crear usuario*/
+.registrar-header{
+    position: relative;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.title-div{
+    position: absolute;
+    top: 8px;
+    left: 16px;
+    font-size: 18px;
+}
+
+.button-div{
+    position: absolute;
+    top: 8px;
+    right: 16px;
+    font-size: 18px; 
+}
+/*Fin -> Header crear usuario*/
+
+/*Crear usuario*/
+
+.crear-usuario{
+    width: 20em;
+}
+
+.container-form{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    width: 20em;
+}
+
+.button-layout {
+    justify-content: space-between;
+    margin-top: 15px;
+    background-color: var(--lumo-contrast-5pct);
+    padding-bottom: var(--lumo-space-s);
+    padding-top: var(--lumo-space-s);
+    padding-left: var(--lumo-space-l);
+    padding-right: var(--lumo-space-l);
+    gap: var(--lumo-space-m);
+}
