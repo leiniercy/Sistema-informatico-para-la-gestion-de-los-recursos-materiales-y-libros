@@ -11,7 +11,7 @@
 }
 .header .filtrar{
     margin-right: 10px;
-    font-family: aria-laber;
+    font-family: aria-label;
 }
 
 
@@ -44,7 +44,7 @@
 }
 
 .imagen-div-div{
-    height: 256px;
+    height: 300px;
     background-color: var(--lumo-primary-color);
     display: flex;
     overflow: hidden;
@@ -54,19 +54,20 @@
 .imagen-div{
     padding-top: 5px;
     max-width: 300px;
-    max-height: 180px;
+    max-height: 220px;
 
 }
 
 .imagen-div .imagen{
     height: 100%;
     width: 100%;
-    margin: 10px;
+    margin: 5px;
     object-fit: fill;
     border-radius: 10%;
 }
 .imagen{
     width: 300px;
+    max-width: 300px;
 }
 
 .info{
@@ -91,8 +92,21 @@
 }
 
 .leer-div .leer-button{
-    width: 300px;
+    width: 400px;
+    height: 30px;
     background-color: var(--lumo-primary-color);
     color: #fff;
-
+    text-decoration: none;
+    text-align: center;
+}
+/*
+.leer-button:hover {
+  color: rgb(0,0,255);
+  background-color: transparent;
+  text-decoration: underline;
+}*/
+.leer-button:active {
+  color: #ffffff;
+  background-color: var(--lumo-primary-color-50pct);
+  text-decoration: underline;
 }

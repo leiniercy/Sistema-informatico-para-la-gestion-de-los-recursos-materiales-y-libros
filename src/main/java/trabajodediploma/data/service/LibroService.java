@@ -46,4 +46,7 @@ public class LibroService {
       return repository.count();
     }
 
+    public  List<Libro> ordenarAlfabeticamente(){
+        return repository.ordenarAlfabeticamente();
+    }
 }
