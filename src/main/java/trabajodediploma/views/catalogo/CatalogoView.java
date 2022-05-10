@@ -32,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import trabajodediploma.data.entity.Libro;
 import trabajodediploma.data.service.LibroService;
 import trabajodediploma.views.MainLayout;
+import trabajodediploma.views.footer.MyFooter;
 
 @PageTitle("Catalogo")
 @Route(value = "catalogo-libros", layout = MainLayout.class)
@@ -50,15 +51,18 @@ public class CatalogoView extends Div {
     private H3 tomo;
     private H3 parte;
     private StreamResource source;
+    private MyFooter footer;
 
     public CatalogoView(@Autowired LibroService libroService) {
         addClassNames("catalogo-view");
+//        footer = new MyFooter();
+//        footer.addClassName("footer");
         this.libroService = libroService;
         this.libros = libroService.findAll();
         Configuracion();
         barraDeNavegacion();
         post(libros);
-        add(header, content);
+        add(header, content/*,footer*/);
     }
 
     private void Configuracion() {

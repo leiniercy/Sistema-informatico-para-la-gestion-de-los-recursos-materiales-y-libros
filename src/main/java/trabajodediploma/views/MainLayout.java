@@ -8,8 +8,10 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.contextmenu.ContextMenu;
 import com.vaadin.flow.component.dependency.NpmPackage;
 import com.vaadin.flow.component.html.Anchor;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.ListItem;
 import com.vaadin.flow.component.html.Nav;
 import com.vaadin.flow.component.html.Span;
@@ -91,25 +93,30 @@ public class MainLayout extends AppLayout {
     }
 
     private Component createHeaderContent() {
+        
         DrawerToggle toggle = new DrawerToggle();
-        toggle.addClassName("text-secondary");
+        toggle.addClassNames("toggle","text-secondary");
         toggle.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
         toggle.getElement().setAttribute("aria-label", "Menu toggle");
-
+        
         viewTitle = new H1();
-        viewTitle.addClassNames("m-0", "text-l");
+        viewTitle.addClassNames("h1-title","m-0", "text-l");
         viewTitle.getStyle()
                 .set("font-size", "var(--lumo-font-size-l)")
                 .set("margin", "0");
+        
+        Div titleDiv = new Div(toggle,viewTitle);
+        titleDiv.addClassName("div-toggle-title");
 
-        HorizontalLayout layout = new HorizontalLayout();
+        
+        Div layout = new Div();
         layout.addClassNames("flex", "items-center", "my-s", "px-m", "py-xs");
         Optional<User> maybeUser = authenticatedUser.get();
         if (maybeUser.isPresent()) {
             User user = maybeUser.get();
 
             Avatar avatar = new Avatar(user.getUsername(), user.getProfilePictureUrl());
-            avatar.addClassNames("me-xs");
+            avatar.addClassNames("avatar","me-xs");
 
             ContextMenu userMenu = new ContextMenu(avatar);
             userMenu.setOpenOnClick(true);
@@ -118,7 +125,7 @@ public class MainLayout extends AppLayout {
             });
 
             Span name = new Span(user.getName());
-            name.addClassNames("font-medium", "text-s", "text-secondary");
+            name.addClassNames("span-name","font-medium", "text-s", "text-secondary");
             layout.add(avatar, name);
 
         } else {
@@ -127,16 +134,11 @@ public class MainLayout extends AppLayout {
             loginLink.setHref("login");
             loginLink.add(new Span("Acceder"));
             layout.add(loginLink);
-            layout.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.BASELINE);
-            layout.addClassNames("bg-base", "border-b", "border-contrast-10", "box-border");
+            layout.addClassNames("bg-base", "border-b", "border-contrast-10", "box-border","rounded-l");
         }
 
-        HorizontalLayout header = new HorizontalLayout(toggle, viewTitle, layout);
-        header.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
-        header.setWidth("100%");
-        header.expand(viewTitle);
-        header.addClassNames("bg-base", "border-b", "border-contrast-10", "box-border", "flex", "py-0", "px-m");
-
+        Div header = new Div(titleDiv, layout);
+        header.addClassNames("div-header","bg-primary");
         return header;
     }
 
@@ -187,7 +189,6 @@ public class MainLayout extends AppLayout {
         };
     }
 
- 
     @Override
     protected void afterNavigation() {
         super.afterNavigation();
