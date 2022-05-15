@@ -23,7 +23,6 @@ public class CrearTrabajadorForm extends FormLayout {
 
     TextField nombre;
     TextField apellidos;
-    TextField ci;
     TextField solapin;
     ComboBox<String> categoria;
     TextField area;
@@ -33,7 +32,7 @@ public class CrearTrabajadorForm extends FormLayout {
 
     public CrearTrabajadorForm() {
         Configuracion();
-        add(nombre, apellidos, ci, solapin, categoria, area, createButtonsLayout());
+        add(nombre, apellidos, solapin, categoria, area, createButtonsLayout());
     }
 
     private void Configuracion() {
@@ -43,9 +42,6 @@ public class CrearTrabajadorForm extends FormLayout {
 
         apellidos = new TextField();
         apellidos.setPlaceholder("Apellidos");
-
-        ci = new TextField();
-        ci.setPlaceholder("Carnet de Identidad");
 
         solapin = new TextField();
         solapin.setPlaceholder("Solapín");

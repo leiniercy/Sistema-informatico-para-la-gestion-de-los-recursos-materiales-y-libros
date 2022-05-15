@@ -51,26 +51,25 @@ public class Libro extends AbstractEntity {
 
     @Max(message = "Máximo 10", value = 10)
     @Min(message = "Mínimo 1", value = 1)
-    @Column
+    @Column(nullable = true)
     private Integer volumen;
 
     @Max(message = "Máximo 10", value = 10)
     @Min(message = "Mínimo 1", value = 1)
-    @Column
+    @Column(nullable = true)
     private Integer tomo;
-
 
     @Max(message = "Máximo 10", value = 10)
     @Min(message = "Mínimo 1", value = 1)
-    @Column
+    @Column(nullable = true)
     private Integer parte;
 
     @Min(message = "Mínimo 1", value = 1)
-    @Column
+    @Column(nullable = false)
     private Integer cantidad;
 
     @Min(message = "Mínimo 0", value = 0)
-    @Column
+    @Column(nullable = false)
     private Double precio;
     
     @OneToMany(mappedBy = "libro",cascade = CascadeType.ALL)

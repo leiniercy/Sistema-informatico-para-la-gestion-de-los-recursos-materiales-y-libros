@@ -25,17 +25,16 @@ public class CrearEstudianteForm extends FormLayout {
 
     TextField nombre;
     TextField apellidos;
-    TextField ci;
     TextField solapin;
     ComboBox<Integer> anno_academico;
     ComboBox<String> facultad;
-    
+
     Button save = new Button("Añadir", VaadinIcon.PLUS.create());
     Button close = new Button("Cancelar", VaadinIcon.ERASER.create());
 
     public CrearEstudianteForm() {
         Configuracion();
-        add(nombre, apellidos, ci, solapin, anno_academico, facultad, createButtonsLayout());
+        add(nombre, apellidos,solapin, anno_academico, facultad, createButtonsLayout());
     }
 
     private void Configuracion() {
@@ -45,9 +44,6 @@ public class CrearEstudianteForm extends FormLayout {
 
         apellidos = new TextField();
         apellidos.setPlaceholder("Apellidos");
-
-        ci = new TextField();
-        ci.setPlaceholder("Carnet de Identidad");
 
         solapin = new TextField();
         solapin.setPlaceholder("Solapín");
@@ -66,7 +62,7 @@ public class CrearEstudianteForm extends FormLayout {
 
         HorizontalLayout buttonlayout = new HorizontalLayout();
         buttonlayout.addClassName("button-layout");
-        
+
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         save.addClickShortcut(Key.ENTER);
 

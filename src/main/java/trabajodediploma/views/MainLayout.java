@@ -7,6 +7,7 @@ import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.contextmenu.ContextMenu;
 import com.vaadin.flow.component.dependency.NpmPackage;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
@@ -28,6 +29,8 @@ import trabajodediploma.views.catalogo.CatalogoView;
 import trabajodediploma.views.destinofinal.DestinoFinalView;
 import trabajodediploma.views.inicio.InicioView;
 import trabajodediploma.views.libros.LibroView;
+import trabajodediploma.views.login.CrearEstudianteForm;
+import trabajodediploma.views.login.CrearTrabajadorForm;
 import trabajodediploma.views.modulo.ModuloView;
 import trabajodediploma.views.recursosmateriales.RecursosMaterialesView;
 import trabajodediploma.views.tarjetaprestamo.TarjetaPrestamoView;
@@ -36,6 +39,11 @@ import trabajodediploma.views.tarjetaprestamo.TarjetaPrestamoView;
  * The main view is a top-level placeholder for other views.
  */
 public class MainLayout extends AppLayout {
+
+    private Div titleDiv;
+    private Dialog dailog;
+    private CrearEstudianteForm crearEstudianteForm;
+    private CrearTrabajadorForm craCrearTrabajadorForm;
 
     /**
      * A simple navigation item component, based on ListItem element.
@@ -105,9 +113,8 @@ public class MainLayout extends AppLayout {
                 .set("font-size", "var(--lumo-font-size-l)")
                 .set("margin", "0");
         
-        Div titleDiv = new Div(toggle,viewTitle);
+        titleDiv = new Div(toggle,viewTitle);
         titleDiv.addClassName("div-toggle-title");
-
         
         Div layout = new Div();
         layout.addClassNames("flex", "items-center", "my-s", "px-m", "py-xs");
@@ -120,10 +127,14 @@ public class MainLayout extends AppLayout {
 
             ContextMenu userMenu = new ContextMenu(avatar);
             userMenu.setOpenOnClick(true);
+            userMenu.addItem("Perfil", e -> {
+                
+            });
             userMenu.addItem("Cerrar sesión", e -> {
                 authenticatedUser.logout();
             });
-
+            
+            
             Span name = new Span(user.getName());
             name.addClassNames("span-name","font-medium", "text-s", "text-secondary");
             layout.add(avatar, name);
@@ -175,7 +186,7 @@ public class MainLayout extends AppLayout {
         return new MenuItemInfo[]{ //
             new MenuItemInfo("Inicio", "la la-home", InicioView.class), //
 
-            new MenuItemInfo("Catalogo", "la la-th-list", CatalogoView.class), //
+            new MenuItemInfo("Catálogo", "la la-th-list", CatalogoView.class), //
 
             new MenuItemInfo("Libros", "la la-book", LibroView.class), //
 
@@ -188,6 +199,17 @@ public class MainLayout extends AppLayout {
             new MenuItemInfo("Destino Final", "la la-columns", DestinoFinalView.class), //
         };
     }
+    
+   
+    private void modificarUsuario(){
+        dailog = new Dialog();
+        crearEstudianteForm = new CrearEstudianteForm();
+        craCrearTrabajadorForm = new CrearTrabajadorForm();
+        Optional<User> maybeUser = authenticatedUser.get();
+        User user = maybeUser.get();
+        
+    }
+    
 
     @Override
     protected void afterNavigation() {

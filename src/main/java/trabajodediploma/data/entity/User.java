@@ -2,6 +2,7 @@ package trabajodediploma.data.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Set;
+import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -9,15 +10,35 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Lob;
 import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import trabajodediploma.data.AbstractEntity;
 import trabajodediploma.data.Rol;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(onlyExplicitlyIncluded = true)
 @Entity
-@Table(name = "ApplicationUser")
+@Table(name = "Users")
+
 public class User extends AbstractEntity {
 
-    private String username;
+    @EqualsAndHashCode.Include
+    @ToString.Include
+    
+    @Column()
     private String name;
+    
+    @Column(unique = true)
+    private String username;
+    
     @JsonIgnore
     private String hashedPassword;
     @Enumerated(EnumType.STRING)
@@ -25,36 +46,5 @@ public class User extends AbstractEntity {
     private Set<Rol> roles;
     @Lob
     private String profilePictureUrl;
-
-    public String getUsername() {
-        return username;
-    }
-    public void setUsername(String username) {
-        this.username = username;
-    }
-    public String getName() {
-        return name;
-    }
-    public void setName(String name) {
-        this.name = name;
-    }
-    public String getHashedPassword() {
-        return hashedPassword;
-    }
-    public void setHashedPassword(String hashedPassword) {
-        this.hashedPassword = hashedPassword;
-    }
-    public Set<Rol> getRoles() {
-        return roles;
-    }
-    public void setRoles(Set<Rol> roles) {
-        this.roles = roles;
-    }
-    public String getProfilePictureUrl() {
-        return profilePictureUrl;
-    }
-    public void setProfilePictureUrl(String profilePictureUrl) {
-        this.profilePictureUrl = profilePictureUrl;
-    }
 
 }
