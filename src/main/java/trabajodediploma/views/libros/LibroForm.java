@@ -71,6 +71,9 @@ public class LibroForm extends FormLayout {
         imagen = new Upload();
         imagen.getStyle().set("box-sizing", "border-box");
         imagen.getElement().appendChild(imagePreview.getElement());
+        Button uploadButton = new Button("Seleccionar imagen...");
+        uploadButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        imagen.setUploadButton(uploadButton);
 
         //titulo
         titulo.setLabel("Título");

@@ -1,0 +1,23 @@
+.div-footer{
+    width: 100%;
+    background: rgb(50, 102, 171);
+}
+.footer{
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: center;
+}
+
+.icon{
+    color: white;
+    margin-right: 10px;
+}
+
+.title{
+    font-size: var(--lumo-font-size-xs);
+    margin-bottom: 0px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: white;
+}

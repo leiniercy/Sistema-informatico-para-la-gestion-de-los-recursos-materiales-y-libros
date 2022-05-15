@@ -5,28 +5,29 @@
  */
 package trabajodediploma.views.footer;
 
-import com.vaadin.flow.component.html.Footer;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H6;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.orderedlayout.*;
-import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 
 /**
  *
  * @author leinier
  */
-public class MyFooter extends HorizontalLayout {
+public class MyFooter extends Div {
 
     public MyFooter() {
+        addClassName("div-footer");
         setWidthFull();
-        setJustifyContentMode(JustifyContentMode.CENTER);
-        setDefaultVerticalComponentAlignment(Alignment.CENTER);
         
-        HorizontalLayout ly = new HorizontalLayout(new Span(VaadinIcon.ACADEMY_CAP.create()), new H6("Universidad de Ciencias Informáticas"));
-        ly.setAlignItems(Alignment.BASELINE);
+        Span icon =new Span(VaadinIcon.ACADEMY_CAP.create());
+        icon.addClassName("icon");
+        H6 title = new H6("Universidad de Ciencias Informáticas");
+        title.addClassName("title");
+        Div footer = new Div(icon,title);
+        footer.addClassName("footer");
 
-        add(ly);
+        add(footer);
     }
 
 }

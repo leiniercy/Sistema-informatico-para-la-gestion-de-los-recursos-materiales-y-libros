@@ -1,0 +1,23 @@
+.inicio-view{
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.div-content{
+    height:inherit;
+}
+
+.div-image{
+    background: rgb(41 56 56 / 6%) url("./resources/META-INF/resources/images/logo-uci-dark.png") no-repeat center left;
+    height: 95%;
+    width: 100%;
+    display: flex;
+    justify-content: center;    
+}
+
+.footer{
+    height: 5%;
+}

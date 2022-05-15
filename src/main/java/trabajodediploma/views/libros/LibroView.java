@@ -3,6 +3,7 @@ package trabajodediploma.views.libros;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.contextmenu.ContextMenu;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
@@ -17,6 +18,9 @@ import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.orderedlayout.*;
 import com.vaadin.flow.component.contextmenu.MenuItem;
+import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
@@ -38,7 +42,7 @@ import trabajodediploma.views.footer.MyFooter;
 @PageTitle("Libros")
 @Route(value = "libro-view", layout = MainLayout.class)
 @RolesAllowed("ADMIN")
-public class LibroView extends VerticalLayout {
+public class LibroView extends Div {
 
     private Grid<Libro> grid = new Grid<>(Libro.class, false);
 
@@ -56,19 +60,28 @@ public class LibroView extends VerticalLayout {
     Grid.Column<Libro> editColumn;
 
     MyFooter myFooter;
-
     LibroForm form;
-
+    
+    private Dialog dialog;
     private Html total;
     private HorizontalLayout toolbar;
     private HorizontalLayout buttons;
-
+    private TextField filterAuthor;
+    private TextField filterTitle;
+    private IntegerField filterVolumen;
+    private IntegerField filterTomo;
+    private IntegerField filterParte;
+    private IntegerField filterCantidad;
+    private NumberField filterPrecio;
+    private Div header;
+    
     public LibroView(@Autowired LibroService libroService) {
         this.libroService = libroService;
         addClassNames("libros-view");
         setSizeFull();
         configureGrid();
         configureForm();
+        Filtros();
         myFooter = new MyFooter();
         add(menuBar(), getContent(), myFooter);
         updateList();
@@ -77,17 +90,31 @@ public class LibroView extends VerticalLayout {
 
     /*Contenido de la vista*/
     private Div getContent() {
-        
+
         Div formContent = new Div(form);
         formContent.addClassName("form-content");
         Div gridContent = new Div(grid);
         gridContent.addClassName("grid-content");
-        
-        Div content = new Div(gridContent,formContent);        
-        //content.setFlexGrow(2, grid);
-        //content.setFlexGrow(1, form);
+
+        Div content = new Div(gridContent);
         content.addClassName("content");
         content.setSizeFull();
+        
+             
+        /*Dialog Header*/
+        Button closeButton = new Button(new Icon("lumo", "cross"), (e) -> dialog.close());
+        closeButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        Span title = new Span("Libro");
+        Div titleDiv = new Div(title);
+        titleDiv.addClassName("div-dialog-title");
+        Div buttonDiv = new Div(closeButton);
+        buttonDiv.addClassName("div-dialog-button");
+        header = new Div(titleDiv,buttonDiv);
+        header.addClassName("div-dialog-header");
+        /*Dialog Header*/
+        
+        dialog = new Dialog(header,formContent);   
+        
         return content;
     }
 
@@ -116,13 +143,13 @@ public class LibroView extends VerticalLayout {
         parteColumn.setVisible(false);
 
         HeaderRow headerRow = grid.appendHeaderRow();
-        headerRow.getCell(tituloColumn).setComponent(FiltrarTitle());
-        headerRow.getCell(autorColumn).setComponent(FiltrarAuthor());
-        headerRow.getCell(volumenColumn).setComponent(FiltrarVolumen());
-        headerRow.getCell(tomoColumn).setComponent(FiltrarTomo());
-        headerRow.getCell(parteColumn).setComponent(FiltrarParte());
-        headerRow.getCell(cantidadColumn).setComponent(FiltrarCantidad());
-        headerRow.getCell(precioColumn).setComponent(FiltrarPrecio());
+        headerRow.getCell(tituloColumn).setComponent(filterTitle);
+        headerRow.getCell(autorColumn).setComponent(filterAuthor);
+        headerRow.getCell(volumenColumn).setComponent(filterVolumen);
+        headerRow.getCell(tomoColumn).setComponent(filterTomo);
+        headerRow.getCell(parteColumn).setComponent(filterParte);
+        headerRow.getCell(cantidadColumn).setComponent(filterCantidad);
+        headerRow.getCell(precioColumn).setComponent(filterPrecio);
 
         gridListDataView = grid.setItems(libroService.findAll());
         grid.setAllRowsVisible(true);
@@ -142,9 +169,10 @@ public class LibroView extends VerticalLayout {
     }
 
     /*Filtros*/
-    private Component FiltrarAuthor() {
+    private void Filtros() {
 
-        TextField filterAuthor = new TextField();
+        //autor
+        filterAuthor = new TextField();
         filterAuthor.setPlaceholder("Filtrar");
         filterAuthor.setPrefixComponent(VaadinIcon.SEARCH.create());
         filterAuthor.setClearButtonVisible(true);
@@ -155,12 +183,8 @@ public class LibroView extends VerticalLayout {
                         .addFilter(book -> StringUtils.containsIgnoreCase(book.getAutor(), filterAuthor.getValue()))
         );
 
-        return filterAuthor;
-    }
-
-    private Component FiltrarTitle() {
-
-        TextField filterTitle = new TextField();
+        //titulo
+        filterTitle = new TextField();
         filterTitle.setPlaceholder("Filtrar");
         filterTitle.setPrefixComponent(VaadinIcon.SEARCH.create());
         filterTitle.setClearButtonVisible(true);
@@ -171,81 +195,66 @@ public class LibroView extends VerticalLayout {
                         .addFilter(book -> StringUtils.containsIgnoreCase(book.getTitulo(), filterTitle.getValue()))
         );
 
-        return filterTitle;
-    }
-
-    private Component FiltrarVolumen() {
-
-        IntegerField volumenFilter = new IntegerField();
-        volumenFilter.setPlaceholder("Filtrar");
-        volumenFilter.setPrefixComponent(VaadinIcon.SEARCH.create());
-        volumenFilter.setClearButtonVisible(true);
-        volumenFilter.setWidth("100%");
-        volumenFilter.setValueChangeMode(ValueChangeMode.LAZY);
-        volumenFilter.addValueChangeListener(
+        //voulmen
+        filterVolumen = new IntegerField();
+        filterVolumen.setPlaceholder("Filtrar");
+        filterVolumen.setPrefixComponent(VaadinIcon.SEARCH.create());
+        filterVolumen.setClearButtonVisible(true);
+        filterVolumen.setWidth("100%");
+        filterVolumen.setValueChangeMode(ValueChangeMode.LAZY);
+        filterVolumen.addValueChangeListener(
                 event -> gridListDataView
-                        .addFilter(libro -> StringUtils.containsIgnoreCase(Integer.toString(libro.getVolumen()), Integer.toString(volumenFilter.getValue())))
+                        .addFilter(libro -> StringUtils.containsIgnoreCase(Integer.toString(libro.getVolumen()), Integer.toString(filterVolumen.getValue())))
         );
-        return volumenFilter;
 
-    }
-
-    private Component FiltrarTomo() {
-        IntegerField tomoFilter = new IntegerField();
-        tomoFilter.setPlaceholder("Filtrar");
-        tomoFilter.setPrefixComponent(VaadinIcon.SEARCH.create());
-        tomoFilter.setClearButtonVisible(true);
-        tomoFilter.setWidth("100%");
-        tomoFilter.setValueChangeMode(ValueChangeMode.LAZY);
-        tomoFilter.addValueChangeListener(
+        filterTomo = new IntegerField();
+        filterTomo.setPlaceholder("Filtrar");
+        filterTomo.setPrefixComponent(VaadinIcon.SEARCH.create());
+        filterTomo.setClearButtonVisible(true);
+        filterTomo.setWidth("100%");
+        filterTomo.setValueChangeMode(ValueChangeMode.LAZY);
+        filterTomo.addValueChangeListener(
                 event -> gridListDataView
-                        .addFilter(libro -> StringUtils.containsIgnoreCase(Integer.toString(libro.getTomo()), Integer.toString(tomoFilter.getValue())))
+                        .addFilter(libro -> StringUtils.containsIgnoreCase(Integer.toString(libro.getTomo()), Integer.toString(filterTomo.getValue())))
         );
-        return tomoFilter;
-    }
 
-    private Component FiltrarParte() {
-        IntegerField parteFilter = new IntegerField();
-        parteFilter.setPlaceholder("Filtrar");
-        parteFilter.setPrefixComponent(VaadinIcon.SEARCH.create());
-        parteFilter.setClearButtonVisible(true);
-        parteFilter.setWidth("100%");
-        parteFilter.setValueChangeMode(ValueChangeMode.LAZY);
-        parteFilter.addValueChangeListener(
+        //Parte
+        filterParte = new IntegerField();
+        filterParte.setPlaceholder("Filtrar");
+        filterParte.setPrefixComponent(VaadinIcon.SEARCH.create());
+        filterParte.setClearButtonVisible(true);
+        filterParte.setWidth("100%");
+        filterParte.setValueChangeMode(ValueChangeMode.LAZY);
+        filterParte.addValueChangeListener(
                 event -> gridListDataView
-                        .addFilter(libro -> StringUtils.containsIgnoreCase(Integer.toString(libro.getParte()), Integer.toString(parteFilter.getValue())))
+                        .addFilter(libro -> StringUtils.containsIgnoreCase(Integer.toString(libro.getParte()), Integer.toString(filterParte.getValue())))
         );
-        return parteFilter;
-    }
 
-    private Component FiltrarCantidad() {
-        IntegerField parteCantidad = new IntegerField();
-        parteCantidad.setPlaceholder("Filtrar");
-        parteCantidad.setPrefixComponent(VaadinIcon.SEARCH.create());
-        parteCantidad.setClearButtonVisible(true);
-        parteCantidad.setWidth("100%");
-        parteCantidad.setValueChangeMode(ValueChangeMode.LAZY);
-        parteCantidad.addValueChangeListener(
+        //Cantidad
+        filterCantidad = new IntegerField();
+        filterCantidad.setPlaceholder("Filtrar");
+        filterCantidad.setPrefixComponent(VaadinIcon.SEARCH.create());
+        filterCantidad.setClearButtonVisible(true);
+        filterCantidad.setWidth("100%");
+        filterCantidad.setValueChangeMode(ValueChangeMode.LAZY);
+        filterCantidad.addValueChangeListener(
                 event -> gridListDataView
-                        .addFilter(libro -> StringUtils.containsIgnoreCase(Integer.toString(libro.getCantidad()), Integer.toString(parteCantidad.getValue())))
+                        .addFilter(libro -> StringUtils.containsIgnoreCase(Integer.toString(libro.getCantidad()), Integer.toString(filterCantidad.getValue())))
         );
-        return parteCantidad;
-    }
 
-    private Component FiltrarPrecio() {
-        NumberField precioFilter = new NumberField();
-        precioFilter.setPlaceholder("Filtrar");
-        precioFilter.setPrefixComponent(VaadinIcon.SEARCH.create());
-        precioFilter.setClearButtonVisible(true);
-        precioFilter.setWidth("100%");
-        precioFilter.setValueChangeMode(ValueChangeMode.LAZY);
-        precioFilter.addValueChangeListener(
+        //Precio
+        filterPrecio = new NumberField();
+        filterPrecio.setPlaceholder("Filtrar");
+        filterPrecio.setPrefixComponent(VaadinIcon.SEARCH.create());
+        filterPrecio.setClearButtonVisible(true);
+        filterPrecio.setWidth("100%");
+        filterPrecio.setValueChangeMode(ValueChangeMode.LAZY);
+        filterPrecio.addValueChangeListener(
                 event -> gridListDataView
-                        .addFilter(libro -> StringUtils.containsIgnoreCase(Double.toString(libro.getPrecio()), Double.toString(precioFilter.getValue())))
+                        .addFilter(libro -> StringUtils.containsIgnoreCase(Double.toString(libro.getPrecio()), Double.toString(filterPrecio.getValue())))
         );
-        return precioFilter;
-    }
 
+    }
     /*Fin-Filtros*/
 
  /*Barra de menu*/
@@ -344,8 +353,8 @@ public class LibroView extends VerticalLayout {
     }
 
     /*Fin-Menu de Columnas*/
-
  /*Fin-Tabla*/
+    
  /*Formulario*/
     private void configureForm() {
         form = new LibroForm();
@@ -412,6 +421,7 @@ public class LibroView extends VerticalLayout {
             form.setLibro(libro);
             form.setVisible(true);
             addClassName("editing");
+            dialog.open();
         }
     }
 
@@ -426,6 +436,7 @@ public class LibroView extends VerticalLayout {
         form.setLibro(null);
         form.setVisible(false);
         removeClassName("editing");
+        dialog.close();
     }
 
     private void updateList() {
