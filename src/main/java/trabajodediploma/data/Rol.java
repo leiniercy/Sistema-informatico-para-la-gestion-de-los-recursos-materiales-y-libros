@@ -1,5 +1,5 @@
 package trabajodediploma.data;
 
 public enum Rol {
-    USER, ADMIN;
+    ADMIN, VD_ADIMN_ECONOMIA, ASISTENTE_CONTROL, RESP_ALMACEN, USER;
 }

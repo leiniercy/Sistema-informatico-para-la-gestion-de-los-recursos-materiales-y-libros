@@ -49,18 +49,18 @@ public class Libro extends AbstractEntity {
     @Column(nullable = false)
     private String autor;
 
-    @Max(message = "Máximo 10", value = 10)
-    @Min(message = "Mínimo 1", value = 1)
+//    @Max(message = "Máximo 10", value = 10)
+//    @Min(message = "Mínimo 1", value = 1)
     @Column(nullable = true)
     private Integer volumen;
 
-    @Max(message = "Máximo 10", value = 10)
-    @Min(message = "Mínimo 1", value = 1)
+//    @Max(message = "Máximo 10", value = 10)
+//    @Min(message = "Mínimo 1", value = 1)
     @Column(nullable = true)
     private Integer tomo;
 
-    @Max(message = "Máximo 10", value = 10)
-    @Min(message = "Mínimo 1", value = 1)
+//    @Max(message = "Máximo 10", value = 10)
+//    @Min(message = "Mínimo 1", value = 1)
     @Column(nullable = true)
     private Integer parte;
 

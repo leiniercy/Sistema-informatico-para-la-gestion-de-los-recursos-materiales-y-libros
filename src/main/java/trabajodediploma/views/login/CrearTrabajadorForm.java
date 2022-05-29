@@ -10,9 +10,9 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.TextField;
 
 /**
@@ -23,16 +23,17 @@ public class CrearTrabajadorForm extends FormLayout {
 
     TextField nombre;
     TextField apellidos;
+    EmailField email;
     TextField solapin;
     ComboBox<String> categoria;
-    TextField area;
+    ComboBox<String> area;
 
     Button save = new Button("Añadir", VaadinIcon.PLUS.create());
     Button close = new Button("Cancelar", VaadinIcon.ERASER.create());
 
     public CrearTrabajadorForm() {
         Configuracion();
-        add(nombre, apellidos, solapin, categoria, area, createButtonsLayout());
+        add(nombre, apellidos, solapin,email,categoria, area, createButtonsLayout());
     }
 
     private void Configuracion() {
@@ -46,16 +47,23 @@ public class CrearTrabajadorForm extends FormLayout {
         solapin = new TextField();
         solapin.setPlaceholder("Solapín");
 
+        email = new EmailField();
+        email = new EmailField();
+        email.setPlaceholder("usuario@uci.cu");
+        email.setValue("usuario@uci.cu");
+        email.setClearButtonVisible(true);
+
         categoria = new ComboBox<>();
         categoria.setPlaceholder("Categoría");
         categoria.setItems("Tabajador", "otras");
 
-        area = new TextField();
+        area = new ComboBox<>();
         area.setPlaceholder("Área");
+        area.setItems("Area 1", "Area 2");
 
     }
 
-      private HorizontalLayout createButtonsLayout() {
+    private HorizontalLayout createButtonsLayout() {
 
         HorizontalLayout buttonlayout = new HorizontalLayout();
         buttonlayout.addClassName("button-layout");

@@ -1,9 +1,11 @@
 package trabajodediploma.data.entity;
 
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.Email;
@@ -80,6 +82,9 @@ public class Estudiante extends AbstractEntity {
     @ManyToOne(optional = false,fetch = FetchType.EAGER)
     private Grupo grupo;
 
+    @ManyToMany(mappedBy = "estudiantes")
+    List<Modulo> modulos;
+    
     public String getNombreApellidos() {
         return nombre + " " + apellidos;
     }

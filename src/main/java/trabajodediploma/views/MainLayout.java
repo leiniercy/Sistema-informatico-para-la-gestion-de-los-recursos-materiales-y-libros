@@ -23,6 +23,8 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.server.auth.AccessAnnotationChecker;
 import java.util.Optional;
+import trabajodediploma.data.entity.Estudiante;
+import trabajodediploma.data.entity.Trabajador;
 import trabajodediploma.data.entity.User;
 import trabajodediploma.security.AuthenticatedUser;
 import trabajodediploma.views.catalogo.CatalogoView;
@@ -41,9 +43,11 @@ import trabajodediploma.views.tarjetaprestamo.TarjetaPrestamoView;
 public class MainLayout extends AppLayout {
 
     private Div titleDiv;
-    private Dialog dailog;
+    private Dialog modificarPerfil;
+    private Dialog modificarClave;
     private CrearEstudianteForm crearEstudianteForm;
     private CrearTrabajadorForm craCrearTrabajadorForm;
+    private User user;
 
     /**
      * A simple navigation item component, based on ListItem element.
@@ -120,7 +124,7 @@ public class MainLayout extends AppLayout {
         layout.addClassNames("flex", "items-center", "my-s", "px-m", "py-xs");
         Optional<User> maybeUser = authenticatedUser.get();
         if (maybeUser.isPresent()) {
-            User user = maybeUser.get();
+            user = maybeUser.get();
 
             Avatar avatar = new Avatar(user.getUsername(), user.getProfilePictureUrl());
             avatar.addClassNames("avatar","me-xs");
@@ -128,7 +132,10 @@ public class MainLayout extends AppLayout {
             ContextMenu userMenu = new ContextMenu(avatar);
             userMenu.setOpenOnClick(true);
             userMenu.addItem("Perfil", e -> {
-                
+                ModificarUsuario();
+            });
+            userMenu.addItem("Cambiar clave", e -> {
+                ModificarClave();
             });
             userMenu.addItem("Cerrar sesión", e -> {
                 authenticatedUser.logout();
@@ -201,13 +208,20 @@ public class MainLayout extends AppLayout {
     }
     
    
-    private void modificarUsuario(){
-        dailog = new Dialog();
-        crearEstudianteForm = new CrearEstudianteForm();
-        craCrearTrabajadorForm = new CrearTrabajadorForm();
-        Optional<User> maybeUser = authenticatedUser.get();
-        User user = maybeUser.get();
+    private void ModificarUsuario(){
+        modificarPerfil = new Dialog();
+        //crearEstudianteForm = new CrearEstudianteForm();
+        //craCrearTrabajadorForm = new CrearTrabajadorForm();
         
+        Optional<Estudiante> estudiante;
+        Optional<Trabajador> trabajador;
+        
+    }
+    
+    private void ModificarClave(){
+        ModificarClaveView claveView = new ModificarClaveView();
+        modificarClave = new Dialog(claveView);
+        modificarClave.open();
     }
     
 

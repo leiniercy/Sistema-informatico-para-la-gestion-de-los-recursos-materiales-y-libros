@@ -1,8 +1,10 @@
 package trabajodediploma.data.entity;
 
+import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -66,6 +68,9 @@ public class Trabajador extends AbstractEntity {
 
     @Column
     private String area;
+
+    @ManyToMany(mappedBy = "trabajadores")
+    List<Modulo> modulos;
 
     public String getNombreApellidos() {
         return nombre + " " + apellidos;

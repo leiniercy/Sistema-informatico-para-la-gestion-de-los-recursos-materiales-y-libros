@@ -4,20 +4,77 @@
     display: flex;
     flex-direction: column;
     position: relative;
+    box-sizing: border-box;
 }
+
+/*Header crear usuario*/
+.div-perfil-header{
+    position: relative;
+    width: 100%;
+    margin-bottom: 50px;
+}
+
+.div-perfil-title{
+    position: absolute;
+    top: 8px;
+    left: 16px;
+    font-size: 18px;
+}
+
+.div-perfil-button{
+    position: absolute;
+    top: 8px;
+    right: 16px;
+    font-size: 18px; 
+}
+/*Fin -> Header crear usuario*/
+
 
 .div-content{
-    height:inherit;
+    height:50%;
+    background-color: #a9a9a947;
 }
 
+.div-info{
+    margin: auto;
+    width: 60%;
+    height: fit-content;
+}
+
+.div-info .info{
+    font-size: 22px;   
+}
 .div-image{
-    background: rgb(41 56 56 / 6%) url("./resources/META-INF/resources/images/logo-uci-dark.png") no-repeat center left;
-    height: 95%;
-    width: 100%;
+    float: right;
+    width: 300px;
+    margin-right: 18px;
+}
+.div-image .image{
+    width: 300px;
+    padding: 20px;
+}
+
+.div-image .description{
+    width: 50%;
+}
+
+.div-h1-title{
     display: flex;
-    justify-content: center;    
+    justify-content: center;
+}
+
+.h1-title{
+    font-size: 30px; 
+    color: #000;    
+}
+
+.div-link{
+    height: auto;
+    font-size: 25px;
+    background-color: #a9a9a947;
 }
 
 .footer{
     height: 5%;
 }
+

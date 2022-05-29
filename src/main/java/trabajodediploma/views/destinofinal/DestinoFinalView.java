@@ -32,7 +32,7 @@ import trabajodediploma.views.MainLayout;
 
 @PageTitle("Destino Final")
 @Route(value = "destino-final/:destinoFinalID?/:action?(edit)", layout = MainLayout.class)
-@RolesAllowed("ADMIN")
+@RolesAllowed("ASISTENTE_CONTROL")
 public class DestinoFinalView extends Div implements BeforeEnterObserver {
 
     private final String DESTINOFINAL_ID = "destinoFinalID";

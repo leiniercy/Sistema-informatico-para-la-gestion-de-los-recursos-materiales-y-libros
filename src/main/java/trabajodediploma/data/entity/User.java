@@ -41,6 +41,10 @@ public class User extends AbstractEntity {
     
     @JsonIgnore
     private String hashedPassword;
+    
+    @JsonIgnore
+    private String confirmPassword;
+    
     @Enumerated(EnumType.STRING)
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<Rol> roles;

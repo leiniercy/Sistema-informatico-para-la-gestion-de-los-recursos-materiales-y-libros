@@ -131,3 +131,11 @@
     flex-direction: row;
     align-items: center;
 }
+
+.modificar-clave-view{
+    width: 20em;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}

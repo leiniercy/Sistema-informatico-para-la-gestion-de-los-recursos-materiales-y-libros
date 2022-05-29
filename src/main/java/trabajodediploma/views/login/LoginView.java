@@ -12,21 +12,24 @@ import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import org.springframework.beans.factory.annotation.Autowired;
+import trabajodediploma.data.service.UserService;
 
 @PageTitle("Login")
 @Route(value = "login")
 public class LoginView extends Div implements BeforeEnterObserver {
 
+    UserService userService;
     LoginOverlay loginOverlay;
     Dialog dialog;
     CrearUsuarioView crearUsuario;
     Div header;
     
     
-    public LoginView() {
+    public LoginView(@Autowired UserService userService) {
         addClassName("login-view");
-        
-        Configuracion();
+        this.userService = userService;
+        Configuracion(userService);
 
         LoginI18n i18n = LoginI18n.createDefault();
         
@@ -54,9 +57,9 @@ public class LoginView extends Div implements BeforeEnterObserver {
         add(loginOverlay);
     }
 
-    private void Configuracion(){
+    private void Configuracion(UserService userService){
         
-        crearUsuario = new CrearUsuarioView();
+        crearUsuario = new CrearUsuarioView(userService);
         crearUsuario.addClassName("crear-usuario");
         loginOverlay = new LoginOverlay();
         loginOverlay.setAction("login");

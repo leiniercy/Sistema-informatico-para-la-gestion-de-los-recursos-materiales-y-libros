@@ -41,7 +41,7 @@ import trabajodediploma.views.footer.MyFooter;
 
 @PageTitle("Libros")
 @Route(value = "libro-view", layout = MainLayout.class)
-@RolesAllowed("ADMIN")
+@RolesAllowed("RESP_ALMACEN")
 public class LibroView extends Div {
 
     private Grid<Libro> grid = new Grid<>(Libro.class, false);

@@ -31,7 +31,7 @@ import trabajodediploma.views.MainLayout;
 
 @PageTitle("Modulo")
 @Route(value = "modulo-view/:moduloID?/:action?(edit)", layout = MainLayout.class)
-@RolesAllowed("ADMIN")
+@RolesAllowed("ASISTENTE_CONTROL")
 public class ModuloView extends Div implements BeforeEnterObserver {
 
     private final String MODULO_ID = "moduloID";

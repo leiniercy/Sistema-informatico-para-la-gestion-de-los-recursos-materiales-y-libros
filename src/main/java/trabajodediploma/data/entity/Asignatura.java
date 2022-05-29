@@ -1,11 +1,12 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package trabajodediploma.data.entity;
 
-import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.ManyToMany;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -15,6 +16,10 @@ import lombok.Setter;
 import lombok.ToString;
 import trabajodediploma.data.AbstractEntity;
 
+/**
+ *
+ * @author leinier
+ */
 @Data
 @Getter
 @Setter
@@ -23,26 +28,12 @@ import trabajodediploma.data.AbstractEntity;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(onlyExplicitlyIncluded = true)
 @Entity
-public class RecursoMaterial extends AbstractEntity {
+public class Asignatura extends AbstractEntity{
 
     @EqualsAndHashCode.Include
     @ToString.Include
     
     @Column
-    private String codigo;
-    
-    @Column
-    private String descripcion;
-    
-    @Column
-    private String unidadMedida;
-    
-    @Column
-    @Max(message = "Máximo 5", value = 5)
-    @Min(message = "Mínimo 1", value = 1)
-    private Integer cantidad;
-    
-    @ManyToMany(mappedBy = "recursosMateriales")
-    List<Modulo> modulos;
+    private String nombre;
 
 }

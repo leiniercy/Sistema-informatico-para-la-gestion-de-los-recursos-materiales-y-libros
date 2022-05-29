@@ -32,7 +32,7 @@ import trabajodediploma.views.footer.MyFooter;
 
 @PageTitle("Tarjeta Prestamo")
 @Route(value = "tarjeta-prestamo", layout = MainLayout.class)
-@RolesAllowed("ADMIN")
+@RolesAllowed("RESP_ALMACEN")
 public class TarjetaPrestamoView extends VerticalLayout {
 
     MyFooter myFooter;

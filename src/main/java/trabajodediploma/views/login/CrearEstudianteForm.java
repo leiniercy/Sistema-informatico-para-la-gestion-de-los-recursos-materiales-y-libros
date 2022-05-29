@@ -15,6 +15,7 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.TextField;
 
 /**
@@ -25,6 +26,7 @@ public class CrearEstudianteForm extends FormLayout {
 
     TextField nombre;
     TextField apellidos;
+    EmailField email;
     TextField solapin;
     ComboBox<Integer> anno_academico;
     ComboBox<String> facultad;
@@ -34,7 +36,7 @@ public class CrearEstudianteForm extends FormLayout {
 
     public CrearEstudianteForm() {
         Configuracion();
-        add(nombre, apellidos,solapin, anno_academico, facultad, createButtonsLayout());
+        add(nombre, apellidos,solapin,email, anno_academico, facultad, createButtonsLayout());
     }
 
     private void Configuracion() {
@@ -44,6 +46,11 @@ public class CrearEstudianteForm extends FormLayout {
 
         apellidos = new TextField();
         apellidos.setPlaceholder("Apellidos");
+        
+        email = new EmailField();
+        email.setPlaceholder("usuario@estudiantes.uci.cu");
+        email.setValue("usuario@estudiantes.uci.cu");
+        email.setClearButtonVisible(true);
 
         solapin = new TextField();
         solapin.setPlaceholder("Solapín");

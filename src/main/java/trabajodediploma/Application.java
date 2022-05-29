@@ -5,6 +5,8 @@ import com.vaadin.flow.component.page.AppShellConfigurator;
 import com.vaadin.flow.server.PWA;
 import com.vaadin.flow.theme.Theme;
 import java.util.Collections;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,16 +55,46 @@ public class Application extends SpringBootServletInitializer implements AppShel
         logger.info("... generando 1 Usuario");
 
         //Vicedecano
+        createUser1("User", "user", "user");
+        createUser2("Asistente","asistente", "asistente");
+        createUser3("Almacenero","almacen", "almacen");
         createUser4("Leinier", "admin", "admin");
     }
 
     
+    private User createUser1(String name, String username, String password) {
+        User user = new User();
+        user.setName(name);
+        user.setUsername(username);
+        user.setHashedPassword(passwordEncoder.encode(password));
+        user.setRoles(Collections.singleton(Rol.USER));
+        userRepository.saveAndFlush(user);
+        return user;
+    }
+    private User createUser2(String name, String username, String password) {
+        User user = new User();
+        user.setName(name);
+        user.setUsername(username);
+        user.setHashedPassword(passwordEncoder.encode(password));
+        user.setRoles(Collections.singleton(Rol.ASISTENTE_CONTROL));
+        userRepository.saveAndFlush(user);
+        return user;
+    }
+    private User createUser3(String name, String username, String password) {
+        User user = new User();
+        user.setName(name);
+        user.setUsername(username);
+        user.setHashedPassword(passwordEncoder.encode(password));
+        user.setRoles(Collections.singleton(Rol.RESP_ALMACEN));
+        userRepository.saveAndFlush(user);
+        return user;
+    }
     private User createUser4(String name, String username, String password) {
         User user = new User();
         user.setName(name);
         user.setUsername(username);
         user.setHashedPassword(passwordEncoder.encode(password));
-        user.setRoles(Collections.singleton(Rol.ADMIN));
+        user.setRoles(Stream.of(Rol.ADMIN,Rol.RESP_ALMACEN, Rol.ASISTENTE_CONTROL,Rol.USER).collect(Collectors.toSet()));
         userRepository.saveAndFlush(user);
         return user;
     }
