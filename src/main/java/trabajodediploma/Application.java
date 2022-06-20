@@ -56,12 +56,12 @@ public class Application extends SpringBootServletInitializer implements AppShel
 
         //Vicedecano
         createUser1("User", "user", "user");
-        createUser2("Asistente","asistente", "asistente");
-        createUser3("Almacenero","almacen", "almacen");
-        createUser4("Leinier", "admin", "admin");
+        createUser2("Asistente", "asistente", "asistente");
+        createUser3("Almacenero", "almacen", "almacen");
+        createUser4("Admin", "admin", "admin");
+        createUser5("Leinier", "leiniercy", "1234");
     }
 
-    
     private User createUser1(String name, String username, String password) {
         User user = new User();
         user.setName(name);
@@ -71,6 +71,7 @@ public class Application extends SpringBootServletInitializer implements AppShel
         userRepository.saveAndFlush(user);
         return user;
     }
+
     private User createUser2(String name, String username, String password) {
         User user = new User();
         user.setName(name);
@@ -80,6 +81,7 @@ public class Application extends SpringBootServletInitializer implements AppShel
         userRepository.saveAndFlush(user);
         return user;
     }
+
     private User createUser3(String name, String username, String password) {
         User user = new User();
         user.setName(name);
@@ -89,14 +91,25 @@ public class Application extends SpringBootServletInitializer implements AppShel
         userRepository.saveAndFlush(user);
         return user;
     }
-    private User createUser4(String name, String username, String password) {
+
+   private User createUser4(String name, String username, String password) {
         User user = new User();
         user.setName(name);
         user.setUsername(username);
         user.setHashedPassword(passwordEncoder.encode(password));
-        user.setRoles(Stream.of(Rol.ADMIN,Rol.RESP_ALMACEN, Rol.ASISTENTE_CONTROL,Rol.USER).collect(Collectors.toSet()));
+        user.setRoles(Collections.singleton(Rol.ADMIN));
         userRepository.saveAndFlush(user);
         return user;
     }
-    
+
+    private User createUser5(String name, String username, String password) {
+        User user = new User();
+        user.setName(name);
+        user.setUsername(username);
+        user.setHashedPassword(passwordEncoder.encode(password));
+        user.setRoles(Stream.of(Rol.ADMIN, Rol.RESP_ALMACEN, Rol.ASISTENTE_CONTROL, Rol.USER).collect(Collectors.toSet()));
+        userRepository.saveAndFlush(user);
+        return user;
+    }
+
 }

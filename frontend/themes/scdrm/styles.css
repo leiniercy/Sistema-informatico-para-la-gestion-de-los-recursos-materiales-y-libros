@@ -9,6 +9,7 @@
 @import url('./views/catalogo-view.css');
 @import url('./views/inicio-view.css');
 @import url('./views/footer.css');
+@import url('./views/usuario.css');
 @import url('line-awesome/dist/line-awesome/css/line-awesome.min.css');    html {
   --lumo-font-family: Cambria, "Hoefler Text", Utopia, "Liberation Serif", "Nimbus Roman No9 L Regular", Times, "Times New Roman", serif;
   --lumo-font-size: 1rem;

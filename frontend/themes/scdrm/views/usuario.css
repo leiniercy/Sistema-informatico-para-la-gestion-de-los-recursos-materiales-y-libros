@@ -1,0 +1,41 @@
+
+
+
+/*Header Dialog*/
+.div-dialog-header{
+    position: relative;
+    width: 100%;
+    margin-bottom: 50px;
+}
+
+.div-dialog-title{
+    position: absolute;
+    top: 8px;
+    left: 16px;
+    font-size: 18px;
+}
+
+.div-dialog-button{
+    position: absolute;
+    top: 8px;
+    right: 16px;
+    font-size: 18px; 
+}
+
+/*Fin -> Header Dialog*/
+
+.form-content{
+    max-height: 1050px;
+    width: 25em;
+    overflow: auto;
+}
+
+.usuario-view .button-layout {
+    margin-top: 15px;
+    background-color: var(--lumo-contrast-5pct);
+    padding-bottom: var(--lumo-space-s);
+    padding-top: var(--lumo-space-s);
+    padding-left: var(--lumo-space-l);
+    padding-right: var(--lumo-space-l);
+    gap: var(--lumo-space-m);
+}

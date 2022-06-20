@@ -65,11 +65,11 @@ public class Libro extends AbstractEntity {
     private Integer parte;
 
     @Min(message = "Mínimo 1", value = 1)
-    @Column(nullable = false)
+    @Column()
     private Integer cantidad;
 
     @Min(message = "Mínimo 0", value = 0)
-    @Column(nullable = false)
+    @Column()
     private Double precio;
     
     @OneToMany(mappedBy = "libro",cascade = CascadeType.ALL)

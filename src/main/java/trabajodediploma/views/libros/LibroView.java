@@ -280,8 +280,8 @@ public class LibroView extends Div {
 
         return toolbar;
     }
-
     /*Fin-Barra de menu*/
+
     private void deleteLibro() {
 
         try {
@@ -334,7 +334,6 @@ public class LibroView extends Div {
 
         return menuButton;
     }
-
     private static class ColumnToggleContextMenu extends ContextMenu {
 
         public ColumnToggleContextMenu(Component target) {
@@ -351,8 +350,8 @@ public class LibroView extends Div {
 
         }
     }
-
     /*Fin-Menu de Columnas*/
+    
  /*Fin-Tabla*/
     
  /*Formulario*/

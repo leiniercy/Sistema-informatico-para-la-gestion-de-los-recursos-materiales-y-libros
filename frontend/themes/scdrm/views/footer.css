@@ -1,5 +1,7 @@
 .div-footer{
     width: 100%;
+    bottom: 0px;
+    position: absolute;
     background: rgb(50, 102, 171);
 }
 .footer{

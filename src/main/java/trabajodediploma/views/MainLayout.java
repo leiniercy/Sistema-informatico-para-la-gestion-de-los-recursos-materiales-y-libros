@@ -12,13 +12,10 @@ import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.ListItem;
 import com.vaadin.flow.component.html.Nav;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.html.UnorderedList;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.server.auth.AccessAnnotationChecker;
@@ -34,6 +31,7 @@ import trabajodediploma.views.libros.LibroView;
 import trabajodediploma.views.login.CrearEstudianteForm;
 import trabajodediploma.views.login.CrearTrabajadorForm;
 import trabajodediploma.views.modulo.ModuloView;
+import trabajodediploma.views.usuarios.UsuarioView;
 import trabajodediploma.views.recursosmateriales.RecursosMaterialesView;
 import trabajodediploma.views.tarjetaprestamo.TarjetaPrestamoView;
 
@@ -194,6 +192,8 @@ public class MainLayout extends AppLayout {
             new MenuItemInfo("Inicio", "la la-home", InicioView.class), //
 
             new MenuItemInfo("Catálogo", "la la-th-list", CatalogoView.class), //
+            
+            new MenuItemInfo("Usuario", "la la-th-user", UsuarioView.class), //
 
             new MenuItemInfo("Libros", "la la-book", LibroView.class), //
 
