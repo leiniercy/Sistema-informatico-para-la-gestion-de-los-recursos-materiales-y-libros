@@ -124,7 +124,7 @@ public class LibroForm extends FormLayout {
         cantidad.setRequiredIndicatorVisible(true);
         cantidad.setHasControls(true);
         cantidad.setMin(1);
-        cantidad.setHelperText("Míximo 1");
+        cantidad.setHelperText("Mínimo 1");
         //precio
         precio = new NumberField("Precio");
         Div dollarPrefix = new Div();
@@ -209,7 +209,7 @@ public class LibroForm extends FormLayout {
 
         i18n.getError()
                 .setFileIsTooBig("El archivo excede el tamaño máximo permitido de 400 Kb.")
-                .setIncorrectFileType("El archivo seleccionado no es una imágen.");;
+                .setIncorrectFileType("El archivo seleccionado no es una imágen png o jpg.");;
         imagen.setI18n(i18n);
 
     }

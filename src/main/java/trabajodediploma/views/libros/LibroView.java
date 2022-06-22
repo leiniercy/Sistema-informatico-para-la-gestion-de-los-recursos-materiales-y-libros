@@ -34,11 +34,15 @@ import javax.annotation.security.RolesAllowed;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+
 import trabajodediploma.data.entity.Libro;
 import trabajodediploma.data.service.LibroService;
 import trabajodediploma.views.MainLayout;
 import trabajodediploma.views.footer.MyFooter;
 
+@org.springframework.stereotype.Component
+@Scope("prototype")
 @PageTitle("Libros")
 @Route(value = "libro-view", layout = MainLayout.class)
 @RolesAllowed("RESP_ALMACEN")
@@ -61,7 +65,7 @@ public class LibroView extends Div {
 
     MyFooter myFooter;
     LibroForm form;
-    
+
     private Dialog dialog;
     private Html total;
     private HorizontalLayout toolbar;
@@ -74,7 +78,7 @@ public class LibroView extends Div {
     private IntegerField filterCantidad;
     private NumberField filterPrecio;
     private Div header;
-    
+
     public LibroView(@Autowired LibroService libroService) {
         this.libroService = libroService;
         addClassNames("libros-view");
@@ -88,7 +92,7 @@ public class LibroView extends Div {
         closeEditor();
     }
 
-    /*Contenido de la vista*/
+    /* Contenido de la vista */
     private Div getContent() {
 
         Div formContent = new Div(form);
@@ -99,9 +103,8 @@ public class LibroView extends Div {
         Div content = new Div(gridContent);
         content.addClassName("content");
         content.setSizeFull();
-        
-             
-        /*Dialog Header*/
+
+        /* Dialog Header */
         Button closeButton = new Button(new Icon("lumo", "cross"), (e) -> dialog.close());
         closeButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         Span title = new Span("Libro");
@@ -109,17 +112,17 @@ public class LibroView extends Div {
         titleDiv.addClassName("div-dialog-title");
         Div buttonDiv = new Div(closeButton);
         buttonDiv.addClassName("div-dialog-button");
-        header = new Div(titleDiv,buttonDiv);
+        header = new Div(titleDiv, buttonDiv);
         header.addClassName("div-dialog-header");
-        /*Dialog Header*/
-        
-        dialog = new Dialog(header,formContent);   
-        
+        /* Dialog Header */
+
+        dialog = new Dialog(header, formContent);
+
         return content;
     }
 
-    /*Tabla*/
- /*Configuracion de la tabla*/
+    /* Tabla */
+    /* Configuracion de la tabla */
     private void configureGrid() {
         grid.setClassName("libro-grid");
         LitRenderer<Libro> imagenRenderer = LitRenderer.<Libro>of("<img style='height: 64px' src=${item.imagen} />")
@@ -168,10 +171,10 @@ public class LibroView extends Div {
         grid.setItems(libroService.findAll());
     }
 
-    /*Filtros*/
+    /* Filtros */
     private void Filtros() {
 
-        //autor
+        // autor
         filterAuthor = new TextField();
         filterAuthor.setPlaceholder("Filtrar");
         filterAuthor.setPrefixComponent(VaadinIcon.SEARCH.create());
@@ -180,10 +183,9 @@ public class LibroView extends Div {
         filterAuthor.setValueChangeMode(ValueChangeMode.EAGER);
         filterAuthor.addValueChangeListener(
                 event -> gridListDataView
-                        .addFilter(book -> StringUtils.containsIgnoreCase(book.getAutor(), filterAuthor.getValue()))
-        );
+                        .addFilter(book -> StringUtils.containsIgnoreCase(book.getAutor(), filterAuthor.getValue())));
 
-        //titulo
+        // titulo
         filterTitle = new TextField();
         filterTitle.setPlaceholder("Filtrar");
         filterTitle.setPrefixComponent(VaadinIcon.SEARCH.create());
@@ -192,10 +194,9 @@ public class LibroView extends Div {
         filterTitle.setValueChangeMode(ValueChangeMode.EAGER);
         filterTitle.addValueChangeListener(
                 event -> gridListDataView
-                        .addFilter(book -> StringUtils.containsIgnoreCase(book.getTitulo(), filterTitle.getValue()))
-        );
+                        .addFilter(book -> StringUtils.containsIgnoreCase(book.getTitulo(), filterTitle.getValue())));
 
-        //voulmen
+        // voulmen
         filterVolumen = new IntegerField();
         filterVolumen.setPlaceholder("Filtrar");
         filterVolumen.setPrefixComponent(VaadinIcon.SEARCH.create());
@@ -204,8 +205,8 @@ public class LibroView extends Div {
         filterVolumen.setValueChangeMode(ValueChangeMode.LAZY);
         filterVolumen.addValueChangeListener(
                 event -> gridListDataView
-                        .addFilter(libro -> StringUtils.containsIgnoreCase(Integer.toString(libro.getVolumen()), Integer.toString(filterVolumen.getValue())))
-        );
+                        .addFilter(libro -> StringUtils.containsIgnoreCase(Integer.toString(libro.getVolumen()),
+                                Integer.toString(filterVolumen.getValue()))));
 
         filterTomo = new IntegerField();
         filterTomo.setPlaceholder("Filtrar");
@@ -215,10 +216,10 @@ public class LibroView extends Div {
         filterTomo.setValueChangeMode(ValueChangeMode.LAZY);
         filterTomo.addValueChangeListener(
                 event -> gridListDataView
-                        .addFilter(libro -> StringUtils.containsIgnoreCase(Integer.toString(libro.getTomo()), Integer.toString(filterTomo.getValue())))
-        );
+                        .addFilter(libro -> StringUtils.containsIgnoreCase(Integer.toString(libro.getTomo()),
+                                Integer.toString(filterTomo.getValue()))));
 
-        //Parte
+        // Parte
         filterParte = new IntegerField();
         filterParte.setPlaceholder("Filtrar");
         filterParte.setPrefixComponent(VaadinIcon.SEARCH.create());
@@ -227,10 +228,10 @@ public class LibroView extends Div {
         filterParte.setValueChangeMode(ValueChangeMode.LAZY);
         filterParte.addValueChangeListener(
                 event -> gridListDataView
-                        .addFilter(libro -> StringUtils.containsIgnoreCase(Integer.toString(libro.getParte()), Integer.toString(filterParte.getValue())))
-        );
+                        .addFilter(libro -> StringUtils.containsIgnoreCase(Integer.toString(libro.getParte()),
+                                Integer.toString(filterParte.getValue()))));
 
-        //Cantidad
+        // Cantidad
         filterCantidad = new IntegerField();
         filterCantidad.setPlaceholder("Filtrar");
         filterCantidad.setPrefixComponent(VaadinIcon.SEARCH.create());
@@ -239,10 +240,10 @@ public class LibroView extends Div {
         filterCantidad.setValueChangeMode(ValueChangeMode.LAZY);
         filterCantidad.addValueChangeListener(
                 event -> gridListDataView
-                        .addFilter(libro -> StringUtils.containsIgnoreCase(Integer.toString(libro.getCantidad()), Integer.toString(filterCantidad.getValue())))
-        );
+                        .addFilter(libro -> StringUtils.containsIgnoreCase(Integer.toString(libro.getCantidad()),
+                                Integer.toString(filterCantidad.getValue()))));
 
-        //Precio
+        // Precio
         filterPrecio = new NumberField();
         filterPrecio.setPlaceholder("Filtrar");
         filterPrecio.setPrefixComponent(VaadinIcon.SEARCH.create());
@@ -251,13 +252,13 @@ public class LibroView extends Div {
         filterPrecio.setValueChangeMode(ValueChangeMode.LAZY);
         filterPrecio.addValueChangeListener(
                 event -> gridListDataView
-                        .addFilter(libro -> StringUtils.containsIgnoreCase(Double.toString(libro.getPrecio()), Double.toString(filterPrecio.getValue())))
-        );
+                        .addFilter(libro -> StringUtils.containsIgnoreCase(Double.toString(libro.getPrecio()),
+                                Double.toString(filterPrecio.getValue()))));
 
     }
-    /*Fin-Filtros*/
+    /* Fin-Filtros */
 
- /*Barra de menu*/
+    /* Barra de menu */
     private HorizontalLayout menuBar() {
         buttons = new HorizontalLayout();
         Button refreshButton = new Button(VaadinIcon.REFRESH.create());
@@ -280,14 +281,15 @@ public class LibroView extends Div {
 
         return toolbar;
     }
-    /*Fin-Barra de menu*/
+    /* Fin-Barra de menu */
 
     private void deleteLibro() {
 
         try {
 
             if (grid.asMultiSelect().isEmpty()) {
-                Notification notification = Notification.show("Debe elegir al menos un campo", 5000, Notification.Position.MIDDLE);
+                Notification notification = Notification.show("Debe elegir al menos un campo", 5000,
+                        Notification.Position.MIDDLE);
                 notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
             } else {
                 deleteItems(grid.getSelectedItems().size(), grid.getSelectedItems());
@@ -301,7 +303,8 @@ public class LibroView extends Div {
 
         } catch (Exception e) {
             e.printStackTrace();
-            Notification notification = Notification.show("Ocurrió un problema al intentar eliminar el libro", 5000, Notification.Position.MIDDLE);
+            Notification notification = Notification.show("Ocurrió un problema al intentar eliminar el libro", 5000,
+                    Notification.Position.MIDDLE);
             ;
             notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
         }
@@ -313,14 +316,15 @@ public class LibroView extends Div {
         if (cantidad == 1) {
             notification = Notification.show("El libro ha sido eliminado", 5000, Notification.Position.BOTTOM_START);
         } else {
-            notification = Notification.show("Han sido eliminados" + cantidad + " libros", 5000, Notification.Position.BOTTOM_START);
+            notification = Notification.show("Han sido eliminados" + cantidad + " libros", 5000,
+                    Notification.Position.BOTTOM_START);
         }
         notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
     }
 
-    /*Menu de Columnas*/
+    /* Menu de Columnas */
     private Button watchColumns() {
-        Button menuButton = new Button(/*"Mostar/Ocultar Columnas"*/VaadinIcon.EYE.create());
+        Button menuButton = new Button(/* "Mostar/Ocultar Columnas" */VaadinIcon.EYE.create());
 
         ColumnToggleContextMenu columnToggleContextMenu = new ColumnToggleContextMenu(
                 menuButton);
@@ -334,6 +338,7 @@ public class LibroView extends Div {
 
         return menuButton;
     }
+
     private static class ColumnToggleContextMenu extends ContextMenu {
 
         public ColumnToggleContextMenu(Component target) {
@@ -350,11 +355,11 @@ public class LibroView extends Div {
 
         }
     }
-    /*Fin-Menu de Columnas*/
-    
- /*Fin-Tabla*/
-    
- /*Formulario*/
+    /* Fin-Menu de Columnas */
+
+    /* Fin-Tabla */
+
+    /* Formulario */
     private void configureForm() {
         form = new LibroForm();
         form.setWidth("25em");
@@ -368,22 +373,20 @@ public class LibroView extends Div {
 
         listLibros = listLibros.parallelStream()
                 .filter(lib -> event.getLibro().getImagen().equals(lib.getImagen())
-                && event.getLibro().getTitulo().equals(lib.getTitulo())
-                && event.getLibro().getAutor().equals(lib.getAutor())
-                && event.getLibro().getVolumen().equals(lib.getVolumen())
-                && event.getLibro().getTomo().equals(lib.getTomo())
-                && event.getLibro().getParte().equals(lib.getParte())
-                && event.getLibro().getCantidad().equals(lib.getCantidad())
-                && event.getLibro().getPrecio().equals(lib.getPrecio())
-                )
+                        && event.getLibro().getTitulo().equals(lib.getTitulo())
+                        && event.getLibro().getAutor().equals(lib.getAutor())
+                        && event.getLibro().getVolumen().equals(lib.getVolumen())
+                        && event.getLibro().getTomo().equals(lib.getTomo())
+                        && event.getLibro().getParte().equals(lib.getParte())
+                        && event.getLibro().getCantidad().equals(lib.getCantidad())
+                        && event.getLibro().getPrecio().equals(lib.getPrecio()))
                 .collect(Collectors.toList());
 
         if (listLibros.size() != 0) {
             Notification notification = Notification.show(
                     "El libro ya existe",
                     5000,
-                    Notification.Position.MIDDLE
-            );
+                    Notification.Position.MIDDLE);
             notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
         } else {
             if (event.getLibro().getId() == null) {
@@ -391,16 +394,14 @@ public class LibroView extends Div {
                 Notification notification = Notification.show(
                         "Libro añadido",
                         5000,
-                        Notification.Position.BOTTOM_START
-                );
+                        Notification.Position.BOTTOM_START);
                 notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
             } else {
                 libroService.update(event.getLibro());
                 Notification notification = Notification.show(
                         "Libro modificado",
                         5000,
-                        Notification.Position.BOTTOM_START
-                );
+                        Notification.Position.BOTTOM_START);
                 notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
             }
             toolbar.remove(total);
@@ -413,7 +414,7 @@ public class LibroView extends Div {
 
     }
 
-    public void editLibro(Libro libro) {
+    private void editLibro(Libro libro) {
         if (libro == null) {
             closeEditor();
         } else {
@@ -424,7 +425,7 @@ public class LibroView extends Div {
         }
     }
 
-    void addLibro() {
+    private void addLibro() {
         grid.asMultiSelect().clear();
         Libro b = new Libro();
         b.setImagen("");
@@ -442,5 +443,5 @@ public class LibroView extends Div {
         grid.setItems(libroService.findAll());
     }
 
-    /*Fin-Formulario*/
+    /* Fin-Formulario */
 }

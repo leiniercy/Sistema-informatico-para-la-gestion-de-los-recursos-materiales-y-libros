@@ -1,7 +1,10 @@
 package trabajodediploma.data.service;
 
 import trabajodediploma.data.repository.RecursoMaterialRepository;
+
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -18,24 +21,30 @@ public class RecursoMaterialService {
         this.repository = repository;
     }
 
-    public Optional<RecursoMaterial> get(UUID id) {
-        return repository.findById(id);
+    public List<RecursoMaterial> findAll() {
+        return repository.findAll();
     }
 
-    public RecursoMaterial update(RecursoMaterial entity) {
-        return repository.save(entity);
+    public RecursoMaterial findById(UUID id) {
+        return repository.findById(id).get();
     }
 
-    public void delete(UUID id) {
-        repository.deleteById(id);
+    public RecursoMaterial save(RecursoMaterial material) {
+        return repository.save(material);
     }
 
-    public Page<RecursoMaterial> list(Pageable pageable) {
-        return repository.findAll(pageable);
+    public RecursoMaterial update(RecursoMaterial material) {
+        return repository.save(material);
     }
 
-    public int count() {
-        return (int) repository.count();
+    public void delete(RecursoMaterial material) {
+        repository.delete(material);
+    }
+
+    public void deleteAll(Set<RecursoMaterial>materiales){repository.deleteAll(materiales);}
+
+    public long count() {
+        return repository.count();
     }
 
 }

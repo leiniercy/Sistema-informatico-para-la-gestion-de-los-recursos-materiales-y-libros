@@ -60,6 +60,7 @@ public class Application extends SpringBootServletInitializer implements AppShel
         createUser3("Almacenero", "almacen", "almacen");
         createUser4("Admin", "admin", "admin");
         createUser5("Leinier", "leiniercy", "1234");
+        createUser6("Vicedecano", "vicedecano", "vicedecano");
     }
 
     private User createUser1(String name, String username, String password) {
@@ -107,7 +108,17 @@ public class Application extends SpringBootServletInitializer implements AppShel
         user.setName(name);
         user.setUsername(username);
         user.setHashedPassword(passwordEncoder.encode(password));
-        user.setRoles(Stream.of(Rol.ADMIN, Rol.RESP_ALMACEN, Rol.ASISTENTE_CONTROL, Rol.USER).collect(Collectors.toSet()));
+        user.setRoles(Stream.of(Rol.ADMIN, Rol.VD_ADIMN_ECONOMIA,Rol.RESP_ALMACEN, Rol.ASISTENTE_CONTROL, Rol.USER).collect(Collectors.toSet()));
+        userRepository.saveAndFlush(user);
+        return user;
+    }
+    
+    private User createUser6(String name, String username, String password) {
+        User user = new User();
+        user.setName(name);
+        user.setUsername(username);
+        user.setHashedPassword(passwordEncoder.encode(password));
+        user.setRoles(Collections.singleton(Rol.VD_ADIMN_ECONOMIA));
         userRepository.saveAndFlush(user);
         return user;
     }
