@@ -1,15 +1,15 @@
 package trabajodediploma.data.entity;
 
 import java.util.List;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -66,14 +66,18 @@ public class Trabajador extends AbstractEntity {
     @Column
     private String categoria;
 
-    @Column
-    private String area;
+    @ManyToMany(mappedBy = "trabajadores")
+    List<DestinoFinal> destinoFinal;
 
     @ManyToMany(mappedBy = "trabajadores")
-    List<Modulo> modulos;
+    List<TarjetaPrestamo> tarjetaPrestamo;
 
     public String getNombreApellidos() {
         return nombre + " " + apellidos;
     }
+
+    @JoinColumn(name = "area_id",nullable = false, updatable = false)
+    @ManyToOne()
+    private Area area;
 
 }

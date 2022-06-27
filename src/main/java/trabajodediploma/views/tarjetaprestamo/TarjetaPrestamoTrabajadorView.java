@@ -150,7 +150,7 @@ public class TarjetaPrestamoTrabajadorView extends Div {
         headerRow.getCell(fechaDevolucionColumn).setComponent(devolucionFilter);
 
         gridListDataView = grid.setItems(
-                prestamos.parallelStream().filter(t -> t.getTrabajador().equals(trabajador)).collect(Collectors.toList())
+                prestamos.parallelStream().filter(t -> t.getTrabajadores().equals(trabajador)).collect(Collectors.toList())
         );
         grid.setAllRowsVisible(true);
         grid.setSizeFull();
@@ -165,7 +165,7 @@ public class TarjetaPrestamoTrabajadorView extends Div {
 
     private void refreshGrid() {
         grid.setVisible(true);
-        grid.setItems(prestamos.parallelStream().filter(event -> event.getTrabajador().equals(trabajador)).collect(Collectors.toList()));
+        grid.setItems(prestamos.parallelStream().filter(event -> event.getTrabajadores().equals(trabajador)).collect(Collectors.toList()));
     }
 
     /*Filtros*/
@@ -179,7 +179,7 @@ public class TarjetaPrestamoTrabajadorView extends Div {
         libroFilter.setWidth("100%");
         libroFilter.addValueChangeListener(event -> {
             if (libroFilter.getValue() == null) {
-                gridListDataView = grid.setItems(prestamos.parallelStream().filter(t -> t.getTrabajador().equals(trabajador)).collect(Collectors.toList()));
+                gridListDataView = grid.setItems(prestamos.parallelStream().filter(t -> t.getTrabajadores().equals(trabajador)).collect(Collectors.toList()));
             } else {
                 gridListDataView.addFilter(tarjeta -> areLibroEqual(tarjeta, libroFilter));
             }
@@ -191,7 +191,7 @@ public class TarjetaPrestamoTrabajadorView extends Div {
         entregaFilter.setWidth("100%");
         entregaFilter.addValueChangeListener(event -> {
             if (entregaFilter.getValue() == null) {
-                gridListDataView = grid.setItems(prestamos.parallelStream().filter(t -> t.getTrabajador().equals(trabajador)).collect(Collectors.toList()));
+                gridListDataView = grid.setItems(prestamos.parallelStream().filter(t -> t.getTrabajadores().equals(trabajador)).collect(Collectors.toList()));
             } else {
                 gridListDataView.addFilter(tarjeta -> areFechaInicioEqual(tarjeta, entregaFilter));
             }
@@ -203,7 +203,7 @@ public class TarjetaPrestamoTrabajadorView extends Div {
         devolucionFilter.setWidth("100%");
         devolucionFilter.addValueChangeListener(event -> {
             if (devolucionFilter.getValue() == null) {
-                gridListDataView = grid.setItems(prestamos.parallelStream().filter(t -> t.getTrabajador().equals(trabajador)).collect(Collectors.toList()));
+                gridListDataView = grid.setItems(prestamos.parallelStream().filter(t -> t.getTrabajadores().equals(trabajador)).collect(Collectors.toList()));
             } else {
                 gridListDataView.addFilter(tarjeta -> areFechaFinEqual(tarjeta, devolucionFilter));
             }
@@ -318,7 +318,7 @@ public class TarjetaPrestamoTrabajadorView extends Div {
 
         prestamos = prestamos.parallelStream()
                 .filter(lib -> event.getTarjetaPrestamo().getLibro().equals(lib.getLibro())
-                && event.getTarjetaPrestamo().getTrabajador().equals(lib.getTrabajador())
+                && event.getTarjetaPrestamo().getTrabajadores().equals(lib.getTrabajadores())
                 && event.getTarjetaPrestamo().getFechaPrestamo().equals(lib.getFechaPrestamo())
                 && event.getTarjetaPrestamo().getFechaDevolucion().equals(lib.getFechaDevolucion())
                 )
@@ -380,7 +380,7 @@ public class TarjetaPrestamoTrabajadorView extends Div {
     }
 
     private void updateList() {
-        grid.setItems(prestamoService.findAll().parallelStream().filter(event -> event.getTrabajador().equals(trabajador)).collect(Collectors.toList()));
+        grid.setItems(prestamoService.findAll().parallelStream().filter(event -> event.getTrabajadores().equals(trabajador)).collect(Collectors.toList()));
     }
     /*Fin-Barra de menu*/
 

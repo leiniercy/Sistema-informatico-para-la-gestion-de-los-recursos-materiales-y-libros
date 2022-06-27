@@ -1,11 +1,15 @@
 package trabajodediploma.data.entity;
 
 import java.time.LocalDate;
-import javax.persistence.CascadeType;
+import java.util.List;
+
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
@@ -30,8 +34,13 @@ public class TarjetaPrestamo extends AbstractEntity {
     @EqualsAndHashCode.Include
     @ToString.Include
 
-    @OneToOne()
-    private Estudiante estudiante;
+    @ManyToMany
+    @JoinTable(
+            name = "tarjetaPrestamo_estudiantes",
+            joinColumns = @JoinColumn(name = "tarjetaP_id"),
+            inverseJoinColumns = @JoinColumn(name = "estudiante_id"))
+    @ElementCollection(fetch = FetchType.EAGER)
+    private List<Estudiante> estudiantes;
 
     @NotNull(message = "El campo no debe estar vacío")
     @JoinColumn(name = "libro_id", nullable = false, updatable = false)
@@ -44,6 +53,11 @@ public class TarjetaPrestamo extends AbstractEntity {
     @Column(name = "fechaDevolucion")
     private LocalDate fechaDevolucion;
 
-    @OneToOne()
-    Trabajador trabajador;
+    @ManyToMany
+    @JoinTable(
+            name = "tarjetaPrestamo_trabajadores",
+            joinColumns = @JoinColumn(name = "tarjetaP_id"),
+            inverseJoinColumns = @JoinColumn(name = "trabajador_id"))
+    @ElementCollection(fetch = FetchType.EAGER)
+    private List<Trabajador> trabajadores;
 }

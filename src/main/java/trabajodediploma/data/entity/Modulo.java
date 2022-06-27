@@ -54,20 +54,4 @@ public class Modulo extends AbstractEntity {
     @ManyToMany(mappedBy = "modulos")
     List<DestinoFinal> destinosFinales;
 
-    @ManyToMany
-    @JoinTable(
-            name = "modulo_trabajadores",
-            joinColumns = @JoinColumn(name = "modulo_id"),
-            inverseJoinColumns = @JoinColumn(name = "trabajador_id"))
-    @ElementCollection(fetch = FetchType.EAGER)
-    private List<Trabajador> trabajadores;
-    
-    @ManyToMany
-    @JoinTable(
-            name = "modulo_estudiantes",
-            joinColumns = @JoinColumn(name = "modulo_id"),
-            inverseJoinColumns = @JoinColumn(name = "estudiante_id"))
-    @ElementCollection(fetch = FetchType.EAGER)
-    private List<Estudiante> estudiantes;
-
 }

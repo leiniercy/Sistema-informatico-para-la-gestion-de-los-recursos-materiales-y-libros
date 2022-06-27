@@ -45,4 +45,23 @@ public class DestinoFinal extends AbstractEntity {
     @ElementCollection(fetch = FetchType.EAGER)
     private List<Modulo> modulos;
 
+    @ManyToMany
+    @JoinTable(
+            name = "destinoFinal_trabajadores",
+            joinColumns = @JoinColumn(name = "destinoF_id"),
+            inverseJoinColumns = @JoinColumn(name = "trabajador_id"))
+    @ElementCollection(fetch = FetchType.EAGER)
+    private List<Trabajador> trabajadores;
+    
+    @ManyToMany
+    @JoinTable(
+            name = "destinoFinal_estudiantes",
+            joinColumns = @JoinColumn(name = "destinoF_id"),
+            inverseJoinColumns = @JoinColumn(name = "estudiante_id"))
+    @ElementCollection(fetch = FetchType.EAGER)
+    private List<Estudiante> estudiantes;
+
+
+
+
 }

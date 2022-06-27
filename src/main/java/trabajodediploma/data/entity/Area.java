@@ -1,7 +1,14 @@
 package trabajodediploma.data.entity;
 
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.OneToMany;
+
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -25,5 +32,9 @@ public class Area extends AbstractEntity {
     
     @Column
     private String nombre;
+
+    @OneToMany(mappedBy = "area", cascade = CascadeType.ALL)
+    @ElementCollection(fetch = FetchType.EAGER)
+    private List<Trabajador> trabajadores;
 
 }

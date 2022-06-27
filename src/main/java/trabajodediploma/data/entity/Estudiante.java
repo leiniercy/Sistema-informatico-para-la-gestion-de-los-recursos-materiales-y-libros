@@ -83,7 +83,10 @@ public class Estudiante extends AbstractEntity {
     private Grupo grupo;
 
     @ManyToMany(mappedBy = "estudiantes")
-    List<Modulo> modulos;
+    List<DestinoFinal> destinoFinal;
+
+    @ManyToMany(mappedBy = "estudiantes")
+    List<TarjetaPrestamo> tarjetaPrestamo;
     
     public String getNombreApellidos() {
         return nombre + " " + apellidos;
