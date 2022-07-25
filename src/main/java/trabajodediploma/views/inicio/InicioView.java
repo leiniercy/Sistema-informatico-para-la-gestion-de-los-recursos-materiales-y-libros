@@ -29,7 +29,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import trabajodediploma.data.entity.Estudiante;
 import trabajodediploma.data.entity.Trabajador;
 import trabajodediploma.data.entity.User;
+import trabajodediploma.data.service.AreaService;
 import trabajodediploma.data.service.EstudianteService;
+import trabajodediploma.data.service.GrupoService;
 import trabajodediploma.data.service.TrabajadorService;
 import trabajodediploma.security.AuthenticatedUser;
 import trabajodediploma.views.MainLayout;
@@ -43,38 +45,43 @@ import trabajodediploma.views.login.CrearInformacionPerfilView;
 public class InicioView extends Div {
 
     private CrearInformacionPerfilView crearPerfil;
-    private Estudiante estudiante_registrado;
-    private Trabajador trabajador_registrado;
-
     private MyFooter footer;
     private Div content;
-
     private List<Estudiante> estudiantes;
     private List<Trabajador> trabajadores;
-
     private Dialog dialog;
     private AuthenticatedUser authenticatedUser;
     private EstudianteService estudianteService;
     private TrabajadorService trabajadorService;
+    private AreaService areaService;
+    private GrupoService grupoService;
     private Div header;
+    private User user;
 
     public InicioView(
             @Autowired AuthenticatedUser authenticatedUser,
             @Autowired EstudianteService estudianteService,
-            @Autowired TrabajadorService trabajadorService
+            @Autowired TrabajadorService trabajadorService,
+            @Autowired AreaService areaService,
+            @Autowired GrupoService grupoService
     ) {
         addClassName("inicio-view");
         this.authenticatedUser = authenticatedUser;
         this.estudianteService = estudianteService;
         this.trabajadorService = trabajadorService;
+        this.areaService = areaService;
+        this.grupoService = grupoService;
         estudiantes = estudianteService.findAll();
         trabajadores = trabajadorService.findAll();
         Configuracion();
 
         Optional<User> maybeUser = authenticatedUser.get();
         if (maybeUser.isPresent()) {
-            User user = maybeUser.get();
-
+            user = maybeUser.get();
+            /*crear perfil*/
+            crearPerfil = new CrearInformacionPerfilView(user,estudianteService,trabajadorService,areaService,grupoService);
+            dialog = new Dialog(header,crearPerfil);
+            /*Fin -> crear perfil*/
             estudiantes = estudiantes.parallelStream().filter(event -> event.getUser().getUsername().equals(user.getUsername())).collect(Collectors.toList());
             trabajadores = trabajadores.parallelStream().filter(event -> event.getUser().getUsername().equals(user.getUsername())).collect(Collectors.toList());
 
@@ -107,14 +114,7 @@ public class InicioView extends Div {
         header = new Div(titleDiv, buttonDiv);
         header.addClassName("div-perfil-header");
         /*Fin -> Header crear perfil usuario*/
-
-        /*crear perfil*/
-        crearPerfil = new CrearInformacionPerfilView();
-        dialog = new Dialog(header, crearPerfil);
-        /*Fin -> crear perfil*/
-        
         divDescripcionSistema();
-
     }
 
     private void divDescripcionSistema() {
@@ -125,24 +125,24 @@ public class InicioView extends Div {
         divTitle.addClassName("div-h1-title");
         /*titulo*/
 
-         /*imagen*/
+ /*imagen*/
         Image img = new Image("images/presentacion.png", "Logo");
         img.addClassName("image");
         Div imageDiv = new Div(img);
         imageDiv.addClassName("div-image");
         /*imagen*/
-        /*descripcion*/
+ /*descripcion*/
         Paragraph info = new Paragraph("Aplicación destinada al cuidadado, protección y "
                 + "conservación de los recursos materiales que posee la facutad 4, sobre la base"
                 + "de un uso adecuado en función del control de la entrega del módulos a estudiantes "
                 + "y trabajadores además de la entrada y salida de libros del almacén.");
         info.addClassName("info");
-        Div divInfo = new Div(imageDiv,info);
+        Div divInfo = new Div(imageDiv, info);
         divInfo.addClassName("div-info");
         /*descripcion*/
 
-        content.add(divTitle,divInfo);
-      }
+        content.add(divTitle, divInfo);
+    }
 
     private Component Links() {
 

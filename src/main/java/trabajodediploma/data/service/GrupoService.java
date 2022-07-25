@@ -1,7 +1,9 @@
 package trabajodediploma.data.service;
 
+import java.util.List;
 import trabajodediploma.data.repository.GrupoRepository;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -18,24 +20,31 @@ public class GrupoService {
         this.repository = repository;
     }
 
-    public Optional<Grupo> get(UUID id) {
-        return repository.findById(id);
+ public List<Grupo> findAll() {
+        return repository.findAll();
+    }
+    
+    public Grupo findById(UUID id){
+     return repository.findById(id).get();
+    }
+    
+    public Grupo save(Grupo grupo) {
+        return repository.save(grupo);
     }
 
-    public Grupo update(Grupo entity) {
-        return repository.save(entity);
+    
+    public Grupo update(Grupo grupo) {
+        return repository.save(grupo);
     }
 
-    public void delete(UUID id) {
-        repository.deleteById(id);
+    public void delete(Grupo grupo) {
+        repository.delete(grupo);
     }
 
-    public Page<Grupo> list(Pageable pageable) {
-        return repository.findAll(pageable);
-    }
-
-    public int count() {
-        return (int) repository.count();
+    public void deleteAll(Set<Grupo>grupos){repository.deleteAll(grupos);}
+    
+    public long count(){
+      return repository.count();
     }
 
 }

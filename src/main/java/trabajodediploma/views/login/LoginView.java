@@ -24,15 +24,14 @@ public class LoginView extends Div implements BeforeEnterObserver {
     Dialog dialog;
     CrearUsuarioView crearUsuario;
     Div header;
-    
-    
+
     public LoginView(@Autowired UserService userService) {
         addClassName("login-view");
         this.userService = userService;
         Configuracion(userService);
 
         LoginI18n i18n = LoginI18n.createDefault();
-        
+
         i18n.setHeader(new LoginI18n.Header());
         i18n.getHeader().setTitle("SCDRM");
         i18n.getHeader().setDescription("Sistema de Control y Distribución de los Recursos Materiales");
@@ -49,21 +48,21 @@ public class LoginView extends Div implements BeforeEnterObserver {
         i18n.getErrorMessage().setMessage("Usuario o contraseña incorrectos");
 
         loginOverlay.setI18n(i18n);
-        loginOverlay.addForgotPasswordListener(event->{
+        loginOverlay.addForgotPasswordListener(event -> {
             dialog.open();
-        }); 
+        });
         loginOverlay.setForgotPasswordButtonVisible(true);
         loginOverlay.setOpened(true);
         add(loginOverlay);
     }
 
-    private void Configuracion(UserService userService){
+    private void Configuracion(UserService userService) {
         
-        crearUsuario = new CrearUsuarioView(userService);
+        crearUsuario = new CrearUsuarioView(userService,dialog);
         crearUsuario.addClassName("crear-usuario");
         loginOverlay = new LoginOverlay();
         loginOverlay.setAction("login");
-        
+
         /*Header crear usuario*/
         Button closeButton = new Button(new Icon("lumo", "cross"), (e) -> dialog.close());
         closeButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
@@ -72,17 +71,14 @@ public class LoginView extends Div implements BeforeEnterObserver {
         titleDiv.addClassName("title-div");
         Div buttonDiv = new Div(closeButton);
         buttonDiv.addClassName("button-div");
-        header = new Div(titleDiv,buttonDiv);
+        header = new Div(titleDiv, buttonDiv);
         header.addClassName("registrar-header");
         /*Fin -> Header crear usuario*/
-        
-        dialog = new Dialog(header,crearUsuario);
-                
-  
+
+        dialog = new Dialog(header, crearUsuario);
+
     }
-    
-    
-    
+
     @Override
     public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
         // inform the user about an authentication error
@@ -90,7 +86,7 @@ public class LoginView extends Div implements BeforeEnterObserver {
                 .getQueryParameters()
                 .getParameters()
                 .containsKey("error")) {
-         loginOverlay.setError(true);
+            loginOverlay.setError(true);
         }
     }
 

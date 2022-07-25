@@ -149,7 +149,7 @@ public class TarjetaPrestamoEstudianteView extends Div {
         headerRow.getCell(fechaDevolucionColumn).setComponent(devolucionFilter);
 
         gridListDataView = grid.setItems(
-                prestamos.parallelStream().filter(e -> e.getEstudiante().equals(estudiante)).collect(Collectors.toList())
+                prestamos.parallelStream().filter(e -> e.getEstudiantes().equals(estudiante)).collect(Collectors.toList())
         );
         grid.setAllRowsVisible(true);
         grid.setSizeFull();
@@ -164,7 +164,7 @@ public class TarjetaPrestamoEstudianteView extends Div {
 
     private void refreshGrid() {
         grid.setVisible(true);
-        grid.setItems(prestamos.parallelStream().filter(e -> e.getEstudiante().equals(estudiante)).collect(Collectors.toList()));
+        grid.setItems(prestamos.parallelStream().filter(e -> e.getEstudiantes().equals(estudiante)).collect(Collectors.toList()));
     }
 
     /*Filtros*/
@@ -178,7 +178,7 @@ public class TarjetaPrestamoEstudianteView extends Div {
         libroFilter.setWidth("100%");
         libroFilter.addValueChangeListener(event -> {
             if (libroFilter.getValue() == null) {
-                gridListDataView = grid.setItems(prestamos.parallelStream().filter(e -> e.getEstudiante().equals(estudiante)).collect(Collectors.toList()));
+                gridListDataView = grid.setItems(prestamos.parallelStream().filter(e -> e.getEstudiantes().equals(estudiante)).collect(Collectors.toList()));
             } else {
                 gridListDataView.addFilter(tarjeta -> areLibroEqual(tarjeta, libroFilter));
             }
@@ -190,7 +190,7 @@ public class TarjetaPrestamoEstudianteView extends Div {
         entregaFilter.setWidth("100%");
         entregaFilter.addValueChangeListener(event -> {
             if (entregaFilter.getValue() == null) {
-                gridListDataView = grid.setItems(prestamos.parallelStream().filter(e -> e.getEstudiante().equals(estudiante)).collect(Collectors.toList()));
+                gridListDataView = grid.setItems(prestamos.parallelStream().filter(e -> e.getEstudiantes().equals(estudiante)).collect(Collectors.toList()));
             } else {
                 gridListDataView.addFilter(tarjeta -> areFechaInicioEqual(tarjeta, entregaFilter));
             }
@@ -202,7 +202,7 @@ public class TarjetaPrestamoEstudianteView extends Div {
         devolucionFilter.setWidth("100%");
         devolucionFilter.addValueChangeListener(event -> {
             if (devolucionFilter.getValue() == null) {
-                gridListDataView = grid.setItems(prestamos.parallelStream().filter(e -> e.getEstudiante().equals(estudiante)).collect(Collectors.toList()));
+                gridListDataView = grid.setItems(prestamos.parallelStream().filter(e -> e.getEstudiantes().equals(estudiante)).collect(Collectors.toList()));
             } else {
                 gridListDataView.addFilter(tarjeta -> areFechaFinEqual(tarjeta, devolucionFilter));
             }
@@ -317,7 +317,7 @@ public class TarjetaPrestamoEstudianteView extends Div {
 
         prestamos = prestamos.parallelStream()
                 .filter(lib -> event.getTarjetaPrestamo().getLibro().equals(lib.getLibro())
-                && event.getTarjetaPrestamo().getEstudiante().equals(lib.getEstudiante())
+                && event.getTarjetaPrestamo().getEstudiantes().equals(lib.getEstudiantes())
                 && event.getTarjetaPrestamo().getFechaPrestamo().equals(lib.getFechaPrestamo())
                 && event.getTarjetaPrestamo().getFechaDevolucion().equals(lib.getFechaDevolucion())
                 )
@@ -380,7 +380,7 @@ public class TarjetaPrestamoEstudianteView extends Div {
     }
 
     private void updateList() {
-        grid.setItems(prestamoService.findAll().parallelStream().filter(e -> e.getEstudiante().equals(estudiante)).collect(Collectors.toList()));
+        grid.setItems(prestamoService.findAll().parallelStream().filter(e -> e.getEstudiantes().equals(estudiante)).collect(Collectors.toList()));
     }
     /*Fin-Barra de menu*/
 

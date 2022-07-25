@@ -1,11 +1,10 @@
 package trabajodediploma.data.service;
 
+import java.util.List;
 import trabajodediploma.data.repository.AreaRepository;
-import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import trabajodediploma.data.entity.Area;
 
@@ -18,24 +17,30 @@ public class AreaService {
         this.repository = repository;
     }
 
-    public Optional<Area> get(UUID id) {
-        return repository.findById(id);
+    public List<Area> findAll() {
+        return repository.findAll();
+    }
+    
+    public Area findById(UUID id){
+     return repository.findById(id).get();
+    }
+    
+    public Area save(Area area) {
+        return repository.save(area);
     }
 
-    public Area update(Area entity) {
-        return repository.save(entity);
+    
+    public Area update(Area area) {
+        return repository.save(area);
     }
 
-    public void delete(UUID id) {
-        repository.deleteById(id);
+    public void delete(Area area) {
+        repository.delete(area);
     }
 
-    public Page<Area> list(Pageable pageable) {
-        return repository.findAll(pageable);
+    public void deleteAll(Set<Area>areas){repository.deleteAll(areas);}
+    
+    public long count(){
+      return repository.count();
     }
-
-    public int count() {
-        return (int) repository.count();
-    }
-
 }

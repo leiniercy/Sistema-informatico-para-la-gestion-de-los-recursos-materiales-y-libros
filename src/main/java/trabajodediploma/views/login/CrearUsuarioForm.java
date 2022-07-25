@@ -27,10 +27,14 @@ import elemental.json.Json;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.Collections;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.util.UriUtils;
+import trabajodediploma.data.Rol;
 import trabajodediploma.data.entity.User;
 import trabajodediploma.data.tools.MyUploadI18n;
-import trabajodediploma.views.libros.LibroForm;
+
 
 /**
  *
@@ -38,6 +42,8 @@ import trabajodediploma.views.libros.LibroForm;
  */
 public class CrearUsuarioForm extends FormLayout {
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
     private User user;
     private Image imagePreview;
     Upload profilePictureUrl;
@@ -53,14 +59,12 @@ public class CrearUsuarioForm extends FormLayout {
 
     public CrearUsuarioForm() {
         Configuracion();
-
         add(profilePictureUrl, name, username, hashedPassword, confirmPassword, createButtonsLayout());
     }
 
     private void Configuracion() {
         addClassName("crear-usuario-form");
         binder.bindInstanceFields(this);
-
         /*imagen*/
         Label imageSize = new Label("Tamaño maximo: 400kb");
         imageSize.getStyle().set("color", "var(--lumo-secondary-text-color)");
@@ -73,8 +77,7 @@ public class CrearUsuarioForm extends FormLayout {
         uploadButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         profilePictureUrl.setUploadButton(uploadButton);
         /*Fin->imagen*/
-
- /*nombre*/
+        /*nombre*/
         name = new TextField();
         name.setPlaceholder("Nombre y apellidos ...");
         name.setRequired(true);
@@ -85,20 +88,14 @@ public class CrearUsuarioForm extends FormLayout {
             event.getSource().setHelperText(event.getValue().length() + "/" + 255);
         });
         /*Fin->nombre*/
-
- /*usuario*/
+        /*usuario*/
         username = new TextField();
         username.setPlaceholder("Usuario...");
         username.setRequired(true);
         username.setMinLength(2);
         username.setMaxLength(255);
-        username.setErrorMessage("Solo letras, mínimo 2 caracteres y máximo 255");
-        username.addValueChangeListener(event -> {
-            event.getSource().setHelperText(event.getValue().length() + "/" + 255);
-        });
         /*Fin->usuario*/
-
- /*contrasena*/
+        /*contrasena*/
         hashedPassword = new PasswordField();
         hashedPassword.setPlaceholder("Contraseña...");
         hashedPassword.setMinLength(8);
@@ -108,8 +105,7 @@ public class CrearUsuarioForm extends FormLayout {
             event.getSource().setHelperText(event.getValue().length() + "/" + 255);
         });
         /*Fin->Contrasena*/
-
- /*confirmacion*/
+        /*confirmacion*/
         confirmPassword = new PasswordField();
         confirmPassword.setPlaceholder("Confirmar contraseña...");
         confirmPassword.setMinLength(8);
@@ -119,24 +115,18 @@ public class CrearUsuarioForm extends FormLayout {
             event.getSource().setHelperText(event.getValue().length() + "/" + 255);
         });
         /*Fin->confirmacion*/
-
         attachImageUpload(profilePictureUrl, imagePreview);
-
     }
-
     private HorizontalLayout createButtonsLayout() {
-
         HorizontalLayout buttonlayout = new HorizontalLayout();
         buttonlayout.addClassName("button-layout");
-
+        save.addClickListener(event -> validateAndSave());
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         save.addClickShortcut(Key.ENTER);
-
+        close.addClickListener(event -> fireEvent(new CloseEvent(this)));
         close.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         close.addClickShortcut(Key.ESCAPE);
-
         buttonlayout.add(save, close);
-
         return buttonlayout;
     }
 
@@ -156,6 +146,13 @@ public class CrearUsuarioForm extends FormLayout {
             if (hashedPassword.getValue().equals(confirmPassword.getValue())) {
                 binder.writeBean(user);
                 this.user.setProfilePictureUrl(imagePreview.getSrc());
+                this.user.setName(name.getValue());
+                this.user.setUsername(username.getValue());
+//                this.user.setHashedPassword(passwordEncoder.encode(hashedPassword.getValue()));
+//                this.user.setConfirmPassword(passwordEncoder.encode(confirmPassword.getValue()));
+                this.user.setHashedPassword(hashedPassword.getValue());
+                this.user.setConfirmPassword(confirmPassword.getValue());
+                this.user.setRoles(Collections.singleton(Rol.USER));
                 fireEvent(new CrearUsuarioForm.SaveEvent(this, user));
             } else {
                 Notification notification = Notification.show(
@@ -168,7 +165,7 @@ public class CrearUsuarioForm extends FormLayout {
         } catch (ValidationException e) {
             e.printStackTrace();
             Notification notification = Notification.show(
-                    "Ocurrió un problema al intentar almacenar el libro",
+                    "Ocurrió un problema al intentar almacenar el usuario",
                     5000,
                     Notification.Position.MIDDLE
             );

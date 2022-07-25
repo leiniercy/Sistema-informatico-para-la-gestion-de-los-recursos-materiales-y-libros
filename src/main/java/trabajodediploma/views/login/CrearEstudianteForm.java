@@ -5,18 +5,28 @@
  */
 package trabajodediploma.views.login;
 
+import com.vaadin.flow.component.ComponentEvent;
+import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.EmailField;
+import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.binder.BeanValidationBinder;
+import com.vaadin.flow.data.binder.ValidationException;
+import com.vaadin.flow.shared.Registration;
+import java.util.List;
+import trabajodediploma.data.entity.Estudiante;
+import trabajodediploma.data.entity.Grupo;
+import trabajodediploma.data.entity.User;
 
 /**
  *
@@ -24,61 +34,192 @@ import com.vaadin.flow.component.textfield.TextField;
  */
 public class CrearEstudianteForm extends FormLayout {
 
-    TextField nombre;
-    TextField apellidos;
-    EmailField email;
-    TextField solapin;
-    ComboBox<Integer> anno_academico;
-    ComboBox<String> facultad;
-
+    User user;
+    Estudiante estudiante;
+    TextField nombre = new TextField();
+    TextField apellidos = new TextField();
+    EmailField email = new EmailField();
+    TextField solapin = new TextField();
+    IntegerField anno_academico = new IntegerField();
+    ComboBox<String> facultad = new ComboBox<>();
+    ComboBox<Grupo> grupo = new ComboBox<>();
+    List<Grupo> listGrupos;
+    
     Button save = new Button("Añadir", VaadinIcon.PLUS.create());
-    Button close = new Button("Cancelar", VaadinIcon.ERASER.create());
 
-    public CrearEstudianteForm() {
-        Configuracion();
-        add(nombre, apellidos,solapin,email, anno_academico, facultad, createButtonsLayout());
+    BeanValidationBinder<Estudiante> binder = new BeanValidationBinder<>(Estudiante.class);
+
+    public CrearEstudianteForm(List<Grupo> listGrupos, User usuario) {
+        this.user = usuario;
+        this.listGrupos = listGrupos;
+        binder.bindInstanceFields(this);
+        Configuration();
+        add(nombre, apellidos, solapin, email, anno_academico, facultad, grupo,createButtonsLayout());
     }
 
-    private void Configuracion() {
+    //Configuration
+    private void Configuration() {
 
+        //nombre
         nombre = new TextField();
         nombre.setPlaceholder("Nombre");
-
+        nombre.getElement().setAttribute("nombre", "Ejemplo: Daniel");
+        nombre.setAutofocus(true);
+        nombre.setRequired(true);
+        nombre.setMinLength(2);
+        nombre.setMaxLength(100);
+        nombre.setPattern("^[a-zA-ZÀ-ÿ\\u00f1\\u00d1]+(\\s*[a-zA-ZÀ-ÿ\\u00f1\\u00d1]*)*[a-zA-ZÀ-ÿ\\u00f1\\u00d1]+$");
+        nombre.setErrorMessage("Solo letras, mínimo 2 caracteres y máximo 100");
+        nombre.addValueChangeListener(event -> {
+            event.getSource().setHelperText(event.getValue().length() + "/" + 100);
+        });
+        //apellidos
         apellidos = new TextField();
         apellidos.setPlaceholder("Apellidos");
-        
+        apellidos.getElement().setAttribute("apellidos", "Ejemplo:Perez Diaz");
+        apellidos.setAutofocus(true);
+        apellidos.setRequired(true);
+        apellidos.setMinLength(3);
+        apellidos.setMaxLength(100);
+        apellidos.setPattern("^[a-zA-ZÀ-ÿ\\u00f1\\u00d1]+(\\s*[a-zA-ZÀ-ÿ\\u00f1\\u00d1]*)*[a-zA-ZÀ-ÿ\\u00f1\\u00d1]+$");
+        apellidos.setErrorMessage("Solo letras, mínimo 3 caracteres y máximo 100");
+        apellidos.addValueChangeListener(event -> {
+            event.getSource().setHelperText(event.getValue().length() + "/" + 100);
+        });
+        //email
         email = new EmailField();
+        email.setLabel("Correo");
         email.setPlaceholder("usuario@estudiantes.uci.cu");
         email.setValue("usuario@estudiantes.uci.cu");
         email.setClearButtonVisible(true);
-
+        email.setPattern("^[a-zA-Z][a-zA-Z0-9_\\.][a-zA-Z0-9]+(@estudiantes\\.uci\\.cu)$");
+        email.setErrorMessage("Por favor escriba un correo válido");
+        email.setClearButtonVisible(true);
+        //solapin
         solapin = new TextField();
-        solapin.setPlaceholder("Solapín");
-
-        anno_academico = new ComboBox<>();
-        anno_academico.setPlaceholder("Año académico");
-        anno_academico.setItems(1, 2, 3, 4, 5);
-
+        solapin.setLabel("Solapín");
+        solapin.setPlaceholder("E1705587");
+        solapin.getElement().setAttribute("solapin", "E1705587");
+        solapin.setAutofocus(true);
+        solapin.setRequired(true);
+        solapin.setMinLength(7);
+        solapin.setMaxLength(7);
+        solapin.setPattern("^[A-Z][0-9]+$");
+        solapin.setErrorMessage("Una letra , mínimo 7 caracteres y máximo 7");
+        solapin.addValueChangeListener(event -> {
+            event.getSource().setHelperText(event.getValue().length() + "/" + 7);
+        });
+        //anno academico
+        anno_academico = new IntegerField();
+        anno_academico.setLabel("Año académico");
+        anno_academico.setHelperText("Máximo 5");
+        anno_academico.setValue(1);
+        anno_academico.setHasControls(true);
+        anno_academico.setMin(1);
+        anno_academico.setMax(5);
+        //facultad
         facultad = new ComboBox<>();
         facultad.setPlaceholder("Facultad");
         facultad.setItems("Facultad 1", "Facultad 2", "Facultad 3", "Facultad 4", "CITEC", "FTE");
+        //Grupo 
+        grupo = new ComboBox<>();
+        grupo.setPlaceholder("Grupo");
+        grupo.setItems(listGrupos);
+        grupo.setItemLabelGenerator(Grupo::getNumero);
+    }
+
+    //Buttons 
+    private HorizontalLayout createButtonsLayout() {
+        HorizontalLayout buttonlayout = new HorizontalLayout();
+        buttonlayout.addClassName("button-layout");
+        save.addClickListener(event -> validateAndSave());
+        save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        save.addClickShortcut(Key.ENTER);
+        // binder.addStatusChangeListener(e -> save.setEnabled(binder.isValid()));
+        buttonlayout.add(save);
+
+        return buttonlayout;
+    }
+
+    //Set Estudiante
+    public void setEstudiante(Estudiante estudiante) {
+        this.estudiante = estudiante;
+        binder.readBean(estudiante);
+         if (user == null) {
+            this.estudiante.setUser(null);
+        } else {
+            this.estudiante.setUser(user);;
+        }
+    }
+
+    //Validate and Save
+    private void validateAndSave() {
+        try {
+            binder.writeBean(estudiante);
+            this.estudiante.setNombre(nombre.getValue());
+            this.estudiante.setApellidos(apellidos.getValue());
+            this.estudiante.setAnno_academico(anno_academico.getValue());
+            this.estudiante.setEmail(email.getValue());
+            this.estudiante.setFacultad(facultad.getValue());
+            this.estudiante.setGrupo(grupo.getValue());
+            this.estudiante.setSolapin(solapin.getValue());
+            this.estudiante.setUser(user);
+
+            fireEvent(new SaveEvent(this, estudiante));
+        } catch (ValidationException e) {
+            e.printStackTrace();
+            Notification notification = Notification.show(
+                    "Ocurrió un problema al intentar guardar el estudiante",
+                    5000,
+                    Notification.Position.MIDDLE
+            );
+            notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+        }
+    }
+
+    // Events
+    public static abstract class EstudianteFormEvent extends ComponentEvent<CrearEstudianteForm> {
+
+        private Estudiante estudiante;
+
+        protected EstudianteFormEvent(CrearEstudianteForm source, Estudiante estudiante) {
+            super(source, false);
+            this.estudiante = estudiante;
+        }
+
+        public Estudiante getEstudiante() {
+            return estudiante;
+        }
+    }
+
+    //Save Event
+    public static class SaveEvent extends EstudianteFormEvent {
+
+        SaveEvent(CrearEstudianteForm source, Estudiante estudiante) {
+            super(source, estudiante);
+        }
+    }
+
+    //Delete Event
+    public static class DeleteEvent extends EstudianteFormEvent {
+
+        DeleteEvent(CrearEstudianteForm source, Estudiante estudiante) {
+            super(source, estudiante);
+        }
 
     }
 
-    private HorizontalLayout createButtonsLayout() {
+    //Close Event
+    public static class CloseEvent extends EstudianteFormEvent {
 
-        HorizontalLayout buttonlayout = new HorizontalLayout();
-        buttonlayout.addClassName("button-layout");
+        CloseEvent(CrearEstudianteForm source) {
+            super(source, null);
+        }
+    }
 
-        save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        save.addClickShortcut(Key.ENTER);
-
-        close.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
-        close.addClickShortcut(Key.ESCAPE);
-
-        buttonlayout.add(save, close);
-
-        return buttonlayout;
+    public <T extends ComponentEvent<?>> Registration addListener(Class<T> eventType,
+            ComponentEventListener<T> listener) {
+        return getEventBus().addListener(eventType, listener);
     }
 
 }

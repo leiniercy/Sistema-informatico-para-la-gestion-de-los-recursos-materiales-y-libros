@@ -66,6 +66,10 @@ public class Trabajador extends AbstractEntity {
     @Column
     private String categoria;
 
+    @JoinColumn(name = "area_id",nullable = false, updatable = false)
+    @ManyToOne()
+    private Area area;
+    
     @ManyToMany(mappedBy = "trabajadores")
     List<DestinoFinal> destinoFinal;
 
@@ -75,9 +79,4 @@ public class Trabajador extends AbstractEntity {
     public String getNombreApellidos() {
         return nombre + " " + apellidos;
     }
-
-    @JoinColumn(name = "area_id",nullable = false, updatable = false)
-    @ManyToOne()
-    private Area area;
-
 }
