@@ -5,12 +5,14 @@
  */
 package trabajodediploma.views;
 
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import trabajodediploma.data.entity.User;
 import trabajodediploma.data.service.UserService;
 
@@ -21,20 +23,24 @@ import trabajodediploma.data.service.UserService;
 public class ModificarClaveView extends Div {
 
     User user;
+    private PasswordEncoder passwordEncoder;
     ModificarClaveForm form;
     UserService userService;
+    Dialog dialog;
 
-    public ModificarClaveView(User user,UserService userService) {
+    public ModificarClaveView(User user,UserService userService, PasswordEncoder passwordEncoder, Dialog dialog) {
         addClassName("modificar-clave-view");
         this.user = user;
         this.userService = userService;
+        this.dialog = dialog;
+        this.passwordEncoder = passwordEncoder;
         Configuracion();
         editUser();
         add(form);
     }
 
     private void Configuracion() {
-        form = new ModificarClaveForm(user);
+        form = new ModificarClaveForm(user,passwordEncoder);
         form.addListener(ModificarClaveForm.SaveEvent.class, this::saveUser);
         form.addListener(ModificarClaveForm.CloseEvent.class, e -> closeEditor());        
     }
@@ -63,7 +69,7 @@ public class ModificarClaveView extends Div {
         form.setUser(null);
         form.setVisible(false);
         removeClassName("editing");
-       // dialog.close();
+        dialog.close();
     }
 
 

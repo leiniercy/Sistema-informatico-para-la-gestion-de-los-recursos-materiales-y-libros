@@ -21,6 +21,7 @@ import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.server.auth.AccessAnnotationChecker;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import trabajodediploma.data.entity.Estudiante;
 import trabajodediploma.data.entity.Trabajador;
 import trabajodediploma.data.entity.User;
@@ -94,15 +95,18 @@ public class MainLayout extends AppLayout {
     private AuthenticatedUser authenticatedUser;
     private AccessAnnotationChecker accessChecker;
     private UserService userService;
+    private PasswordEncoder passwordEncoder;
 
     public MainLayout(
             AuthenticatedUser authenticatedUser, 
             AccessAnnotationChecker accessChecker,
-            @Autowired UserService userService
+            @Autowired UserService userService,
+            @Autowired PasswordEncoder passwordEncoder
     ) {
         this.authenticatedUser = authenticatedUser;
         this.accessChecker = accessChecker;
         this.userService = userService;
+        this.passwordEncoder = passwordEncoder;
         setPrimarySection(Section.DRAWER);
         addToNavbar(true, createHeaderContent());
         addToDrawer(createDrawerContent());
@@ -225,8 +229,9 @@ public class MainLayout extends AppLayout {
     }
     
     private void ModificarClave(){
-        ModificarClaveView claveView = new ModificarClaveView(user,userService);
-        modificarClave = new Dialog(claveView);
+        modificarClave= new Dialog();
+        ModificarClaveView claveView = new ModificarClaveView(user,userService,passwordEncoder,modificarClave);
+        modificarClave.add(claveView);
         modificarClave.open();
     }
     

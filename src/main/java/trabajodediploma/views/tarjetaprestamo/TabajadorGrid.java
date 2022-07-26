@@ -36,11 +36,9 @@ public class TabajadorGrid extends Div {
 
     GridListDataView<Trabajador> gridListDataView;
     Grid.Column<Trabajador> nombreColumn;
-    Grid.Column<Trabajador> apellidosColumn;
     Grid.Column<Trabajador> tarjetaColumn;
 
     private TextField nombreFilter;
-    private TextField apellidosFilter;
     private Div content;
 
     public TabajadorGrid(@Autowired TarjetaPrestamoService prestamoService, @Autowired TrabajadorService trabajadorService,
@@ -59,8 +57,7 @@ public class TabajadorGrid extends Div {
     private void configureGrid() {
 
         gridTrabajador.setClassName("tarjera-prestamo-trabajador-grid");
-        nombreColumn = gridTrabajador.addColumn(Trabajador::getNombre).setHeader("Nombre").setAutoWidth(true).setSortable(true);
-        apellidosColumn = gridTrabajador.addColumn(Trabajador::getApellidos).setHeader("Apellidos").setAutoWidth(true).setSortable(true);
+        nombreColumn = gridTrabajador.addColumn(Trabajador::getNombreApellidos).setHeader("Nombre").setAutoWidth(true).setSortable(true);
         tarjetaColumn = gridTrabajador.addComponentColumn(event -> {
             Button cardButton = new Button("Tarjeta");
             cardButton.addClickListener(e -> this.editCard(event));
@@ -70,7 +67,6 @@ public class TabajadorGrid extends Div {
         Filters();
         HeaderRow headerRow = gridTrabajador.appendHeaderRow();
         headerRow.getCell(nombreColumn).setComponent(nombreFilter);
-        headerRow.getCell(apellidosColumn).setComponent(apellidosFilter);
 
         gridListDataView = gridTrabajador.setItems(trabajadorService.findAll());
         gridTrabajador.setAllRowsVisible(true);
@@ -91,17 +87,7 @@ public class TabajadorGrid extends Div {
         nombreFilter.setValueChangeMode(ValueChangeMode.LAZY);
         nombreFilter.addValueChangeListener(
                 event -> gridListDataView
-                        .addFilter(trabajador -> StringUtils.containsIgnoreCase(trabajador.getNombre(), nombreFilter.getValue()))
-        );
-        apellidosFilter = new TextField();
-        apellidosFilter.setPlaceholder("Filtrar");
-        apellidosFilter.setPrefixComponent(VaadinIcon.SEARCH.create());
-        apellidosFilter.setClearButtonVisible(true);
-        apellidosFilter.setWidth("100%");
-        apellidosFilter.setValueChangeMode(ValueChangeMode.LAZY);
-        apellidosFilter.addValueChangeListener(
-                event -> gridListDataView
-                        .addFilter(trabajador -> StringUtils.containsIgnoreCase(trabajador.getApellidos(), apellidosFilter.getValue()))
+                        .addFilter(trabajador -> StringUtils.containsIgnoreCase(trabajador.getNombreApellidos(), nombreFilter.getValue()))
         );
     }
 

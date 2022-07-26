@@ -35,8 +35,6 @@ public class CrearTrabajadorForm extends FormLayout {
     Trabajador trabajador;
     User user;
     List<Area> listArea;
-    TextField nombre = new TextField();
-    TextField apellidos = new TextField();
     EmailField email = new EmailField();
     TextField solapin = new TextField();
     ComboBox<String> categoria = new ComboBox<>();
@@ -50,36 +48,14 @@ public class CrearTrabajadorForm extends FormLayout {
         this.listArea = listArea;
         this.user = user;
         Configuration();
-        add(nombre, apellidos, solapin, email, categoria, area, createButtonsLayout());
+        add(solapin, email, categoria, area, createButtonsLayout());
     }
 
     //Configuration
     private void Configuration() {
         addClassName("crear-trabajdor-form");
         binder.bindInstanceFields(this);
-        //nombre
-        nombre.setPlaceholder("Nombre");
-        nombre.getElement().setAttribute("nombre", "Ejemplo: Daniel");
-        nombre.setAutofocus(true);
-        nombre.setMinLength(2);
-        nombre.setMaxLength(100);
-        //  nombre.setPattern("^[a-zA-ZÀ-ÿ\\u00f1\\u00d1]+(\\s*[a-zA-ZÀ-ÿ\\u00f1\\u00d1]*)*[a-zA-ZÀ-ÿ\\u00f1\\u00d1]+$");
-        nombre.setErrorMessage("Solo letras, mínimo 2 caracteres y máximo 100");
-        nombre.addValueChangeListener(event -> {
-            event.getSource().setHelperText(event.getValue().length() + "/" + 100);
-        });
-        //apellidos
-        apellidos.setPlaceholder("Apellidos");
-        apellidos.getElement().setAttribute("apellidos", "Ejemplo:Perez Diaz");
-        apellidos.setAutofocus(true);
-        apellidos.setRequired(true);
-        apellidos.setMinLength(3);
-        apellidos.setMaxLength(100);
-        //    apellidos.setPattern("^[a-zA-ZÀ-ÿ\\u00f1\\u00d1]+(\\s*[a-zA-ZÀ-ÿ\\u00f1\\u00d1]*)*[a-zA-ZÀ-ÿ\\u00f1\\u00d1]+$");
-        apellidos.setErrorMessage("Solo letras, mínimo 3 caracteres y máximo 100");
-        apellidos.addValueChangeListener(event -> {
-            event.getSource().setHelperText(event.getValue().length() + "/" + 100);
-        });
+        
         //email
         email.setLabel("Correo");
         email.setPlaceholder("usuario@uci.cu");
@@ -135,8 +111,6 @@ public class CrearTrabajadorForm extends FormLayout {
         try {
             binder.writeBean(trabajador);
             this.trabajador.setUser(user);
-            this.trabajador.setNombre(nombre.getValue());
-            this.trabajador.setApellidos(apellidos.getValue());
             this.trabajador.setSolapin(solapin.getValue());
             this.trabajador.setEmail(email.getValue());
             this.trabajador.setCategoria(categoria.getValue());

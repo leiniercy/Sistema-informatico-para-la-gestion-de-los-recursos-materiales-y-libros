@@ -38,7 +38,7 @@ public class CrearInformacionPerfilView extends VerticalLayout {
     CrearTrabajadorForm form_trabajador;
     Div container;
     Dialog dialog;
-    
+
     public CrearInformacionPerfilView(
             User user,
             @Autowired EstudianteService estudianteService,
@@ -53,7 +53,7 @@ public class CrearInformacionPerfilView extends VerticalLayout {
         this.areaService = areaService;
         this.grupoService = grupoService;
         this.dialog = dialog;
-        
+
         Configuracion();
         selection.addValueChangeListener(event -> {
             if (event.getValue() == "Estudiante") {
@@ -72,7 +72,7 @@ public class CrearInformacionPerfilView extends VerticalLayout {
     }
 
     private void Configuracion() {
-        
+
         form_estudiante = new CrearEstudianteForm(grupoService.findAll(), user);
         form_estudiante.addListener(CrearEstudianteForm.SaveEvent.class, this::saveEstudiante);
         form_estudiante.addListener(CrearEstudianteForm.CloseEvent.class, e -> closeEstudianteEditor());
@@ -95,9 +95,7 @@ public class CrearInformacionPerfilView extends VerticalLayout {
         List<Estudiante> listEstudiante = estudianteService.findAll();
 
         listEstudiante = listEstudiante.parallelStream()
-                .filter(est -> event.getEstudiante().getNombre().equals(est.getNombre())
-                && event.getEstudiante().getApellidos().equals(est.getApellidos())
-                && event.getEstudiante().getEmail().equals(est.getEmail())
+                .filter(est-> event.getEstudiante().getEmail().equals(est.getEmail())
                 && event.getEstudiante().getSolapin().equals(est.getSolapin())
                 && event.getEstudiante().getAnno_academico().equals(est.getAnno_academico())
                 && event.getEstudiante().getGrupo().equals(est.getGrupo())
@@ -156,11 +154,10 @@ public class CrearInformacionPerfilView extends VerticalLayout {
         List<Trabajador> listTrabajadores = trabajadorService.findAll();
 
         listTrabajadores = listTrabajadores.parallelStream()
-                .filter(trab -> event.getTrabajador().getNombre().equals(trab.getNombre())
-                && event.getTrabajador().getApellidos().equals(trab.getApellidos())
-                && event.getTrabajador().getEmail().equals(trab.getEmail())
+                .filter(trab -> event.getTrabajador().getEmail().equals(trab.getEmail())
                 && event.getTrabajador().getSolapin().equals(trab.getSolapin())
                 && event.getTrabajador().getCategoria().equals(trab.getCategoria())
+                && event.getTrabajador().getArea().equals(trab.getArea())
                 && event.getTrabajador().getUser().equals(trab.getUser())
                 )
                 .collect(Collectors.toList());
@@ -206,6 +203,6 @@ public class CrearInformacionPerfilView extends VerticalLayout {
         form_trabajador.setVisible(false);
         removeClassName("editing");
         dialog.close();
-}
+    }
 
 }

@@ -36,8 +36,6 @@ public class CrearEstudianteForm extends FormLayout {
 
     User user;
     Estudiante estudiante;
-    TextField nombre = new TextField();
-    TextField apellidos = new TextField();
     EmailField email = new EmailField();
     TextField solapin = new TextField();
     IntegerField anno_academico = new IntegerField();
@@ -54,36 +52,12 @@ public class CrearEstudianteForm extends FormLayout {
         this.listGrupos = listGrupos;
         binder.bindInstanceFields(this);
         Configuration();
-        add(nombre, apellidos, solapin, email, anno_academico, facultad, grupo,createButtonsLayout());
+        add(solapin, email, anno_academico, facultad, grupo,createButtonsLayout());
     }
 
     //Configuration
     private void Configuration() {
 
-        //nombre
-        nombre.setPlaceholder("Nombre");
-        nombre.getElement().setAttribute("nombre", "Ejemplo: Daniel");
-        nombre.setAutofocus(true);
-        nombre.setRequired(true);
-        nombre.setMinLength(2);
-        nombre.setMaxLength(100);
-        nombre.setPattern("^[a-zA-ZÀ-ÿ\\u00f1\\u00d1]+(\\s*[a-zA-ZÀ-ÿ\\u00f1\\u00d1]*)*[a-zA-ZÀ-ÿ\\u00f1\\u00d1]+$");
-        nombre.setErrorMessage("Solo letras, mínimo 2 caracteres y máximo 100");
-        nombre.addValueChangeListener(event -> {
-            event.getSource().setHelperText(event.getValue().length() + "/" + 100);
-        });
-        //apellidos
-        apellidos.setPlaceholder("Apellidos");
-        apellidos.getElement().setAttribute("apellidos", "Ejemplo:Perez Diaz");
-        apellidos.setAutofocus(true);
-        apellidos.setRequired(true);
-        apellidos.setMinLength(3);
-        apellidos.setMaxLength(100);
-        apellidos.setPattern("^[a-zA-ZÀ-ÿ\\u00f1\\u00d1]+(\\s*[a-zA-ZÀ-ÿ\\u00f1\\u00d1]*)*[a-zA-ZÀ-ÿ\\u00f1\\u00d1]+$");
-        apellidos.setErrorMessage("Solo letras, mínimo 3 caracteres y máximo 100");
-        apellidos.addValueChangeListener(event -> {
-            event.getSource().setHelperText(event.getValue().length() + "/" + 100);
-        });
         //email
         email.setLabel("Correo");
         email.setPlaceholder("usuario@estudiantes.uci.cu");
@@ -91,7 +65,7 @@ public class CrearEstudianteForm extends FormLayout {
         email.setClearButtonVisible(true);
         email.setPattern("^[a-zA-Z][a-zA-Z0-9_\\.][a-zA-Z0-9]+(@estudiantes\\.uci\\.cu)$");
         email.setErrorMessage("Por favor escriba un correo válido");
-        email.setClearButtonVisible(true);
+        
         //solapin
         solapin.setLabel("Solapín");
         solapin.setPlaceholder("E1705587");
@@ -149,8 +123,6 @@ public class CrearEstudianteForm extends FormLayout {
     private void validateAndSave() {
         try {
             binder.writeBean(estudiante);
-            this.estudiante.setNombre(nombre.getValue());
-            this.estudiante.setApellidos(apellidos.getValue());
             this.estudiante.setAnno_academico(anno_academico.getValue());
             this.estudiante.setEmail(email.getValue());
             this.estudiante.setFacultad(facultad.getValue());

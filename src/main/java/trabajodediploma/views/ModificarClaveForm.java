@@ -11,6 +11,7 @@ import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
@@ -29,21 +30,21 @@ import trabajodediploma.data.entity.User;
  */
 public class ModificarClaveForm extends FormLayout {
 
-    @Autowired
     private PasswordEncoder passwordEncoder;
 
     User user;
-    PasswordField initPassword;
-    PasswordField hashedPassword;
-    PasswordField confirmPassword;
-
+    PasswordField initPassword = new PasswordField();
+    PasswordField hashedPassword  = new PasswordField();
+    PasswordField confirmPassword = new PasswordField();
+    
     Button save = new Button("Añadir", VaadinIcon.PLUS.create());
     Button close = new Button("Cancelar", VaadinIcon.ERASER.create());
 
     BeanValidationBinder<User> binder = new BeanValidationBinder<>(User.class);
 
-    public ModificarClaveForm(User user) {
+    public ModificarClaveForm(User user, PasswordEncoder passwordEncoder) {
         this.user = user;
+        this.passwordEncoder = passwordEncoder;
         Configuracion();
         add(initPassword, hashedPassword, confirmPassword, createButtonsLayout());
     }
@@ -52,25 +53,24 @@ public class ModificarClaveForm extends FormLayout {
         addClassName("modificar-clave-form");
         binder.bindInstanceFields(this);
         //contraseña actual
-        initPassword = new PasswordField();
         initPassword.setPlaceholder("Contraseña actual...");
         //initPassword.setValue(user.getHashedPassword());
         
         //nueva contraseña 
-        hashedPassword = new PasswordField();
         hashedPassword.setPlaceholder("Nueva contraseña...");
         hashedPassword.setMinLength(8);
         hashedPassword.setMaxLength(255);
+        hashedPassword.setClearButtonVisible(true);
         hashedPassword.setErrorMessage("mínimo 8 caracteres y máximo 255");
         hashedPassword.addValueChangeListener(event -> {
             event.getSource().setHelperText(event.getValue().length() + "/" + 255);
         });
         
         //confirmacion de nueva contraseña
-        confirmPassword = new PasswordField();
         confirmPassword.setPlaceholder("Confirmar contraseña...");
         confirmPassword.setMinLength(8);
         confirmPassword.setMaxLength(255);
+        confirmPassword.setClearButtonVisible(true);
         confirmPassword.setErrorMessage("mínimo 8 caracteres y máximo 255");
         confirmPassword.addValueChangeListener(event -> {
             event.getSource().setHelperText(event.getValue().length() + "/" + 255);
@@ -97,10 +97,12 @@ public class ModificarClaveForm extends FormLayout {
 
     private void validateAndSave() {
         try {
-            if (initPassword.getValue().equals(user.getHashedPassword())
+            if (    !initPassword.getValue() .equals( hashedPassword.getValue() ) 
+                    && initPassword.getValue().equals(user.getConfirmPassword())
                     && hashedPassword.getValue().equals(confirmPassword.getValue())) {
                 binder.writeBean(user);
-                this.user.setHashedPassword(hashedPassword.getValue());
+                this.user.setHashedPassword(passwordEncoder.encode(hashedPassword.getValue()));
+                //this.user.setConfirmPassword(passwordEncoder.encode(confirmPassword.getValue()));
                 this.user.setConfirmPassword(confirmPassword.getValue());
                 fireEvent(new ModificarClaveForm.SaveEvent(this, user));
             } else {

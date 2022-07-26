@@ -156,7 +156,8 @@ public class CrearUsuarioForm extends FormLayout {
                 this.user.setName(name.getValue());
                 this.user.setUsername(username.getValue());
                 this.user.setHashedPassword(passwordEncoder.encode(hashedPassword.getValue()));
-                this.user.setConfirmPassword(passwordEncoder.encode(confirmPassword.getValue()));
+                //this.user.setConfirmPassword(passwordEncoder.encode(confirmPassword.getValue()));
+                this.user.setConfirmPassword(confirmPassword.getValue());
                 this.user.setRoles(Collections.singleton(Rol.USER));
 
                 fireEvent(new CrearUsuarioForm.SaveEvent(this, user));
