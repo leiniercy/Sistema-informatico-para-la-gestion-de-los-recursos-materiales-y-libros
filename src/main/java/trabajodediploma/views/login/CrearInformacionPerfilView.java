@@ -37,19 +37,22 @@ public class CrearInformacionPerfilView extends VerticalLayout {
     CrearEstudianteForm form_estudiante;
     CrearTrabajadorForm form_trabajador;
     Div container;
+    Dialog dialog;
     
     public CrearInformacionPerfilView(
             User user,
             @Autowired EstudianteService estudianteService,
             @Autowired TrabajadorService trabajadorService,
             @Autowired AreaService areaService,
-            @Autowired GrupoService grupoService
+            @Autowired GrupoService grupoService,
+            Dialog dialog
     ) {
         this.user = user;
         this.estudianteService = estudianteService;
         this.trabajadorService = trabajadorService;
         this.areaService = areaService;
         this.grupoService = grupoService;
+        this.dialog = dialog;
         
         Configuracion();
         selection.addValueChangeListener(event -> {
@@ -143,6 +146,7 @@ public class CrearInformacionPerfilView extends VerticalLayout {
         form_estudiante.setEstudiante(null);
         form_estudiante.setVisible(false);
         removeClassName("editing");
+        dialog.close();
     }
 
     //Trabajador
@@ -201,6 +205,7 @@ public class CrearInformacionPerfilView extends VerticalLayout {
         form_trabajador.setTrabajador(null);
         form_trabajador.setVisible(false);
         removeClassName("editing");
+        dialog.close();
 }
 
 }

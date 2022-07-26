@@ -70,6 +70,7 @@ public class CrearUsuarioView extends VerticalLayout {
                     Notification.Position.BOTTOM_START
             );
             notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+            closeEditor();
         }
 
     }

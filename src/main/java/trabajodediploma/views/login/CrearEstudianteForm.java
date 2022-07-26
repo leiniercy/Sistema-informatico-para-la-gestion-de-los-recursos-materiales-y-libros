@@ -61,7 +61,6 @@ public class CrearEstudianteForm extends FormLayout {
     private void Configuration() {
 
         //nombre
-        nombre = new TextField();
         nombre.setPlaceholder("Nombre");
         nombre.getElement().setAttribute("nombre", "Ejemplo: Daniel");
         nombre.setAutofocus(true);
@@ -74,7 +73,6 @@ public class CrearEstudianteForm extends FormLayout {
             event.getSource().setHelperText(event.getValue().length() + "/" + 100);
         });
         //apellidos
-        apellidos = new TextField();
         apellidos.setPlaceholder("Apellidos");
         apellidos.getElement().setAttribute("apellidos", "Ejemplo:Perez Diaz");
         apellidos.setAutofocus(true);
@@ -87,7 +85,6 @@ public class CrearEstudianteForm extends FormLayout {
             event.getSource().setHelperText(event.getValue().length() + "/" + 100);
         });
         //email
-        email = new EmailField();
         email.setLabel("Correo");
         email.setPlaceholder("usuario@estudiantes.uci.cu");
         email.setValue("usuario@estudiantes.uci.cu");
@@ -96,7 +93,6 @@ public class CrearEstudianteForm extends FormLayout {
         email.setErrorMessage("Por favor escriba un correo válido");
         email.setClearButtonVisible(true);
         //solapin
-        solapin = new TextField();
         solapin.setLabel("Solapín");
         solapin.setPlaceholder("E1705587");
         solapin.getElement().setAttribute("solapin", "E1705587");
@@ -110,7 +106,6 @@ public class CrearEstudianteForm extends FormLayout {
             event.getSource().setHelperText(event.getValue().length() + "/" + 7);
         });
         //anno academico
-        anno_academico = new IntegerField();
         anno_academico.setLabel("Año académico");
         anno_academico.setHelperText("Máximo 5");
         anno_academico.setValue(1);
@@ -118,11 +113,9 @@ public class CrearEstudianteForm extends FormLayout {
         anno_academico.setMin(1);
         anno_academico.setMax(5);
         //facultad
-        facultad = new ComboBox<>();
         facultad.setPlaceholder("Facultad");
         facultad.setItems("Facultad 1", "Facultad 2", "Facultad 3", "Facultad 4", "CITEC", "FTE");
         //Grupo 
-        grupo = new ComboBox<>();
         grupo.setPlaceholder("Grupo");
         grupo.setItems(listGrupos);
         grupo.setItemLabelGenerator(Grupo::getNumero);

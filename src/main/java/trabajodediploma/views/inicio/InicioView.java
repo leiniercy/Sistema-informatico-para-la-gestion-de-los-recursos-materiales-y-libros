@@ -79,9 +79,21 @@ public class InicioView extends Div {
         if (maybeUser.isPresent()) {
             user = maybeUser.get();
             /*crear perfil*/
-            crearPerfil = new CrearInformacionPerfilView(user,estudianteService,trabajadorService,areaService,grupoService);
-            dialog = new Dialog(header,crearPerfil);
-            /*Fin -> crear perfil*/
+            dialog = new Dialog();
+            crearPerfil = new CrearInformacionPerfilView(user, estudianteService, trabajadorService, areaService, grupoService, dialog);
+            /*Fin -> crear perfil
+            * Header crear  perfil usuario*/
+            Button closeButton = new Button(new Icon("lumo", "cross"), (e) -> dialog.close());
+            closeButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+            Span title = new Span("Perfil");
+            Div titleDiv = new Div(title);
+            titleDiv.addClassName("div-perfil-title");
+            Div buttonDiv = new Div(closeButton);
+            buttonDiv.addClassName("div-perfil-button");
+            header = new Div(titleDiv, buttonDiv);
+            header.addClassName("div-perfil-header");
+            dialog.add(header, crearPerfil);
+            /*Fin -> Header crear perfil usuario*/
             estudiantes = estudiantes.parallelStream().filter(event -> event.getUser().getUsername().equals(user.getUsername())).collect(Collectors.toList());
             trabajadores = trabajadores.parallelStream().filter(event -> event.getUser().getUsername().equals(user.getUsername())).collect(Collectors.toList());
 
@@ -102,18 +114,6 @@ public class InicioView extends Div {
         content.addClassName("div-content");
         footer = new MyFooter();
         footer.addClassName("footer");
-
-        /*Header crear  perfil usuario*/
-        Button closeButton = new Button(new Icon("lumo", "cross"), (e) -> dialog.close());
-        closeButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
-        Span title = new Span("Perfil");
-        Div titleDiv = new Div(title);
-        titleDiv.addClassName("div-perfil-title");
-        Div buttonDiv = new Div(closeButton);
-        buttonDiv.addClassName("div-perfil-button");
-        header = new Div(titleDiv, buttonDiv);
-        header.addClassName("div-perfil-header");
-        /*Fin -> Header crear perfil usuario*/
         divDescripcionSistema();
     }
 

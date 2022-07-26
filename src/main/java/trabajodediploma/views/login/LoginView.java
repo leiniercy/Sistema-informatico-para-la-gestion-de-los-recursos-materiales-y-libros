@@ -57,8 +57,9 @@ public class LoginView extends Div implements BeforeEnterObserver {
     }
 
     private void Configuracion(UserService userService) {
-        
-        crearUsuario = new CrearUsuarioView(userService,dialog);
+
+        dialog = new Dialog();
+        crearUsuario = new CrearUsuarioView(userService, dialog);
         crearUsuario.addClassName("crear-usuario");
         loginOverlay = new LoginOverlay();
         loginOverlay.setAction("login");
@@ -75,7 +76,7 @@ public class LoginView extends Div implements BeforeEnterObserver {
         header.addClassName("registrar-header");
         /*Fin -> Header crear usuario*/
 
-        dialog = new Dialog(header, crearUsuario);
+        dialog.add(header, crearUsuario);
 
     }
 
