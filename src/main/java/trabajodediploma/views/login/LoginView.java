@@ -13,6 +13,7 @@ import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import trabajodediploma.data.service.UserService;
 
 @PageTitle("Login")
@@ -20,14 +21,19 @@ import trabajodediploma.data.service.UserService;
 public class LoginView extends Div implements BeforeEnterObserver {
 
     UserService userService;
+    PasswordEncoder passwordEncoder;
     LoginOverlay loginOverlay;
     Dialog dialog;
     CrearUsuarioView crearUsuario;
     Div header;
 
-    public LoginView(@Autowired UserService userService) {
+    public LoginView(
+            @Autowired UserService userService,
+            @Autowired PasswordEncoder passwordEncoder
+    ) {
         addClassName("login-view");
         this.userService = userService;
+        this.passwordEncoder  = passwordEncoder;
         Configuracion(userService);
 
         LoginI18n i18n = LoginI18n.createDefault();
@@ -59,7 +65,7 @@ public class LoginView extends Div implements BeforeEnterObserver {
     private void Configuracion(UserService userService) {
 
         dialog = new Dialog();
-        crearUsuario = new CrearUsuarioView(userService, dialog);
+        crearUsuario = new CrearUsuarioView(userService, passwordEncoder,dialog);
         crearUsuario.addClassName("crear-usuario");
         loginOverlay = new LoginOverlay();
         loginOverlay.setAction("login");

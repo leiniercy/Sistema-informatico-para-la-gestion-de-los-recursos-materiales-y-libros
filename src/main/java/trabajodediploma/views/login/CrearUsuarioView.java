@@ -13,6 +13,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import trabajodediploma.data.entity.User;
 import trabajodediploma.data.service.UserService;
 
@@ -25,11 +26,13 @@ public class CrearUsuarioView extends VerticalLayout {
     Div container;
     CrearUsuarioForm form;
     UserService userService;
+    PasswordEncoder passwordEncoder;
     Dialog dialog;
 
-    public CrearUsuarioView(@Autowired UserService userService, Dialog dialog) {
+    public CrearUsuarioView(UserService userService, PasswordEncoder passwordEncoder, Dialog dialog) {
         addClassName("crear-usuario-view");
         this.userService = userService;
+        this.passwordEncoder = passwordEncoder;
         this.dialog = dialog;
         Configuracion();
         addUser();
@@ -38,7 +41,7 @@ public class CrearUsuarioView extends VerticalLayout {
     }
 
     private void Configuracion() {
-        form = new CrearUsuarioForm();
+        form = new CrearUsuarioForm(passwordEncoder);
         form.addListener(CrearUsuarioForm.SaveEvent.class, this::saveUser);
         form.addListener(CrearUsuarioForm.CloseEvent.class, e -> closeEditor());
         container = new Div();

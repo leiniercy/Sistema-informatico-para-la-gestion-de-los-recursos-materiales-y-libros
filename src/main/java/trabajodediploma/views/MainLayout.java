@@ -20,9 +20,11 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.server.auth.AccessAnnotationChecker;
 import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
 import trabajodediploma.data.entity.Estudiante;
 import trabajodediploma.data.entity.Trabajador;
 import trabajodediploma.data.entity.User;
+import trabajodediploma.data.service.UserService;
 import trabajodediploma.security.AuthenticatedUser;
 import trabajodediploma.views.catalogo.CatalogoView;
 import trabajodediploma.views.destinofinal.DestinoFinalView;
@@ -89,14 +91,18 @@ public class MainLayout extends AppLayout {
     }
 
     private H1 viewTitle;
-
     private AuthenticatedUser authenticatedUser;
     private AccessAnnotationChecker accessChecker;
+    private UserService userService;
 
-    public MainLayout(AuthenticatedUser authenticatedUser, AccessAnnotationChecker accessChecker) {
+    public MainLayout(
+            AuthenticatedUser authenticatedUser, 
+            AccessAnnotationChecker accessChecker,
+            @Autowired UserService userService
+    ) {
         this.authenticatedUser = authenticatedUser;
         this.accessChecker = accessChecker;
-
+        this.userService = userService;
         setPrimarySection(Section.DRAWER);
         addToNavbar(true, createHeaderContent());
         addToDrawer(createDrawerContent());
@@ -219,7 +225,7 @@ public class MainLayout extends AppLayout {
     }
     
     private void ModificarClave(){
-        ModificarClaveView claveView = new ModificarClaveView();
+        ModificarClaveView claveView = new ModificarClaveView(user,userService);
         modificarClave = new Dialog(claveView);
         modificarClave.open();
     }

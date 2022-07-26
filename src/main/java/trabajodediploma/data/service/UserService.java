@@ -34,7 +34,7 @@ public class UserService {
 
     
     public User update(User user) {
-        return repository.save(user);
+        return repository.saveAndFlush(user);
     }
 
     public void delete(User  user) {

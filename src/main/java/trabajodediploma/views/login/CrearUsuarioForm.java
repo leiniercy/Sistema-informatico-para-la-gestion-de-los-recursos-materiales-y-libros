@@ -35,14 +35,12 @@ import trabajodediploma.data.Rol;
 import trabajodediploma.data.entity.User;
 import trabajodediploma.data.tools.MyUploadI18n;
 
-
 /**
  *
  * @author leinier
  */
 public class CrearUsuarioForm extends FormLayout {
 
-    @Autowired
     private PasswordEncoder passwordEncoder;
     private User user;
     private Image imagePreview;
@@ -57,7 +55,8 @@ public class CrearUsuarioForm extends FormLayout {
 
     BeanValidationBinder<User> binder = new BeanValidationBinder<>(User.class);
 
-    public CrearUsuarioForm() {
+    public CrearUsuarioForm(PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
         Configuracion();
         add(profilePictureUrl, name, username, hashedPassword, confirmPassword, createButtonsLayout());
     }
@@ -77,7 +76,7 @@ public class CrearUsuarioForm extends FormLayout {
         uploadButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         profilePictureUrl.setUploadButton(uploadButton);
         /*Fin->imagen*/
-        /*nombre*/
+ /*nombre*/
         name = new TextField();
         name.setPlaceholder("Nombre y apellidos ...");
         name.setRequired(true);
@@ -88,14 +87,14 @@ public class CrearUsuarioForm extends FormLayout {
             event.getSource().setHelperText(event.getValue().length() + "/" + 255);
         });
         /*Fin->nombre*/
-        /*usuario*/
+ /*usuario*/
         username = new TextField();
         username.setPlaceholder("Usuario...");
         username.setRequired(true);
         username.setMinLength(2);
         username.setMaxLength(255);
         /*Fin->usuario*/
-        /*contrasena*/
+ /*contrasena*/
         hashedPassword = new PasswordField();
         hashedPassword.setPlaceholder("Contraseña...");
         hashedPassword.setMinLength(8);
@@ -105,7 +104,7 @@ public class CrearUsuarioForm extends FormLayout {
             event.getSource().setHelperText(event.getValue().length() + "/" + 255);
         });
         /*Fin->Contrasena*/
-        /*confirmacion*/
+ /*confirmacion*/
         confirmPassword = new PasswordField();
         confirmPassword.setPlaceholder("Confirmar contraseña...");
         confirmPassword.setMinLength(8);
@@ -117,6 +116,7 @@ public class CrearUsuarioForm extends FormLayout {
         /*Fin->confirmacion*/
         attachImageUpload(profilePictureUrl, imagePreview);
     }
+
     private HorizontalLayout createButtonsLayout() {
         HorizontalLayout buttonlayout = new HorizontalLayout();
         buttonlayout.addClassName("button-layout");
@@ -144,16 +144,23 @@ public class CrearUsuarioForm extends FormLayout {
     private void validateAndSave() {
         try {
             if (hashedPassword.getValue().equals(confirmPassword.getValue())) {
+
                 binder.writeBean(user);
-                this.user.setProfilePictureUrl(imagePreview.getSrc());
+
+                if (imagePreview.getSrc() != "") {
+                    this.user.setProfilePictureUrl(imagePreview.getSrc());
+                } else {
+                    this.user.setProfilePictureUrl(null);
+                }
+
                 this.user.setName(name.getValue());
                 this.user.setUsername(username.getValue());
-//                this.user.setHashedPassword(passwordEncoder.encode(hashedPassword.getValue()));
-//                this.user.setConfirmPassword(passwordEncoder.encode(confirmPassword.getValue()));
-                this.user.setHashedPassword(hashedPassword.getValue());
-                this.user.setConfirmPassword(confirmPassword.getValue());
+                this.user.setHashedPassword(passwordEncoder.encode(hashedPassword.getValue()));
+                this.user.setConfirmPassword(passwordEncoder.encode(confirmPassword.getValue()));
                 this.user.setRoles(Collections.singleton(Rol.USER));
+
                 fireEvent(new CrearUsuarioForm.SaveEvent(this, user));
+
             } else {
                 Notification notification = Notification.show(
                         "Usuario o contraseña incorrectos",
