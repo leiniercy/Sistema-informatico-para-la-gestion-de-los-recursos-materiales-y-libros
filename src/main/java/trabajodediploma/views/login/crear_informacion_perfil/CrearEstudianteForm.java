@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package trabajodediploma.views.login;
+package trabajodediploma.views.login.crear_informacion_perfil;
 
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
@@ -47,8 +47,8 @@ public class CrearEstudianteForm extends FormLayout {
 
     BeanValidationBinder<Estudiante> binder = new BeanValidationBinder<>(Estudiante.class);
 
-    public CrearEstudianteForm(List<Grupo> listGrupos, User usuario) {
-        this.user = usuario;
+    public CrearEstudianteForm(List<Grupo> listGrupos, User user) {
+        this.user = user;
         this.listGrupos = listGrupos;
         binder.bindInstanceFields(this);
         Configuration();
@@ -102,7 +102,7 @@ public class CrearEstudianteForm extends FormLayout {
         save.addClickListener(event -> validateAndSave());
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         save.addClickShortcut(Key.ENTER);
-        // binder.addStatusChangeListener(e -> save.setEnabled(binder.isValid()));
+        binder.addStatusChangeListener(e -> save.setEnabled(binder.isValid()));
         buttonlayout.add(save);
 
         return buttonlayout;

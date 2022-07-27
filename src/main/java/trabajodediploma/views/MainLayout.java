@@ -1,5 +1,6 @@
 package trabajodediploma.views;
 
+import trabajodediploma.views.menu_personal.modificar_clave.ModificarClaveView;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
@@ -16,23 +17,32 @@ import com.vaadin.flow.component.html.ListItem;
 import com.vaadin.flow.component.html.Nav;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.html.UnorderedList;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.server.auth.AccessAnnotationChecker;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import trabajodediploma.data.entity.Estudiante;
 import trabajodediploma.data.entity.Trabajador;
 import trabajodediploma.data.entity.User;
+import trabajodediploma.data.service.AreaService;
+import trabajodediploma.data.service.EstudianteService;
+import trabajodediploma.data.service.GrupoService;
+import trabajodediploma.data.service.TrabajadorService;
 import trabajodediploma.data.service.UserService;
 import trabajodediploma.security.AuthenticatedUser;
 import trabajodediploma.views.catalogo.CatalogoView;
 import trabajodediploma.views.destinofinal.DestinoFinalView;
 import trabajodediploma.views.inicio.InicioView;
 import trabajodediploma.views.libros.LibroView;
-import trabajodediploma.views.login.CrearEstudianteForm;
-import trabajodediploma.views.login.CrearTrabajadorForm;
+import trabajodediploma.views.login.crear_informacion_perfil.CrearEstudianteForm;
+import trabajodediploma.views.login.crear_informacion_perfil.CrearTrabajadorForm;
+import trabajodediploma.views.menu_personal.modificar_perfil.ModificarPerfilView;
 import trabajodediploma.views.modulo.ModuloView;
 import trabajodediploma.views.usuarios.UsuarioView;
 import trabajodediploma.views.recursosmateriales.RecursosMaterialesView;
@@ -43,11 +53,18 @@ import trabajodediploma.views.tarjetaprestamo.TarjetaPrestamoView;
  */
 public class MainLayout extends AppLayout {
 
+    private H1 viewTitle;
+    private AuthenticatedUser authenticatedUser;
+    private AccessAnnotationChecker accessChecker;
+    private UserService userService;
+    private EstudianteService estudianteService;
+    private TrabajadorService trabajadorService;
+    private GrupoService grupoService;
+    private AreaService areaService;
+    private PasswordEncoder passwordEncoder;
     private Div titleDiv;
     private Dialog modificarPerfil;
     private Dialog modificarClave;
-    private CrearEstudianteForm crearEstudianteForm;
-    private CrearTrabajadorForm craCrearTrabajadorForm;
     private User user;
 
     /**
@@ -91,43 +108,46 @@ public class MainLayout extends AppLayout {
 
     }
 
-    private H1 viewTitle;
-    private AuthenticatedUser authenticatedUser;
-    private AccessAnnotationChecker accessChecker;
-    private UserService userService;
-    private PasswordEncoder passwordEncoder;
-
     public MainLayout(
-            AuthenticatedUser authenticatedUser, 
+            AuthenticatedUser authenticatedUser,
             AccessAnnotationChecker accessChecker,
             @Autowired UserService userService,
+            @Autowired EstudianteService estudianteService,
+            @Autowired TrabajadorService trabajadorService,
+            @Autowired GrupoService grupoService,
+            @Autowired AreaService areaService,
             @Autowired PasswordEncoder passwordEncoder
     ) {
         this.authenticatedUser = authenticatedUser;
         this.accessChecker = accessChecker;
         this.userService = userService;
+        this.estudianteService = estudianteService;
+        this.trabajadorService = trabajadorService;
+        this.grupoService = grupoService;
+        this.areaService = areaService;
         this.passwordEncoder = passwordEncoder;
         setPrimarySection(Section.DRAWER);
         addToNavbar(true, createHeaderContent());
         addToDrawer(createDrawerContent());
     }
 
+    //barra de menu
     private Component createHeaderContent() {
-        
+
         DrawerToggle toggle = new DrawerToggle();
-        toggle.addClassNames("toggle","text-secondary");
+        toggle.addClassNames("toggle", "text-secondary");
         toggle.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
         toggle.getElement().setAttribute("aria-label", "Menu toggle");
-        
+
         viewTitle = new H1();
-        viewTitle.addClassNames("h1-title","m-0", "text-l");
+        viewTitle.addClassNames("h1-title", "m-0", "text-l");
         viewTitle.getStyle()
                 .set("font-size", "var(--lumo-font-size-l)")
                 .set("margin", "0");
-        
-        titleDiv = new Div(toggle,viewTitle);
+
+        titleDiv = new Div(toggle, viewTitle);
         titleDiv.addClassName("div-toggle-title");
-        
+
         Div layout = new Div();
         layout.addClassNames("flex", "items-center", "my-s", "px-m", "py-xs");
         Optional<User> maybeUser = authenticatedUser.get();
@@ -135,7 +155,7 @@ public class MainLayout extends AppLayout {
             user = maybeUser.get();
 
             Avatar avatar = new Avatar(user.getUsername(), user.getProfilePictureUrl());
-            avatar.addClassNames("avatar","me-xs");
+            avatar.addClassNames("avatar", "me-xs");
 
             ContextMenu userMenu = new ContextMenu(avatar);
             userMenu.setOpenOnClick(true);
@@ -148,10 +168,9 @@ public class MainLayout extends AppLayout {
             userMenu.addItem("Cerrar sesión", e -> {
                 authenticatedUser.logout();
             });
-            
-            
+
             Span name = new Span(user.getName());
-            name.addClassNames("span-name","font-medium", "text-s", "text-secondary");
+            name.addClassNames("span-name", "font-medium", "text-s", "text-secondary");
             layout.add(avatar, name);
 
         } else {
@@ -160,14 +179,15 @@ public class MainLayout extends AppLayout {
             loginLink.setHref("login");
             loginLink.add(new Span("Acceder"));
             layout.add(loginLink);
-            layout.addClassNames("bg-base", "border-b", "border-contrast-10", "box-border","rounded-l");
+            layout.addClassNames("bg-base", "border-b", "border-contrast-10", "box-border", "rounded-l");
         }
 
         Div header = new Div(titleDiv, layout);
-        header.addClassNames("div-header","bg-primary");
+        header.addClassNames("div-header", "bg-primary");
         return header;
     }
 
+    //barra de menu desplegable lateral izquierda
     private Component createDrawerContent() {
         H2 appName = new H2("Menú");
         appName.addClassNames("app-name");
@@ -178,6 +198,7 @@ public class MainLayout extends AppLayout {
         return section;
     }
 
+    //
     private Nav createNavigation() {
         Nav nav = new Nav();
         nav.addClassNames("menu-item-container");
@@ -197,12 +218,13 @@ public class MainLayout extends AppLayout {
         return nav;
     }
 
+    //
     private MenuItemInfo[] createMenuItems() {
         return new MenuItemInfo[]{ //
             new MenuItemInfo("Inicio", "la la-home", InicioView.class), //
 
             new MenuItemInfo("Catálogo", "la la-th-list", CatalogoView.class), //
-            
+
             new MenuItemInfo("Usuario", "la la-th-user", UsuarioView.class), //
 
             new MenuItemInfo("Libros", "la la-book", LibroView.class), //
@@ -216,32 +238,46 @@ public class MainLayout extends AppLayout {
             new MenuItemInfo("Destino Final", "la la-columns", DestinoFinalView.class), //
         };
     }
-    
-   
-    private void ModificarUsuario(){
+
+    //
+    private void ModificarUsuario() {
         modificarPerfil = new Dialog();
-        //crearEstudianteForm = new CrearEstudianteForm();
-        //craCrearTrabajadorForm = new CrearTrabajadorForm();
-        
-        Optional<Estudiante> estudiante;
-        Optional<Trabajador> trabajador;
-        
+        ModificarPerfilView modificarPerfilView = new ModificarPerfilView(user, userService,estudianteService, trabajadorService, grupoService, areaService, modificarPerfil);
+        modificarPerfil.add(modificarPerfilView);
+
+        List<Estudiante> estudiantes = estudianteService.findAll();
+        estudiantes = estudiantes.stream().filter(est -> est.getUser().equals(user)).collect(Collectors.toList());
+        List<Trabajador> trabajadores = trabajadorService.findAll();
+        trabajadores = trabajadores.stream().filter(trab -> trab.getUser().equals(user)).collect(Collectors.toList());
+
+        if (estudiantes.size() == 0 && trabajadores.size() == 0) {
+            Notification notification = Notification.show(
+                    "Información de perfil no disponible",
+                    5000,
+                    Notification.Position.MIDDLE
+            );
+            notification.addThemeVariants(NotificationVariant.LUMO_PRIMARY);
+        } else {
+            modificarPerfil.open();
+        }
     }
-    
-    private void ModificarClave(){
-        modificarClave= new Dialog();
-        ModificarClaveView claveView = new ModificarClaveView(user,userService,passwordEncoder,modificarClave);
+
+    //
+    private void ModificarClave() {
+        modificarClave = new Dialog();
+        ModificarClaveView claveView = new ModificarClaveView(user, userService, passwordEncoder, modificarClave);
         modificarClave.add(claveView);
         modificarClave.open();
     }
-    
 
+    //
     @Override
     protected void afterNavigation() {
         super.afterNavigation();
         viewTitle.setText(getCurrentPageTitle());
     }
 
+    //
     private String getCurrentPageTitle() {
         PageTitle title = getContent().getClass().getAnnotation(PageTitle.class);
         return title == null ? "" : title.value();

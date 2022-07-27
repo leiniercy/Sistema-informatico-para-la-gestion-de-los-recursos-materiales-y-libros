@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package trabajodediploma.views.login;
+package trabajodediploma.views.menu_personal.modificar_perfil;
 
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
@@ -17,6 +17,7 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.EmailField;
+import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.ValidationException;
@@ -24,52 +25,62 @@ import com.vaadin.flow.shared.Registration;
 import java.util.List;
 import trabajodediploma.data.entity.Area;
 import trabajodediploma.data.entity.Trabajador;
+import trabajodediploma.data.entity.Trabajador;
 import trabajodediploma.data.entity.User;
 
 /**
  *
  * @author leinier
  */
-public class CrearTrabajadorForm extends FormLayout {
+public class ModificarPerfilTrabajadorForm extends FormLayout {
 
-    Trabajador trabajador;
-    User user;
-    List<Area> listArea;
+    private User user;
+    private List<Area> areas;
+    private Trabajador trabajador;
+    TextField name = new TextField();
     EmailField email = new EmailField();
     TextField solapin = new TextField();
     ComboBox<String> categoria = new ComboBox<>();
     ComboBox<Area> area = new ComboBox<>();
 
-    BeanValidationBinder<Trabajador> binder = new BeanValidationBinder<>(Trabajador.class);
-
     Button save = new Button("Añadir", VaadinIcon.PLUS.create());
+    Button close = new Button("Cancelar", VaadinIcon.ERASER.create());
 
-    public CrearTrabajadorForm(List<Area> listArea, User user) {
-        this.listArea = listArea;
+    BeanValidationBinder<Trabajador> binderTrabajador = new BeanValidationBinder<>(Trabajador.class);
+    BeanValidationBinder<User> binderUser = new BeanValidationBinder<>(User.class);
+
+    public ModificarPerfilTrabajadorForm(List<Area> areas, User user, Trabajador trabajador) {
         this.user = user;
+        this.areas = areas;
+        this.trabajador = trabajador;
         Configuration();
-        add(solapin, email, categoria, area, createButtonsLayout());
+        add(name, email, solapin, categoria, area, createButtonsLayout());
     }
 
     //Configuration
     private void Configuration() {
-        addClassName("crear-trabajdor-form");
-        binder.bindInstanceFields(this);
-        
+        binderTrabajador.bindInstanceFields(this);
+        binderUser.bindInstanceFields(this);
+        //nombre
+        name.setLabel("Nombre");
+        name.setPlaceholder("Nombre y  apellidos...");
+        name.setClearButtonVisible(true);
+        name.setValue(trabajador.getUser().getName());
         //email
         email.setLabel("Correo");
-        email.setPlaceholder("usuario@uci.cu");
-        email.setValue("usuario@uci.cu");
+        email.setPlaceholder("usuario@trabajadors.uci.cu");
+        email.setValue(trabajador.getEmail());
         email.setClearButtonVisible(true);
-        email.setPattern("^[a-zA-Z][a-zA-Z0-9_\\.][a-zA-Z0-9]+(@uci\\.cu)$");
+        email.setPattern("^[a-zA-Z][a-zA-Z0-9_\\.][a-zA-Z0-9]+(@trabajadors\\.uci\\.cu)$");
         email.setErrorMessage("Por favor escriba un correo válido");
         //solapin
         solapin.setLabel("Solapín");
         solapin.setPlaceholder("E1705587");
-        solapin.getElement().setAttribute("solapin", "E1705587");
-        solapin.setAutofocus(true);
+        solapin.setValue(trabajador.getSolapin());
+        solapin.setClearButtonVisible(true);
         solapin.setMinLength(7);
         solapin.setMaxLength(7);
+        solapin.setPattern("^[A-Z][0-9]+$");
         solapin.setErrorMessage("Una letra , mínimo 7 caracteres y máximo 7");
         solapin.addValueChangeListener(event -> {
             event.getSource().setHelperText(event.getValue().length() + "/" + 7);
@@ -77,10 +88,12 @@ public class CrearTrabajadorForm extends FormLayout {
         //categoria
         categoria.setPlaceholder("Categoría");
         categoria.setItems("Tabajador", "otras");
-        //area
-        area.setPlaceholder("Área");
-        area.setItems(listArea);
+        categoria.setValue(trabajador.getCategoria());
+        //Area 
+        area.setPlaceholder("Area");
+        area.setItems(areas);
         area.setItemLabelGenerator(Area::getNombre);
+        area.setValue(trabajador.getArea());
     }
 
     //Buttons 
@@ -90,32 +103,38 @@ public class CrearTrabajadorForm extends FormLayout {
         save.addClickListener(event -> validateAndSave());
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         save.addClickShortcut(Key.ENTER);
-        binder.addStatusChangeListener(e -> save.setEnabled(binder.isValid()));
-        buttonlayout.add(save);
+        close.addClickListener(event -> fireEvent(new CloseEvent(this)));
+        close.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+        close.addClickShortcut(Key.ESCAPE);
+        binderTrabajador.addStatusChangeListener(e -> save.setEnabled(binderTrabajador.isValid()));
+        buttonlayout.add(save, close);
+
         return buttonlayout;
     }
 
     //Set Trabajador
-    public void setTrabajador(Trabajador trabajador) {
+    public void setTrabajador(Trabajador trabajador, User user) {
         this.trabajador = trabajador;
-        binder.readBean(trabajador);
-        if (user == null) {
-            this.trabajador.setUser(null);
-        } else {
-            this.trabajador.setUser(user);;
-        }
+        this.user = user;
+        binderTrabajador.readBean(trabajador);
+        binderUser.readBean(user);
+        this.trabajador.setUser(user);
     }
 
     //Validate and Save
     private void validateAndSave() {
         try {
-            binder.writeBean(trabajador);
-            this.trabajador.setUser(user);
-            this.trabajador.setSolapin(solapin.getValue());
+            binderTrabajador.writeBean(trabajador);
+            binderUser.writeBean(user);
+            //user
+            this.user.setName(name.getValue());
+            //trabajador
             this.trabajador.setEmail(email.getValue());
             this.trabajador.setCategoria(categoria.getValue());
             this.trabajador.setArea(area.getValue());
-            fireEvent(new CrearTrabajadorForm.SaveEvent(this, trabajador));
+            this.trabajador.setSolapin(solapin.getValue());
+            this.trabajador.setUser(user);
+            fireEvent(new SaveEvent(this, trabajador, user));
         } catch (ValidationException e) {
             e.printStackTrace();
             Notification notification = Notification.show(
@@ -128,33 +147,39 @@ public class CrearTrabajadorForm extends FormLayout {
     }
 
     // Events
-    public static abstract class TrabajadorFormEvent extends ComponentEvent<CrearTrabajadorForm> {
+    public static abstract class TrabajadorFormEvent extends ComponentEvent<ModificarPerfilTrabajadorForm> {
 
         private Trabajador trabajador;
+        private User user;
 
-        protected TrabajadorFormEvent(CrearTrabajadorForm source, Trabajador trabajador) {
+        protected TrabajadorFormEvent(ModificarPerfilTrabajadorForm source, Trabajador trabajador, User user) {
             super(source, false);
             this.trabajador = trabajador;
+            this.user = user;
         }
 
         public Trabajador getTrabajador() {
             return trabajador;
+        }
+
+        public User getUser() {
+            return user;
         }
     }
 
     //Save Event
     public static class SaveEvent extends TrabajadorFormEvent {
 
-        SaveEvent(CrearTrabajadorForm source, Trabajador trabajador) {
-            super(source, trabajador);
+        SaveEvent(ModificarPerfilTrabajadorForm source, Trabajador trabajador, User user) {
+            super(source, trabajador, user);
         }
     }
 
     //Delete Event
     public static class DeleteEvent extends TrabajadorFormEvent {
 
-        DeleteEvent(CrearTrabajadorForm source, Trabajador trabajador) {
-            super(source, trabajador);
+        DeleteEvent(ModificarPerfilTrabajadorForm source, Trabajador trabajador, User user) {
+            super(source, trabajador, user);
         }
 
     }
@@ -162,8 +187,8 @@ public class CrearTrabajadorForm extends FormLayout {
     //Close Event
     public static class CloseEvent extends TrabajadorFormEvent {
 
-        CloseEvent(CrearTrabajadorForm source) {
-            super(source, null);
+        CloseEvent(ModificarPerfilTrabajadorForm source) {
+            super(source, null, null);
         }
     }
 
@@ -171,4 +196,5 @@ public class CrearTrabajadorForm extends FormLayout {
             ComponentEventListener<T> listener) {
         return getEventBus().addListener(eventType, listener);
     }
+
 }

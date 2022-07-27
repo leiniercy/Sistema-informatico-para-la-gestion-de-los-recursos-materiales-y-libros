@@ -36,7 +36,7 @@ import trabajodediploma.data.service.TrabajadorService;
 import trabajodediploma.security.AuthenticatedUser;
 import trabajodediploma.views.MainLayout;
 import trabajodediploma.views.footer.MyFooter;
-import trabajodediploma.views.login.CrearInformacionPerfilView;
+import trabajodediploma.views.login.crear_informacion_perfil.CrearInformacionPerfilView;
 
 @PageTitle("Inicio")
 @Route(value = "inicio", layout = MainLayout.class)
