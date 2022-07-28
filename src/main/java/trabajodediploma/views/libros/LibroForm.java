@@ -136,14 +136,14 @@ public class LibroForm extends FormLayout {
         parte.setMax(10);
         parte.setHelperText("Máximo 10");
         //cantidad
-        cantidad = new IntegerField("Cantidad");
+        cantidad.setLabel("Cantidad");
         cantidad.setValue(1);
         cantidad.setRequiredIndicatorVisible(true);
         cantidad.setHasControls(true);
         cantidad.setMin(1);
         cantidad.setHelperText("Mínimo 1");
         //precio
-        precio = new NumberField("Precio");
+        precio.setLabel("Precio");
         Div dollarPrefix = new Div();
         dollarPrefix.setText("$");
         precio.setPrefixComponent(dollarPrefix);

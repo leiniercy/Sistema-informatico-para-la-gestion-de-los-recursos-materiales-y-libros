@@ -40,6 +40,7 @@ import trabajodediploma.views.catalogo.CatalogoView;
 import trabajodediploma.views.destinofinal.DestinoFinalView;
 import trabajodediploma.views.inicio.InicioView;
 import trabajodediploma.views.libros.LibroView;
+import trabajodediploma.views.libros.estadisticas.EstadisticasView;
 import trabajodediploma.views.login.crear_informacion_perfil.CrearEstudianteForm;
 import trabajodediploma.views.login.crear_informacion_perfil.CrearTrabajadorForm;
 import trabajodediploma.views.menu_personal.modificar_perfil.ModificarPerfilView;
@@ -130,7 +131,6 @@ public class MainLayout extends AppLayout {
         addToNavbar(true, createHeaderContent());
         addToDrawer(createDrawerContent());
     }
-
     //barra de menu
     private Component createHeaderContent() {
 
@@ -186,7 +186,6 @@ public class MainLayout extends AppLayout {
         header.addClassNames("div-header", "bg-primary");
         return header;
     }
-
     //barra de menu desplegable lateral izquierda
     private Component createDrawerContent() {
         H2 appName = new H2("Menú");
@@ -197,18 +196,15 @@ public class MainLayout extends AppLayout {
         section.addClassNames("drawer-section");
         return section;
     }
-
     //
     private Nav createNavigation() {
         Nav nav = new Nav();
         nav.addClassNames("menu-item-container");
         nav.getElement().setAttribute("aria-labelledby", "views");
-
         // Wrap the links in a list; improves accessibility
         UnorderedList list = new UnorderedList();
         list.addClassNames("navigation-list");
         nav.add(list);
-
         for (MenuItemInfo menuItem : createMenuItems()) {
             if (accessChecker.hasAccess(menuItem.getView())) {
                 list.add(menuItem);
@@ -217,7 +213,6 @@ public class MainLayout extends AppLayout {
         }
         return nav;
     }
-
     //
     private MenuItemInfo[] createMenuItems() {
         return new MenuItemInfo[]{ //
@@ -226,23 +221,25 @@ public class MainLayout extends AppLayout {
             new MenuItemInfo("Catálogo", "la la-th-list", CatalogoView.class), //
 
             new MenuItemInfo("Usuario", "la la-th-user", UsuarioView.class), //
+            
+            new MenuItemInfo("Estadística", "la la-chart-bar", EstadisticasView.class), //
 
             new MenuItemInfo("Libros", "la la-book", LibroView.class), //
 
-            new MenuItemInfo("Recursos Materiales ", "la la-columns", RecursosMaterialesView.class), //
+            new MenuItemInfo("Recursos Materiales ", "la la-tools", RecursosMaterialesView.class), //
 
             new MenuItemInfo("Tarjeta Prestamo", "la la-columns", TarjetaPrestamoView.class), //
 
-            new MenuItemInfo("Modulo", "la la-columns", ModuloView.class), //
+            new MenuItemInfo("Modulo", "la la-gift", ModuloView.class), //
 
-            new MenuItemInfo("Destino Final", "la la-columns", DestinoFinalView.class), //
+            new MenuItemInfo("Destino Final", "la la-user-check", DestinoFinalView.class), //
         };
     }
 
     //
     private void ModificarUsuario() {
         modificarPerfil = new Dialog();
-        ModificarPerfilView modificarPerfilView = new ModificarPerfilView(user, userService,estudianteService, trabajadorService, grupoService, areaService, modificarPerfil);
+        ModificarPerfilView modificarPerfilView = new ModificarPerfilView(user, userService, estudianteService, trabajadorService, grupoService, areaService, modificarPerfil);
         modificarPerfil.add(modificarPerfilView);
 
         List<Estudiante> estudiantes = estudianteService.findAll();
