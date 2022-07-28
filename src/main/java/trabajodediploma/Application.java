@@ -7,6 +7,7 @@ import com.vaadin.flow.theme.Theme;
 import java.util.Collections;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.mail.MessagingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import trabajodediploma.data.Rol;
 import trabajodediploma.data.entity.User;
 import trabajodediploma.data.repository.UserRepository;
+import trabajodediploma.data.tools.EmailSenderService;
 
 /**
  * The entry point of the Spring Boot application.
@@ -93,7 +95,7 @@ public class Application extends SpringBootServletInitializer implements AppShel
         return user;
     }
 
-   private User createUser4(String name, String username, String password) {
+    private User createUser4(String name, String username, String password) {
         User user = new User();
         user.setName(name);
         user.setUsername(username);
@@ -108,11 +110,11 @@ public class Application extends SpringBootServletInitializer implements AppShel
         user.setName(name);
         user.setUsername(username);
         user.setHashedPassword(passwordEncoder.encode(password));
-        user.setRoles(Stream.of(Rol.ADMIN, Rol.VD_ADIMN_ECONOMIA,Rol.RESP_ALMACEN, Rol.ASISTENTE_CONTROL, Rol.USER).collect(Collectors.toSet()));
+        user.setRoles(Stream.of(Rol.ADMIN, Rol.VD_ADIMN_ECONOMIA, Rol.RESP_ALMACEN, Rol.ASISTENTE_CONTROL, Rol.USER).collect(Collectors.toSet()));
         userRepository.saveAndFlush(user);
         return user;
     }
-    
+
     private User createUser6(String name, String username, String password) {
         User user = new User();
         user.setName(name);
@@ -122,5 +124,16 @@ public class Application extends SpringBootServletInitializer implements AppShel
         userRepository.saveAndFlush(user);
         return user;
     }
+
+//    @Autowired
+//    private EmailSenderService senderService;
+
+//    @EventListener(ApplicationReadyEvent.class)
+//    public void triggerMail() throws MessagingException {
+//        senderService.sendSimpleEmail("leiniercaraballo08@gmail.com",
+//                "This is email body",
+//                "This is email subject");
+//
+//    }
 
 }
