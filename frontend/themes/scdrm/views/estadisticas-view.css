@@ -1,0 +1,44 @@
+
+.felx-container{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-content: flex-start;
+}
+
+.felx-item{
+    height: 100px;
+    width: 100%;
+    min-width: 360px;
+    flex-grow: 1;
+}
+
+.barra-menu{
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    min-height: 100px;
+    min-width: 477px;
+    justify-content: end;
+    align-items: baseline;
+}
+
+.barra-menu-date{
+    display: flex;
+    flex-direction: row;
+    height: 100px;
+    width: 432px;
+    align-items: inherit;
+    justify-content: space-evenly;
+    margin: 5px;
+}
+
+.barra-menu-export{
+    margin: 10px;
+    height: 44px;
+    min-width: 45px;
+}
+    
+.estadisticas{
+
+}

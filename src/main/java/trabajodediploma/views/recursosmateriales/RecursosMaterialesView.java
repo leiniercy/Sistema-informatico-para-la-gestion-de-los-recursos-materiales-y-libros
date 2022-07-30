@@ -75,9 +75,9 @@ public class RecursosMaterialesView extends Div {
         addClassNames("recurso-material-view");
         this.materialService = materialService;
         setSizeFull();
+        Filtros();
         configureGrid();
         configureForm();
-        Filtros();
         myFooter = new MyFooter();
         add(menuBar(), getContent(), myFooter);
         updateList();
@@ -193,10 +193,15 @@ public class RecursosMaterialesView extends Div {
         filterCantidad.setClearButtonVisible(true);
         filterCantidad.setWidth("100%");
         filterCantidad.setValueChangeMode(ValueChangeMode.EAGER);
-        filterCantidad.addValueChangeListener(
-                event -> gridListDataView
+        filterCantidad.addValueChangeListener(event -> {
+            if (filterCantidad.getValue() == null) {
+                gridListDataView = grid.setItems(materialService.findAll());
+            } else {
+                gridListDataView
                         .addFilter(material -> StringUtils.containsIgnoreCase(Integer.toString(material.getCantidad()),
-                                Integer.toString(filterCantidad.getValue()))));
+                                Integer.toString(filterCantidad.getValue())));
+            }
+        });
     }
 
     private void refreshGrid() {
@@ -213,7 +218,7 @@ public class RecursosMaterialesView extends Div {
         Button addButton = new Button(VaadinIcon.PLUS.create());
         addButton.addClickListener(click -> addMaterial());
         Button modelButton = new Button(VaadinIcon.FILE.create());
-        buttons.add(refreshButton, watchColumns(), deleteButton, addButton,modelButton);
+        buttons.add(refreshButton, watchColumns(), deleteButton, addButton, modelButton);
 
         total = new Html("<span>Total: <b>" + materialService.count() + "</b> materiales </span>");
 

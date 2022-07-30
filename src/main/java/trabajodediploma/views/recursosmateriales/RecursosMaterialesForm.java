@@ -32,6 +32,7 @@ public class RecursosMaterialesForm extends FormLayout {
     public RecursosMaterialesForm() {
         addClassName("recurso-material-form");
         // Config form
+       binder.bindInstanceFields(this);
         // codigo
         codigo.setLabel("Código");
         codigo.setAutofocus(true);
@@ -56,7 +57,7 @@ public class RecursosMaterialesForm extends FormLayout {
         unidadMedida.setRequired(true);
         unidadMedida.setMaxLength(3);
 
-        cantidad = new IntegerField("Cantidad");
+        cantidad.setLabel("Cantidad");
         cantidad.setValue(1);
         cantidad.setRequiredIndicatorVisible(true);
         cantidad.setHasControls(true);

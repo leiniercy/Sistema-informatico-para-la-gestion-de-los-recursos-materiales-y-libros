@@ -6,19 +6,26 @@
 package trabajodediploma.views.libros.estadisticas;
 
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.HasStyle;
 import com.vaadin.flow.component.board.Board;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.charts.Chart;
 import com.vaadin.flow.component.charts.model.ChartType;
 import com.vaadin.flow.component.charts.model.DataSeries;
 import com.vaadin.flow.component.charts.model.DataSeriesItem;
+import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 import trabajodediploma.data.entity.Libro;
@@ -39,16 +46,58 @@ public class EstadisticasView extends Div {
 
     private LibroService libroService;
     private TarjetaPrestamoService prestamoService;
+    private Div container;
     private MyFooter footer;
-
+    private DatePicker endDate;
+    private DatePicker initDate;
+    private List<TarjetaPrestamo> tarjetas;
+    private List<Libro> listLibros;
+    
     public EstadisticasView(
             @Autowired LibroService libroService,
             @Autowired TarjetaPrestamoService prestamoService
     ) {
+        addClassNames("estadistica-view","felx-container");
         this.libroService = libroService;
         this.prestamoService = prestamoService;
+        
+        container = new Div();
+        container.addClassNames("felx-item","estadisticas");
+        
         footer = new MyFooter();
-        add(getBoard(), getGraficosPasteles(),footer);
+        add(getBarraDeMenu());
+        if (initDate.getValue() == null || endDate.getValue() == null) {
+            container.removeAll();
+            updateList();
+            container.add(getBoard(), getGraficosPasteles());
+            add(container);
+        } else {
+            container.removeAll();
+            updateList();
+            container.add(getBoard(), getGraficosPasteles());
+            add(container);
+        }
+        add(footer);
+    }
+
+    //actualizar listas
+    private void updateList() {
+        if (initDate.getValue() == null || endDate.getValue() == null) {
+            listLibros = libroService.findAll();
+            tarjetas = prestamoService.findAll();
+        } else if (initDate.getValue() != null && endDate.getValue() != null) {
+            listLibros = libroService.findAll();
+            tarjetas = prestamoService.findAll();
+            tarjetas = tarjetas.stream().filter(
+                    //fecha_inicio <= x <= fecha_fin            
+                    event -> event.getFechaPrestamo() != null
+                    &&   (event.getFechaPrestamo().equals(initDate.getValue())
+                    || event.getFechaPrestamo().isAfter(initDate.getValue()))
+                    &&   event.getFechaDevolucion() != null      
+                    && (event.getFechaDevolucion().equals(endDate.getValue())
+                    || event.getFechaDevolucion().isBefore(endDate.getValue()))
+            ).collect(Collectors.toList());
+        }
     }
 
     private Component getBoard() {
@@ -81,7 +130,6 @@ public class EstadisticasView extends Div {
 
     //Cantidad real de libros
     public int cantRealLibros() {
-        List<Libro> listLibros = libroService.findAll();
         int cantReal = 0;
         for (int i = 0; i < listLibros.size(); i++) {
             cantReal += listLibros.get(i).getCantidad();
@@ -91,7 +139,6 @@ public class EstadisticasView extends Div {
 
     //Cantidad real de libros en el almacen
     public int cantRealLibrosAlmacen() {
-        List<TarjetaPrestamo> tarjetas = prestamoService.findAll();
         int librosPrestados = 0;
         for (int i = 0; i < tarjetas.size(); i++) {
             if (tarjetas.get(i).getFechaDevolucion() == null) {
@@ -121,9 +168,12 @@ public class EstadisticasView extends Div {
     private Component getEstadisticasProrcientoLibros() {
 
         Chart chart = new Chart(ChartType.PIE);
-
-        float promedioP = cantRealLibrosPrestados() * 100 / cantRealLibros();
-        float promedioA = cantRealLibrosAlmacen() * 100 / cantRealLibros();
+        float promedioP = 0;
+        float promedioA = 0;
+        if (cantRealLibros() != 0) {
+            promedioP = cantRealLibrosPrestados() * 100 / cantRealLibros();
+            promedioA = cantRealLibrosAlmacen() * 100 / cantRealLibros();
+        }
 
         DataSeries dataSeries = new DataSeries();
         dataSeries.add(new DataSeriesItem(String.format("Libros prestados: %d", cantRealLibrosPrestados()), promedioP));
@@ -141,6 +191,53 @@ public class EstadisticasView extends Div {
         serviceHealth.getElement().getThemeList().add("spacing-l");
         serviceHealth.setDefaultHorizontalComponentAlignment(FlexComponent.Alignment.CENTER);
         return serviceHealth;
+    }
+
+    //Barra de menu
+    private Component getBarraDeMenu() {
+
+        Div buttons = new Div();
+        buttons.addClassNames("barra-menu-export");
+        Button exportButton = new Button(VaadinIcon.FILE.create());
+        buttons.add(exportButton);
+
+        Div toolbar = new Div(DatePickerDateRange(), buttons);
+        toolbar.addClassNames("felx-item","barra-menu");
+        return toolbar;
+    }
+
+    //Rango de las fechas
+    private Component DatePickerDateRange() {
+
+        DatePicker.DatePickerI18n singleFormatI18n = new DatePicker.DatePickerI18n();
+        singleFormatI18n.setDateFormat("dd.MM.yyyy");
+
+        initDate = new DatePicker("Fecha de inicio:");
+        initDate.setI18n(singleFormatI18n);
+        initDate.setClearButtonVisible(true);
+        initDate.addValueChangeListener(event -> {
+            container.removeAll();
+            updateList();
+            container.add(getBoard(), getGraficosPasteles());
+        });
+        endDate = new DatePicker("Fecha de fin:");
+        endDate.setI18n(singleFormatI18n);
+        endDate.setClearButtonVisible(true);
+        endDate.setValue(LocalDate.now());
+        endDate.addValueChangeListener(event -> {
+            container.removeAll();
+            updateList();
+            container.add(getBoard(), getGraficosPasteles());
+        });
+
+        initDate.addValueChangeListener(e -> endDate.setMin(e.getValue()));
+        endDate.addValueChangeListener(e -> initDate.setMax(e.getValue()));
+
+        Span  s = new Span("-");
+
+        Div layout = new Div(initDate, s ,endDate);
+        layout.addClassNames("barra-menu-date");
+        return layout;
     }
 
 }
