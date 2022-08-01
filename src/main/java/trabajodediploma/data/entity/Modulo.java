@@ -13,6 +13,11 @@ import javax.persistence.OneToOne;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -35,21 +40,17 @@ public class Modulo extends AbstractEntity {
     @EqualsAndHashCode.Include
     @ToString.Include
 
-    @Column
-    @Max(message = "Máximo 5", value = 5)
-    @Min(message = "Mínimo 1", value = 1)
-    private Integer anno_academico;
+    @NotEmpty
+    @NotBlank(message = "El campo no debe estar vacío")
+    @Pattern(regexp = "^[a-zA-ZÀ-ÿ0-9\\u00f1\\u00d1]+(\\s*[a-zA-ZÀ-ÿ0-9\\u00f1\\u00d1]*)*[a-zA-ZÀ-ÿ0-9\\u00f1\\u00d1]+$", message = "Datos incorrectos, solo letras y números") // 0
+    @Size(message = "Mínimo 1 caracteres y máximo 100", min = 1, max = 100)
+    @Column(name = "nombre", nullable = false)
+    private String nombre;
 
     @ManyToMany
-    @JoinTable(
-            name = "modulo_recurosMateriales",
-            joinColumns = @JoinColumn(name = "modulo_id"),
-            inverseJoinColumns = @JoinColumn(name = "material_id"))
+    @JoinTable(name = "modulo_recurosMateriales", joinColumns = @JoinColumn(name = "modulo_id"), inverseJoinColumns = @JoinColumn(name = "material_id"))
     @ElementCollection(fetch = FetchType.EAGER)
     private List<RecursoMaterial> recursosMateriales;
-
-    @OneToOne
-    private Asignatura asignatura;
 
     @ManyToMany(mappedBy = "modulos")
     List<DestinoFinal> destinosFinales;

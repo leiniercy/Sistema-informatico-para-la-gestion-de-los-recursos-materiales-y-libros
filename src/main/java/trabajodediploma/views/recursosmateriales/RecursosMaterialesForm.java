@@ -120,14 +120,13 @@ public class RecursosMaterialesForm extends FormLayout {
             return material;
         }
     }
-
+    //save-event
     public static class SaveEvent extends RecursoMaterialFormEvent {
-
         SaveEvent(RecursosMaterialesForm source, RecursoMaterial material) {
             super(source, material);
         }
     }
-
+    //delete-event
     public static class DeleteEvent extends RecursoMaterialFormEvent {
 
         DeleteEvent(RecursosMaterialesForm source, RecursoMaterial material) {
@@ -135,7 +134,7 @@ public class RecursosMaterialesForm extends FormLayout {
         }
 
     }
-
+    //close-event
     public static class CloseEvent extends RecursoMaterialFormEvent {
 
         CloseEvent(RecursosMaterialesForm source) {

@@ -3,11 +3,8 @@ package trabajodediploma.views.recursosmateriales;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import javax.annotation.security.RolesAllowed;
-
 import org.springframework.beans.factory.annotation.Autowired;
-
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.button.Button;
@@ -32,12 +29,10 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-
 import trabajodediploma.data.entity.RecursoMaterial;
 import trabajodediploma.data.service.RecursoMaterialService;
 import trabajodediploma.views.MainLayout;
 import trabajodediploma.views.footer.MyFooter;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Scope;
 
@@ -151,7 +146,7 @@ public class RecursosMaterialesView extends Div {
         grid.addThemeVariants(GridVariant.LUMO_WRAP_CELL_CONTENT);
 
     }
-
+    //Filtros
     private void Filtros() {
 
         filterCodigo = new TextField();
@@ -219,9 +214,12 @@ public class RecursosMaterialesView extends Div {
         addButton.addClickListener(click -> addMaterial());
         Button modelButton = new Button(VaadinIcon.FILE.create());
         buttons.add(refreshButton, watchColumns(), deleteButton, addButton, modelButton);
-
-        total = new Html("<span>Total: <b>" + materialService.count() + "</b> materiales </span>");
-
+        if(materialService.count()==1){
+            total = new Html("<span>Total: <b>" + materialService.count() + "</b> material</span>");
+        
+        }else if(materialService.count()==0 || materialService.count()>1){
+            total = new Html("<span>Total: <b>" + materialService.count() + "</b> materiales</span>");
+        }
         toolbar = new HorizontalLayout(buttons, total);
         toolbar.addClassName("toolbar");
         toolbar.setAlignItems(FlexComponent.Alignment.CENTER);
@@ -234,7 +232,6 @@ public class RecursosMaterialesView extends Div {
     }
 
     private void deleteMaterial() {
-
         try {
 
             if (grid.asMultiSelect().isEmpty()) {
@@ -245,7 +242,12 @@ public class RecursosMaterialesView extends Div {
                 deleteItems(grid.getSelectedItems().size(), grid.getSelectedItems());
                 refreshGrid();
                 toolbar.remove(total);
-                total = new Html("<span>Total: <b>" + materialService.count() + "</b> materiales</span>");
+                if(materialService.count()==1){
+                    total = new Html("<span>Total: <b>" + materialService.count() + "</b> material</span>");
+                
+                }else if(materialService.count()==0 || materialService.count()>1){
+                    total = new Html("<span>Total: <b>" + materialService.count() + "</b> materiales</span>");
+                }
                 toolbar.addComponentAtIndex(1, total);
                 toolbar.setFlexGrow(1, buttons);
 
@@ -347,7 +349,12 @@ public class RecursosMaterialesView extends Div {
                 notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
             }
             toolbar.remove(total);
-            total = new Html("<span>Total: <b>" + materialService.count() + "</b> materiales</span>");
+            if(materialService.count()==1){
+                total = new Html("<span>Total: <b>" + materialService.count() + "</b> material</span>");
+            
+            }else if(materialService.count()==0 || materialService.count()>1){
+                total = new Html("<span>Total: <b>" + materialService.count() + "</b> materiales</span>");
+            }
             toolbar.addComponentAtIndex(1, total);
             toolbar.setFlexGrow(1, buttons);
             updateList();

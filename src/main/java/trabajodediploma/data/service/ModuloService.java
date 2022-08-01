@@ -1,11 +1,11 @@
 package trabajodediploma.data.service;
 
 import trabajodediploma.data.repository.ModuloRepository;
-import java.util.Optional;
+
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import trabajodediploma.data.entity.Modulo;
 
@@ -18,24 +18,30 @@ public class ModuloService {
         this.repository = repository;
     }
 
-    public Optional<Modulo> get(UUID id) {
-        return repository.findById(id);
+    public List<Modulo> findAll() {
+        return repository.findAll();
     }
 
-    public Modulo update(Modulo entity) {
-        return repository.save(entity);
+    public Modulo findById(UUID id) {
+        return repository.findById(id).get();
     }
 
-    public void delete(UUID id) {
-        repository.deleteById(id);
+    public Modulo save(Modulo modulo) {
+        return repository.save(modulo);
     }
 
-    public Page<Modulo> list(Pageable pageable) {
-        return repository.findAll(pageable);
+    public Modulo update(Modulo modulo) {
+        return repository.save(modulo);
     }
 
-    public int count() {
-        return (int) repository.count();
+    public void delete(Modulo modulo) {
+        repository.delete(modulo);
+    }
+
+    public void deleteAll(Set<Modulo>moduloes){repository.deleteAll(moduloes);}
+
+    public long count() {
+        return repository.count();
     }
 
 }
