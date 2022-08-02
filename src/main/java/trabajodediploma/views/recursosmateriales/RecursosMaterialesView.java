@@ -16,10 +16,12 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
+import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
@@ -29,12 +31,28 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.StreamResource;
+import com.itextpdf.kernel.color.Color;
+import com.itextpdf.kernel.color.DeviceRgb;
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.layout.Document;
+import com.itextpdf.layout.border.Border;
+import com.itextpdf.layout.element.Cell;
+import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.layout.element.Table;
+import com.itextpdf.layout.property.TextAlignment;
+import com.itextpdf.layout.property.VerticalAlignment;
 import trabajodediploma.data.entity.RecursoMaterial;
 import trabajodediploma.data.service.RecursoMaterialService;
 import trabajodediploma.views.MainLayout;
 import trabajodediploma.views.footer.MyFooter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Scope;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 
 @org.springframework.stereotype.Component
 @Scope("prototype")
@@ -146,7 +164,8 @@ public class RecursosMaterialesView extends Div {
         grid.addThemeVariants(GridVariant.LUMO_WRAP_CELL_CONTENT);
 
     }
-    //Filtros
+
+    // Filtros
     private void Filtros() {
 
         filterCodigo = new TextField();
@@ -212,12 +231,13 @@ public class RecursosMaterialesView extends Div {
         deleteButton.addClickListener(click -> deleteMaterial());
         Button addButton = new Button(VaadinIcon.PLUS.create());
         addButton.addClickListener(click -> addMaterial());
-        Button modelButton = new Button(VaadinIcon.FILE.create());
-        buttons.add(refreshButton, watchColumns(), deleteButton, addButton, modelButton);
-        if(materialService.count()==1){
+        // Button modelButton = new Button(VaadinIcon.FILE.create());
+
+        buttons.add(refreshButton, watchColumns(), deleteButton, addButton, exportModelPdf());
+        if (materialService.count() == 1) {
             total = new Html("<span>Total: <b>" + materialService.count() + "</b> material</span>");
-        
-        }else if(materialService.count()==0 || materialService.count()>1){
+
+        } else if (materialService.count() == 0 || materialService.count() > 1) {
             total = new Html("<span>Total: <b>" + materialService.count() + "</b> materiales</span>");
         }
         toolbar = new HorizontalLayout(buttons, total);
@@ -242,10 +262,10 @@ public class RecursosMaterialesView extends Div {
                 deleteItems(grid.getSelectedItems().size(), grid.getSelectedItems());
                 refreshGrid();
                 toolbar.remove(total);
-                if(materialService.count()==1){
+                if (materialService.count() == 1) {
                     total = new Html("<span>Total: <b>" + materialService.count() + "</b> material</span>");
-                
-                }else if(materialService.count()==0 || materialService.count()>1){
+
+                } else if (materialService.count() == 0 || materialService.count() > 1) {
                     total = new Html("<span>Total: <b>" + materialService.count() + "</b> materiales</span>");
                 }
                 toolbar.addComponentAtIndex(1, total);
@@ -349,10 +369,10 @@ public class RecursosMaterialesView extends Div {
                 notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
             }
             toolbar.remove(total);
-            if(materialService.count()==1){
+            if (materialService.count() == 1) {
                 total = new Html("<span>Total: <b>" + materialService.count() + "</b> material</span>");
-            
-            }else if(materialService.count()==0 || materialService.count()>1){
+
+            } else if (materialService.count() == 0 || materialService.count() > 1) {
                 total = new Html("<span>Total: <b>" + materialService.count() + "</b> materiales</span>");
             }
             toolbar.addComponentAtIndex(1, total);
@@ -390,5 +410,204 @@ public class RecursosMaterialesView extends Div {
     private void updateList() {
         grid.setItems(materialService.findAll());
     }
+
     /* Fin-Formulario */
+    /* Reporte */
+    private Component exportModelPdf() {
+        Icon icon = new Icon(VaadinIcon.FILE);
+        icon.getStyle().set("width", "var(--lumo-icon-size-s)");
+        icon.getStyle().set("height", "var(--lumo-icon-size-s)");
+        icon.getStyle().set("marginRight", "var(--lumo-space-s)");
+
+        Anchor rp = new Anchor();
+        rp.add(icon);
+        rp.setHref(ReportePDF());
+        rp.setTarget("_BLANK");
+
+        MenuBar menuBar = new MenuBar();
+        menuBar.addItem(rp);
+        return menuBar;
+    }
+
+    private StreamResource ReportePDF() {
+        StreamResource source = new StreamResource("ReporteEvaluaciones.pdf", () -> {
+            String path = "src/main/resources/META-INF/resources/archivos/RecurosMateriales.pdf";
+
+            try {
+                PdfWriter pdfWriter = new PdfWriter(path);
+                PdfDocument pdfDocument = new PdfDocument(pdfWriter);
+                Document document = new Document(pdfDocument);
+
+                document.add(primeraFila());
+                document.add(segundaFila());
+                document.close();
+
+                File initialFile = new File(path);
+                InputStream targetStream = new FileInputStream(initialFile);
+                return targetStream;
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                return null;
+            }
+
+        });
+        return source;
+    }
+
+    // Primera Fila
+    private Table primeraFila() {
+
+        float firstGrow_columnWidth[] = { 320, 200, 50, 50, 50 };
+
+        Table firstGrow = new Table(firstGrow_columnWidth);
+
+        firstGrow.addCell(new Cell().add("Universidad de las Ciencias Informáticas")
+                .setTextAlignment(TextAlignment.CENTER)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setMarginTop(30f)
+                .setMarginBottom(30f)
+                .setFontSize(10f));
+        firstGrow.addCell(new Cell().add("Solicitud de Materiales")
+                .setTextAlignment(TextAlignment.CENTER)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setMarginTop(30f)
+                .setMarginBottom(30f)
+                .setFontSize(14f)
+                .setBorderBottom(Border.NO_BORDER)
+                .setBold());
+        firstGrow.addCell(new Cell().add("D")
+                .setTextAlignment(TextAlignment.CENTER)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setMarginTop(30f)
+                .setMarginBottom(30f)
+                .setFontSize(10f));
+        firstGrow.addCell(new Cell().add("M")
+                .setTextAlignment(TextAlignment.CENTER)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setMarginTop(30f)
+                .setMarginBottom(30f)
+                .setFontSize(10f));
+        firstGrow.addCell(new Cell().add("A")
+                .setTextAlignment(TextAlignment.CENTER)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setMarginTop(30f)
+                .setMarginBottom(30f)
+                .setFontSize(10f));
+        return firstGrow;
+    }
+
+    // Segunda Fila
+    private Table segundaFila() {
+
+        float secondGrow_columnWidth[] = { 148, 147, 215, 51, 50, 50 };
+        Table secondGrow = new Table(secondGrow_columnWidth);
+
+        secondGrow.addCell(new Cell().add("Direccción:")
+                .setTextAlignment(TextAlignment.JUSTIFIED)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setFontSize(10f));
+
+        secondGrow.addCell(new Cell().add("Código:")
+                .setTextAlignment(TextAlignment.JUSTIFIED)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setBorderTop(Border.NO_BORDER)
+                .setFontSize(10f));
+
+        secondGrow.addCell(new Cell().add("")
+                .setTextAlignment(TextAlignment.JUSTIFIED)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setFontSize(10f)
+                .setBorderTop(Border.NO_BORDER));
+
+        // Día
+        secondGrow.addCell(new Cell().add("")
+                .setTextAlignment(TextAlignment.CENTER)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setFontSize(10f));
+        // Mes
+        secondGrow.addCell(new Cell().add("")
+                .setTextAlignment(TextAlignment.CENTER)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setFontSize(10f));
+        // Año
+        secondGrow.addCell(new Cell().add("")
+                .setTextAlignment(TextAlignment.CENTER)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setFontSize(10f));
+
+        return secondGrow;
+    }
+
+    // Tercera Fila
+    private Table terceraFila() {
+        float terceraFila_columnWidth[] = { 148, 147, 215, 51, 50, 50 };
+        Table terceraFila = new Table(terceraFila_columnWidth);
+
+        return terceraFila;
+    }
+
+    // Cuarta Fila
+    private Table cuartaFila() {
+        float terceraFila_columnWidth[] = { 148, 147, 215, 51, 50, 50 };
+        Table terceraFila = new Table(terceraFila_columnWidth);
+
+        return terceraFila;
+    }
+
+    // Quinta Fila
+    private Table quintaFila() {
+        float terceraFila_columnWidth[] = { 148, 147, 215, 51, 50, 50 };
+        Table terceraFila = new Table(terceraFila_columnWidth);
+
+        return terceraFila;
+    }
+
+    // Sexta Fila
+    private Table sextaFila() {
+        float terceraFila_columnWidth[] = { 148, 147, 215, 51, 50, 50 };
+        Table terceraFila = new Table(terceraFila_columnWidth);
+
+        return terceraFila;
+    }
+
+    // Septima Fila
+    private Table septimaFila() {
+        float terceraFila_columnWidth[] = { 148, 147, 215, 51, 50, 50 };
+        Table terceraFila = new Table(terceraFila_columnWidth);
+
+        return terceraFila;
+    }
+
+    //Octava Fila
+    private Table octavaFila() {
+        float terceraFila_columnWidth[] = { 148, 147, 215, 51, 50, 50 };
+        Table terceraFila = new Table(terceraFila_columnWidth);
+
+        return terceraFila;
+    }
+    //Novena Fila
+    private Table novenaFila(){
+        float terceraFila_columnWidth[] = { 148, 147, 215, 51, 50, 50 };
+        Table terceraFila = new Table(terceraFila_columnWidth);
+
+        return terceraFila;
+    }
+    // Decima Fila
+    private Table decimaFila(){
+        float terceraFila_columnWidth[] = { 148, 147, 215, 51, 50, 50 };
+        Table terceraFila = new Table(terceraFila_columnWidth);
+
+        return terceraFila;
+    }
+   // Ultima Fila
+   private Table ultimaFila(){
+    float terceraFila_columnWidth[] = { 148, 147, 215, 51, 50, 50 };
+    Table terceraFila = new Table(terceraFila_columnWidth);
+
+    return terceraFila;
+}
+
+   
+
+    /* Reporte */
 }
