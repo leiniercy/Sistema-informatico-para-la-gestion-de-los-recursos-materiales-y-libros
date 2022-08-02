@@ -49,9 +49,7 @@ import trabajodediploma.views.footer.MyFooter;
 public class LibroView extends Div {
 
     private Grid<Libro> grid = new Grid<>(Libro.class, false);
-
     LibroService libroService;
-
     GridListDataView<Libro> gridListDataView;
     Grid.Column<Libro> imagenColumn;
     Grid.Column<Libro> tituloColumn;
@@ -62,10 +60,8 @@ public class LibroView extends Div {
     Grid.Column<Libro> cantidadColumn;
     Grid.Column<Libro> precioColumn;
     Grid.Column<Libro> editColumn;
-
     MyFooter myFooter;
     LibroForm form;
-
     private Dialog dialog;
     private Html total;
     private HorizontalLayout toolbar;
@@ -298,7 +294,6 @@ public class LibroView extends Div {
                 total = new Html("<span>Total: <b>" + libroService.count() + "</b> libros</span>");
                 toolbar.addComponentAtIndex(1, total);
                 toolbar.setFlexGrow(1, buttons);
-
             }
 
         } catch (Exception e) {

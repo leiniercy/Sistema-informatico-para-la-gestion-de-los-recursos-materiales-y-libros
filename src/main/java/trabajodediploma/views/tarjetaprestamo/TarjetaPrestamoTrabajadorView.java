@@ -8,13 +8,12 @@ package trabajodediploma.views.tarjetaprestamo;
 import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-
 import org.springframework.beans.factory.annotation.Autowired;
-
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.GridVariant;
@@ -61,15 +60,14 @@ public class TarjetaPrestamoTrabajadorView extends Div {
     TarjetaPrestamoService prestamoService;
     TrabajadorService trabajadorService;
     LibroService libroService;
-
     TarjetaPrestamoTrabajadorForm form;
-
     private ComboBox<Libro> libroFilter;
     private DatePicker entregaFilter;
     private DatePicker devolucionFilter;
-
     private Html total;
     private HorizontalLayout info;
+    private Div header;
+    private Dialog dialog;
     private Div content;
 
     public TarjetaPrestamoTrabajadorView(
@@ -88,21 +86,34 @@ public class TarjetaPrestamoTrabajadorView extends Div {
 
         configureGrid();
         configureForm();
-        content = new Div(getGridContent());
-
+        getContent();
         add(content);
         updateList();
         closeEditor();
     }
 
-    /*Contenido de la vista*/
-    private HorizontalLayout getContent() {
-        HorizontalLayout contenedor = new HorizontalLayout(grid, form);
-        contenedor.setFlexGrow(2, grid);
-        contenedor.setFlexGrow(1, form);
-        contenedor.addClassNames("content");
-        contenedor.setSizeFull();
-        return contenedor;
+    /* Contenido de la vista */
+    private void getContent() {
+        Div formContent = new Div(form);
+        formContent.addClassName("form-content");
+        Div gridContent = new Div(grid);
+        gridContent.addClassName("grid-content");
+        content = new Div();
+        content.addClassName("content");
+        content.setSizeFull();
+        /* Dialog Header */
+        Button closeButton = new Button(new Icon("lumo", "cross"), (e) -> dialog.close());
+        closeButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        Span title = new Span("Libro");
+        Div titleDiv = new Div(title);
+        titleDiv.addClassName("div-dialog-title");
+        Div buttonDiv = new Div(closeButton);
+        buttonDiv.addClassName("div-dialog-button");
+        header = new Div(titleDiv, buttonDiv);
+        header.addClassName("div-dialog-header");
+        /* Dialog Header */
+        dialog = new Dialog(header, formContent);
+        content.add(menuBar(), gridContent, informacionTabla());
     }
 
     private HorizontalLayout informacionTabla() {
@@ -112,14 +123,8 @@ public class TarjetaPrestamoTrabajadorView extends Div {
         return info;
     }
 
-    private VerticalLayout getGridContent() {
-        VerticalLayout nuevo = new VerticalLayout();
-        nuevo.add(menuBar(), getContent(), informacionTabla());
-        return nuevo;
-    }
-
-    /*Tabla*/
- /*Configuracion de la tabla*/
+    /* Tabla */
+    /* Configuracion de la tabla */
     private void configureGrid() {
         grid.setClassName("tarjeta-trabajador-grid");
         libroColumn = grid.addColumn(new ComponentRenderer<>(tarjeta -> {
@@ -134,8 +139,16 @@ public class TarjetaPrestamoTrabajadorView extends Div {
             return hl;
         })).setHeader("Libro").setAutoWidth(true).setSortable(true);
 
-        fechaEntregaColumn = grid.addColumn(new LocalDateRenderer<>(tarjeta -> tarjeta.getFechaPrestamo(), DateTimeFormatter.ofPattern("dd/MM/yyyy"))).setComparator(tarjeta -> tarjeta.getFechaPrestamo()).setHeader("Fecha de Prestamo").setAutoWidth(true).setSortable(true);
-        fechaDevolucionColumn = grid.addColumn(new LocalDateRenderer<>(tarjeta -> tarjeta.getFechaDevolucion(), DateTimeFormatter.ofPattern("dd/MM/yyyy"))).setComparator(tarjeta -> tarjeta.getFechaDevolucion()).setHeader("Fecha de Devolución").setAutoWidth(true).setSortable(true);
+        fechaEntregaColumn = grid
+                .addColumn(new LocalDateRenderer<>(tarjeta -> tarjeta.getFechaPrestamo(),
+                        DateTimeFormatter.ofPattern("dd/MM/yyyy")))
+                .setComparator(tarjeta -> tarjeta.getFechaPrestamo()).setHeader("Fecha de Prestamo").setAutoWidth(true)
+                .setSortable(true);
+        fechaDevolucionColumn = grid
+                .addColumn(new LocalDateRenderer<>(tarjeta -> tarjeta.getFechaDevolucion(),
+                        DateTimeFormatter.ofPattern("dd/MM/yyyy")))
+                .setComparator(tarjeta -> tarjeta.getFechaDevolucion()).setHeader("Fecha de Devolución")
+                .setAutoWidth(true).setSortable(true);
         editColumn = grid.addComponentColumn(libro -> {
             Button editButton = new Button(VaadinIcon.EDIT.create());
             editButton.addClickListener(event -> this.editLibro(libro));
@@ -150,8 +163,8 @@ public class TarjetaPrestamoTrabajadorView extends Div {
         headerRow.getCell(fechaDevolucionColumn).setComponent(devolucionFilter);
 
         gridListDataView = grid.setItems(
-                prestamos.parallelStream().filter(t -> t.getTrabajadores().equals(trabajador)).collect(Collectors.toList())
-        );
+                prestamos.parallelStream().filter(t -> t.getTrabajador().equals(trabajador))
+                        .collect(Collectors.toList()));
         grid.setAllRowsVisible(true);
         grid.setSizeFull();
         grid.setWidthFull();
@@ -165,10 +178,11 @@ public class TarjetaPrestamoTrabajadorView extends Div {
 
     private void refreshGrid() {
         grid.setVisible(true);
-        grid.setItems(prestamos.parallelStream().filter(event -> event.getTrabajadores().equals(trabajador)).collect(Collectors.toList()));
+        grid.setItems(prestamos.parallelStream().filter(event -> event.getTrabajador().equals(trabajador))
+                .collect(Collectors.toList()));
     }
 
-    /*Filtros*/
+    /* Filtros */
     private void Filtros() {
 
         libroFilter = new ComboBox<>();
@@ -179,7 +193,8 @@ public class TarjetaPrestamoTrabajadorView extends Div {
         libroFilter.setWidth("100%");
         libroFilter.addValueChangeListener(event -> {
             if (libroFilter.getValue() == null) {
-                gridListDataView = grid.setItems(prestamos.parallelStream().filter(t -> t.getTrabajadores().equals(trabajador)).collect(Collectors.toList()));
+                gridListDataView = grid.setItems(prestamos.parallelStream()
+                        .filter(t -> t.getTrabajador().equals(trabajador)).collect(Collectors.toList()));
             } else {
                 gridListDataView.addFilter(tarjeta -> areLibroEqual(tarjeta, libroFilter));
             }
@@ -191,7 +206,8 @@ public class TarjetaPrestamoTrabajadorView extends Div {
         entregaFilter.setWidth("100%");
         entregaFilter.addValueChangeListener(event -> {
             if (entregaFilter.getValue() == null) {
-                gridListDataView = grid.setItems(prestamos.parallelStream().filter(t -> t.getTrabajadores().equals(trabajador)).collect(Collectors.toList()));
+                gridListDataView = grid.setItems(prestamos.parallelStream()
+                        .filter(t -> t.getTrabajador().equals(trabajador)).collect(Collectors.toList()));
             } else {
                 gridListDataView.addFilter(tarjeta -> areFechaInicioEqual(tarjeta, entregaFilter));
             }
@@ -203,7 +219,8 @@ public class TarjetaPrestamoTrabajadorView extends Div {
         devolucionFilter.setWidth("100%");
         devolucionFilter.addValueChangeListener(event -> {
             if (devolucionFilter.getValue() == null) {
-                gridListDataView = grid.setItems(prestamos.parallelStream().filter(t -> t.getTrabajadores().equals(trabajador)).collect(Collectors.toList()));
+                gridListDataView = grid.setItems(prestamos.parallelStream()
+                        .filter(t -> t.getTrabajador().equals(trabajador)).collect(Collectors.toList()));
             } else {
                 gridListDataView.addFilter(tarjeta -> areFechaFinEqual(tarjeta, devolucionFilter));
             }
@@ -237,9 +254,9 @@ public class TarjetaPrestamoTrabajadorView extends Div {
         return true;
     }
 
-    /*Fin-Filtros*/
+    /* Fin-Filtros */
 
- /*Barra de menu*/
+    /* Barra de menu */
     private HorizontalLayout menuBar() {
         HorizontalLayout buttons = new HorizontalLayout();
         Button refreshButton = new Button(VaadinIcon.REFRESH.create(), click -> refreshGrid());
@@ -250,7 +267,8 @@ public class TarjetaPrestamoTrabajadorView extends Div {
         addButton.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
         buttons.add(refreshButton, deleteButton, addButton);
 
-        Button salirButton = new Button(trabajador.getNombreApellidos(), new Icon(VaadinIcon.ARROW_RIGHT), click -> volverAtras());
+        Button salirButton = new Button(trabajador.getNombreApellidos(), new Icon(VaadinIcon.ARROW_RIGHT),
+                click -> volverAtras());
         salirButton.setIconAfterText(true);
         salirButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         HorizontalLayout personalInfo = new HorizontalLayout(salirButton);
@@ -278,7 +296,8 @@ public class TarjetaPrestamoTrabajadorView extends Div {
         try {
 
             if (grid.asMultiSelect().isEmpty()) {
-                Notification notification = Notification.show("Debe elegir al menos un campo", 5000, Notification.Position.MIDDLE);
+                Notification notification = Notification.show("Debe elegir al menos un campo", 5000,
+                        Notification.Position.MIDDLE);
                 notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
             } else {
                 deleteItems(grid.getSelectedItems().size(), grid.getSelectedItems());
@@ -290,7 +309,8 @@ public class TarjetaPrestamoTrabajadorView extends Div {
 
         } catch (Exception event) {
             event.printStackTrace();
-            Notification notification = Notification.show("Ocurrió un problema al intentar eliminar el libro", 5000, Notification.Position.MIDDLE);
+            Notification notification = Notification.show("Ocurrió un problema al intentar eliminar el libro", 5000,
+                    Notification.Position.MIDDLE);
             ;
             notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
         }
@@ -302,7 +322,8 @@ public class TarjetaPrestamoTrabajadorView extends Div {
         if (cantidad == 1) {
             notification = Notification.show("El libro ha sido eliminado", 5000, Notification.Position.BOTTOM_START);
         } else {
-            notification = Notification.show("Han sido eliminados" + cantidad + " libros", 5000, Notification.Position.BOTTOM_START);
+            notification = Notification.show("Han sido eliminados" + cantidad + " libros", 5000,
+                    Notification.Position.BOTTOM_START);
         }
         notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
     }
@@ -318,18 +339,16 @@ public class TarjetaPrestamoTrabajadorView extends Div {
 
         prestamos = prestamos.parallelStream()
                 .filter(lib -> event.getTarjetaPrestamo().getLibro().equals(lib.getLibro())
-                && event.getTarjetaPrestamo().getTrabajadores().equals(lib.getTrabajadores())
-                && event.getTarjetaPrestamo().getFechaPrestamo().equals(lib.getFechaPrestamo())
-                && event.getTarjetaPrestamo().getFechaDevolucion().equals(lib.getFechaDevolucion())
-                )
+                        && event.getTarjetaPrestamo().getTrabajador().equals(lib.getTrabajador())
+                        && event.getTarjetaPrestamo().getFechaPrestamo().equals(lib.getFechaPrestamo())
+                        && event.getTarjetaPrestamo().getFechaDevolucion().equals(lib.getFechaDevolucion()))
                 .collect(Collectors.toList());
 
         if (prestamos.size() != 0) {
             Notification notification = Notification.show(
                     "El libro ya existe",
                     5000,
-                    Notification.Position.MIDDLE
-            );
+                    Notification.Position.MIDDLE);
             notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
         } else {
             if (event.getTarjetaPrestamo().getId() == null) {
@@ -337,16 +356,14 @@ public class TarjetaPrestamoTrabajadorView extends Div {
                 Notification notification = Notification.show(
                         "Libro añadido",
                         5000,
-                        Notification.Position.BOTTOM_START
-                );
+                        Notification.Position.BOTTOM_START);
                 notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
             } else {
                 prestamoService.update(event.getTarjetaPrestamo());
                 Notification notification = Notification.show(
                         "Libro modificado",
                         5000,
-                        Notification.Position.BOTTOM_START
-                );
+                        Notification.Position.BOTTOM_START);
                 notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
             }
             info.remove(total);
@@ -365,6 +382,7 @@ public class TarjetaPrestamoTrabajadorView extends Div {
             form.setTarjetaPrestamo(tarjeta);
             form.setVisible(true);
             addClassName("editing");
+            dialog.open();
         }
     }
 
@@ -377,11 +395,13 @@ public class TarjetaPrestamoTrabajadorView extends Div {
         form.setTarjetaPrestamo(null);
         form.setVisible(false);
         removeClassName("editing");
+        dialog.close();
     }
 
     private void updateList() {
-        grid.setItems(prestamoService.findAll().parallelStream().filter(event -> event.getTrabajadores().equals(trabajador)).collect(Collectors.toList()));
+        grid.setItems(prestamoService.findAll().parallelStream()
+                .filter(event -> event.getTrabajador().equals(trabajador)).collect(Collectors.toList()));
     }
-    /*Fin-Barra de menu*/
+    /* Fin-Barra de menu */
 
 }

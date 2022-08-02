@@ -1,6 +1,10 @@
 package trabajodediploma.views.modulo;
 
 import java.util.List;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Key;
@@ -46,10 +50,10 @@ public class ModuloForm extends FormLayout {
             event.getSource().setHelperText(event.getValue().length() + "/" + 100);
         });
         // Recursos Materiales
-        //recursosMateriales.setItems(materiales);
+        //recursosMateriales.setItems(new HashSet<>(materiales));
         //recursosMateriales.setRenderer(new ComponentRenderer<>(material -> new Text(material.getDescripcion())));
 
-        add(nombre, createButtonsLayout());
+        add(nombre, /*recursosMateriales,*/createButtonsLayout());
     }
 
     private HorizontalLayout createButtonsLayout() {
@@ -79,7 +83,8 @@ public class ModuloForm extends FormLayout {
     private void validateAndSave() {
         try {
             binder.writeBean(modulo);
-         
+            this.modulo.setNombre(nombre.getValue());
+           
             fireEvent(new SaveEvent(this, modulo));
         } catch (ValidationException e) {
             e.printStackTrace();

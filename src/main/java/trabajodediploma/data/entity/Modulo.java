@@ -9,10 +9,7 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.OneToOne;
-
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
@@ -52,7 +49,7 @@ public class Modulo extends AbstractEntity {
     @ElementCollection(fetch = FetchType.EAGER)
     private List<RecursoMaterial> recursosMateriales;
 
-    @ManyToMany(mappedBy = "modulos")
+    @OneToMany(mappedBy = "modulo")
     List<DestinoFinal> destinosFinales;
 
 }

@@ -63,10 +63,10 @@ public class TarjetaPrestamoView extends VerticalLayout {
 
     }
 
+    //barra de menu
     private Div MenuBar() {
         Div menu = new Div(getSecondaryNavigation());
         menu.addClassName("barraNavegacion");
-
         return menu;
     }
 

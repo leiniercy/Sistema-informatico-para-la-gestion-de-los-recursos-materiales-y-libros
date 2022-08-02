@@ -9,7 +9,8 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.validation.constraints.Min;
+import javax.persistence.ManyToOne;
+
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -33,33 +34,14 @@ public class DestinoFinal extends AbstractEntity {
     @Column
     private LocalDate fecha;
     
-    @Column
-    @Min(message = "Mínimo 0", value = 0)
-    private Integer cantidad;
-    
-    @ManyToMany
-    @JoinTable(
-            name = "destinoFinal_modulo",
-            joinColumns = @JoinColumn(name = "modulo_id"),
-            inverseJoinColumns = @JoinColumn(name = "destinoF_id"))
-    @ElementCollection(fetch = FetchType.EAGER)
-    private List<Modulo> modulos;
+    @ManyToOne(fetch = FetchType.EAGER)
+    private Modulo modulo;
 
-    @ManyToMany
-    @JoinTable(
-            name = "destinoFinal_trabajadores",
-            joinColumns = @JoinColumn(name = "destinoF_id"),
-            inverseJoinColumns = @JoinColumn(name = "trabajador_id"))
-    @ElementCollection(fetch = FetchType.EAGER)
-    private List<Trabajador> trabajadores;
+    @ManyToOne(fetch = FetchType.EAGER)
+    private Trabajador trabajador;
     
-    @ManyToMany
-    @JoinTable(
-            name = "destinoFinal_estudiantes",
-            joinColumns = @JoinColumn(name = "destinoF_id"),
-            inverseJoinColumns = @JoinColumn(name = "estudiante_id"))
-    @ElementCollection(fetch = FetchType.EAGER)
-    private List<Estudiante> estudiantes;
+    @ManyToOne(fetch = FetchType.EAGER)
+    private Estudiante estudiante;
 
 
 

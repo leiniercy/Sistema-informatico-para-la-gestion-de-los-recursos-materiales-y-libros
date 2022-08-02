@@ -80,7 +80,7 @@ public class TarjetaPrestamoEstudianteForm extends FormLayout {
         close.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         close.addClickShortcut(Key.ESCAPE);
 
-        //binder.addStatusChangeListener(e -> save.setEnabled(binder.isValid()));
+        binder.addStatusChangeListener(e -> save.setEnabled(binder.isValid()));
         buttonlayout.add(save, close);
 
         return buttonlayout;

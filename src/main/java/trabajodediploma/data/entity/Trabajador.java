@@ -4,8 +4,8 @@ import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -60,10 +60,10 @@ public class Trabajador extends AbstractEntity {
     @ManyToOne()
     private Area area;
     
-    @ManyToMany(mappedBy = "trabajadores")
+    @OneToMany(mappedBy = "trabajador")
     List<DestinoFinal> destinoFinal;
 
-    @ManyToMany(mappedBy = "trabajadores")
+    @OneToMany(mappedBy = "trabajador")
     List<TarjetaPrestamo> tarjetaPrestamo;
 
     public String getNombreApellidos() {

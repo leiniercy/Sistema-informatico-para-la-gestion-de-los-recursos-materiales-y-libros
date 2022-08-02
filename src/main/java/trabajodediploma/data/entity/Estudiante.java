@@ -5,8 +5,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Max;
@@ -35,20 +35,6 @@ public class Estudiante extends AbstractEntity {
 
     @EqualsAndHashCode.Include
     @ToString.Include
-
-//    @NotEmpty
-//    @NotBlank(message = "El campo no debe estar vacío")
-//    @Pattern(regexp = "^[a-zA-ZÀ-ÿ\\u00f1\\u00d1]+(\\s*[a-zA-ZÀ-ÿ\\u00f1\\u00d1]*)*[a-zA-ZÀ-ÿ\\u00f1\\u00d1]+$", message = "Datos incorrectos, solo letras") //0 combinaciones de letras 0 o mas veces incluyendo espacios
-//    @Size(message = "Mínimo 2 caracteres y máximo 100", min = 2, max = 100)
-//    @Column(name = "nombre", nullable = false)
-//    private String nombre;
-//
-//    @NotEmpty
-//    @NotBlank(message = "El campo no debe estar vacío")
-//    @Pattern(regexp = "^[a-zA-ZÀ-ÿ\\u00f1\\u00d1]+(\\s*[a-zA-ZÀ-ÿ\\u00f1\\u00d1]*)*[a-zA-ZÀ-ÿ\\u00f1\\u00d1]+$", message = "Datos incorrectos, solo letras") //0 combinaciones de letras 0 o mas veces incluyendo espacios
-//    @Size(message = "Mínimo 3 caracteres y máximo 100", min = 3, max = 100)
-//    @Column(name = "apellidos", nullable = false)
-//    private String apellidos;
 
     @OneToOne()
     private User user;
@@ -82,10 +68,10 @@ public class Estudiante extends AbstractEntity {
     @ManyToOne(optional = false,fetch = FetchType.EAGER)
     private Grupo grupo;
 
-    @ManyToMany(mappedBy = "estudiantes")
+    @OneToMany(mappedBy = "estudiante")
     List<DestinoFinal> destinoFinal;
 
-    @ManyToMany(mappedBy = "estudiantes")
+    @OneToMany(mappedBy = "estudiante")
     List<TarjetaPrestamo> tarjetaPrestamo;
     
     public String getNombreApellidos() {

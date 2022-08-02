@@ -37,16 +37,14 @@ import trabajodediploma.data.service.TrabajadorService;
 import trabajodediploma.data.service.UserService;
 import trabajodediploma.security.AuthenticatedUser;
 import trabajodediploma.views.catalogo.CatalogoView;
-import trabajodediploma.views.destinofinal.DestinoFinalView;
 import trabajodediploma.views.inicio.InicioView;
 import trabajodediploma.views.libros.LibroView;
 import trabajodediploma.views.libros.estadisticas.EstadisticasView;
-import trabajodediploma.views.login.crear_informacion_perfil.CrearEstudianteForm;
-import trabajodediploma.views.login.crear_informacion_perfil.CrearTrabajadorForm;
 import trabajodediploma.views.menu_personal.modificar_perfil.ModificarPerfilView;
 import trabajodediploma.views.modulo.ModuloView;
 import trabajodediploma.views.usuarios.UsuarioView;
 import trabajodediploma.views.recursosmateriales.RecursosMaterialesView;
+import trabajodediploma.views.tarjetaDestinoFinal.TarjetaDestinoFinalView;
 import trabajodediploma.views.tarjetaprestamo.TarjetaPrestamoView;
 
 /**
@@ -232,7 +230,7 @@ public class MainLayout extends AppLayout {
 
             new MenuItemInfo("Modulo", "la la-gift", ModuloView.class), //
 
-            new MenuItemInfo("Destino Final", "la la-user-check", DestinoFinalView.class), //
+            new MenuItemInfo("Destino Final", "la la-user-check", TarjetaDestinoFinalView.class), //
         };
     }
 

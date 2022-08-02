@@ -1,7 +1,10 @@
 package trabajodediploma.data.service;
 
 import trabajodediploma.data.repository.DestinoFinalRepository;
+
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -18,24 +21,31 @@ public class DestinoFinalService {
         this.repository = repository;
     }
 
-    public Optional<DestinoFinal> get(UUID id) {
-        return repository.findById(id);
+    public List<DestinoFinal> findAll() {
+        return repository.findAll();
+    }
+    
+    public DestinoFinal findById(UUID id){
+     return repository.findById(id).get();
+    }
+    
+    public DestinoFinal save(DestinoFinal DestinoFinal) {
+        return repository.save(DestinoFinal);
     }
 
-    public DestinoFinal update(DestinoFinal entity) {
-        return repository.save(entity);
+    
+    public DestinoFinal update(DestinoFinal DestinoFinal) {
+        return repository.save(DestinoFinal);
     }
 
-    public void delete(UUID id) {
-        repository.deleteById(id);
+    public void delete(DestinoFinal DestinoFinal) {
+        repository.delete(DestinoFinal);
     }
 
-    public Page<DestinoFinal> list(Pageable pageable) {
-        return repository.findAll(pageable);
+    public void deleteAll(Set<DestinoFinal>DestinoFinals){repository.deleteAll(DestinoFinals);}
+    
+    public long count(){
+      return repository.count();
     }
-
-    public int count() {
-        return (int) repository.count();
-    }
-
+    
 }
