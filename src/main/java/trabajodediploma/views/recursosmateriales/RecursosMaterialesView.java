@@ -88,6 +88,21 @@ public class RecursosMaterialesView extends Div {
         private HorizontalLayout buttons;
         private Div header;
 
+        private Dialog reportDialog;
+        private TextField codigo;
+        private TextField almacenSolicitud;
+        private TextField proceso;
+        private TextField ordenProd;
+        private TextField lote;
+        private TextField centroCosto;
+        private TextField codigo2;
+        private TextField ordenTrab;
+        private TextField productCod;
+        private TextField otros;
+        private TextField nombre1;
+        private TextField nombre2;
+        private TextField nombre3;
+
         public RecursosMaterialesView(@Autowired RecursoMaterialService materialService) {
                 addClassNames("recurso-material-view");
                 this.materialService = materialService;
@@ -240,9 +255,9 @@ public class RecursosMaterialesView extends Div {
                 deleteButton.addClickListener(click -> deleteMaterial());
                 Button addButton = new Button(VaadinIcon.PLUS.create());
                 addButton.addClickListener(click -> addMaterial());
-                // Button modelButton = new Button(VaadinIcon.FILE.create());
-
-                buttons.add(refreshButton, watchColumns(), deleteButton, addButton, exportModelPdf());
+                Button modelButton = new Button(VaadinIcon.FILE.create());
+                modelButton.addClickListener(click -> formReporte());
+                buttons.add(refreshButton, watchColumns(), deleteButton, addButton, modelButton);
                 if (materialService.count() == 1) {
                         total = new Html("<span>Total: <b>" + materialService.count() + "</b> material</span>");
 
@@ -429,22 +444,64 @@ public class RecursosMaterialesView extends Div {
 
         /* Fin-Formulario */
         /* Reporte */
-        private Component exportModelPdf() {
-                Icon icon = new Icon(VaadinIcon.FILE);
-                icon.getStyle().set("width", "var(--lumo-icon-size-s)");
-                icon.getStyle().set("height", "var(--lumo-icon-size-s)");
-                icon.getStyle().set("marginRight", "var(--lumo-space-s)");
+        private void formReporte() {
+                reportDialog = new Dialog();
+                Div reportContainer = new Div();
+                reportContainer.addClassNames("report-form-container");
+                Anchor reporteLink = new Anchor(ReportePDF(), "Crear Modelo");
+                reporteLink.addClassNames("link-modelo");
+                reporteLink.setTarget("_BLANK");
+                reporteLink.addBlurListener(e -> reportDialog.close());
 
-                Anchor rp = new Anchor();
-                rp.add(icon);
-                rp.setHref(ReportePDF());
-                rp.setTarget("_BLANK");
+                 /* Dialog Header */
+                 Button closeButton = new Button(new Icon("lumo", "cross"), (e) -> reportDialog.close());
+                 closeButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+                 Span title = new Span("Modelo de Recursos Materiales");
+                 Div titleDiv = new Div(title);
+                 titleDiv.addClassName("div-dialog-title");
+                 Div buttonDiv = new Div(closeButton);
+                 buttonDiv.addClassName("div-dialog-button");
+                 header = new Div(titleDiv, buttonDiv);
+                 header.addClassName("div-dialog-header");
+                 /* Dialog Header */
 
-                MenuBar menuBar = new MenuBar();
-                menuBar.addItem(rp);
-                return menuBar;
+                codigo = new  TextField();
+                codigo.setPlaceholder("CÓDIGO");
+
+                almacenSolicitud = new  TextField();
+                almacenSolicitud.setPlaceholder("ALMACÉN AL QUE SE SOLICITAN");
+                proceso = new  TextField();
+                proceso.setPlaceholder("PROCESO");
+
+                ordenProd = new  TextField();
+                ordenProd.setPlaceholder("ORDEN DE PRODUCCIÓN No.");
+                lote = new  TextField();
+                lote.setPlaceholder("LOTE No");
+                centroCosto  = new  TextField();
+                centroCosto.setPlaceholder("CENTRO DE COSTO");
+                codigo2  = new  TextField();
+                codigo2.setPlaceholder("CÓDIGO");
+                ordenTrab  = new  TextField();
+                ordenTrab.setPlaceholder("ORDEN DE TRABAJO No");
+                productCod = new  TextField();
+                productCod.setPlaceholder("PRODUCTO CÓDIGO");
+                otros = new  TextField();
+                otros.setPlaceholder("OTROS");
+
+                nombre1 = new  TextField();
+                nombre1.setPlaceholder("SOLICITADO POR ...");
+                nombre2 = new  TextField();
+                nombre2.setPlaceholder("AUTORIZADO POR...");
+                nombre3 = new  TextField();
+                nombre3.setPlaceholder("RECIBIDO POR ...");
+
+
+                reportContainer.add(header, codigo, almacenSolicitud,proceso, ordenProd, lote, centroCosto, codigo2,ordenTrab, productCod, otros, nombre1 , nombre2, nombre3, reporteLink);
+                reportDialog.add(reportContainer);
+                reportDialog.open();
         }
 
+       /*Link del crear modulo*/
         private StreamResource ReportePDF() {
                 StreamResource source = new StreamResource("ReporteEvaluaciones.pdf", () -> {
                         String path = "src/main/resources/META-INF/resources/archivos/RecurosMateriales.pdf";
