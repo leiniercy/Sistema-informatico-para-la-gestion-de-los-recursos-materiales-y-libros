@@ -5,7 +5,7 @@
 [slot='drawer'] nav a {
     text-decoration: none;
     transition: color 140ms;
-    color: #8B4513;
+    color: #000;
 }
 
 [slot='drawer'] nav a .la {
@@ -113,7 +113,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 10px; 
-    background-color: rgb(50, 102, 171);
+    background-color: #253d6d;
     box-sizing: border-box;
     border-bottom: 1px solid;
 }

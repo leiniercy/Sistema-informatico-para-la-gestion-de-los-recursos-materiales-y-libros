@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <!-- Project from https://start.vaadin.com/project/1454067b-fb2a-4dec-93ad-4087e6f6d820 -->
     <groupId>trabajodediploma</groupId>
@@ -165,20 +163,20 @@
             <groupId>org.vaadin.reportui</groupId>
             <artifactId>report-ui</artifactId>
             <version>4.0.2</version>
-        </dependency> 
+        </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <type>jar</type>
         </dependency>
-        
+
         <!--Generar Archivos PDF-->
         <dependency>
             <groupId>com.itextpdf</groupId>
             <artifactId>itext7-core</artifactId>
             <version>7.0.2</version>
             <type>pom</type>
-        </dependency>        
+        </dependency>
         <dependency>
             <groupId>com.itextpdf</groupId>
             <artifactId>itextpdf</artifactId>
@@ -201,14 +199,14 @@
             <artifactId>spring-context-support</artifactId>
             <version>5.3.16</version>
         </dependency>
-        <!--Email--> 
-        <!--Multiselect-Combobox-->      
-<!--        <dependency>
+        <!--Email-->
+        <!--Multiselect-Combobox-->
+        <!--        <dependency>
             <groupId>org.vaadin.gatanaso</groupId>
             <artifactId>multiselect-combo-box-flow</artifactId>
             <version>3.0.2</version>
         </dependency>-->
-        <!--Multiselect-Combobox--> 
+        <!--Multiselect-Combobox-->
     </dependencies>
 
     <build>
@@ -242,6 +240,15 @@
                     </execution>
                 </executions>
             </plugin>
+            <!-- Jetty plugin for easy testing without a server -->
+            <!-- <plugin>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-maven-plugin</artifactId>
+                <version>9.4.19.v20190610</version>
+                <configuration>
+                    <scanIntervalSeconds>1</scanIntervalSeconds>
+                </configuration>
+            </plugin> -->
         </plugins>
     </build>
 
