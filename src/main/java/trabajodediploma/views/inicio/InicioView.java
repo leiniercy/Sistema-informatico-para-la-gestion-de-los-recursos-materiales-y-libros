@@ -106,11 +106,8 @@ public class InicioView extends Div {
         container_seccion3.addClassName("div-container-seccion3");
         container_seccion4 = new Div(Seccion4());
         container_seccion4.addClassName("div-container-seccion4");
-
-        container.add(container_seccion1, container_seccion2, container_seccion3, container_seccion4);
         footer = new MyFooter();
-        footer.addClassName("footer");
-        
+        container.add(container_seccion1, container_seccion2, container_seccion3, container_seccion4,footer);
     }
   
     private Component Seccion1 (){

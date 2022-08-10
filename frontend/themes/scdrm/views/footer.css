@@ -1,25 +1,15 @@
-.div-footer{
-    width: 100%;
-    bottom: 0px;
-    position: absolute;
-    background: #253d6d;
-}
+
 .footer{
+    width: 100%;
     display: flex;
-    flex-direction: row;
-    align-items: baseline;
     justify-content: center;
+    background-color: var( --lumo-primary-color);
+    border-top: 1px solid;
 }
 
-.icon{
-    color: white;
-    margin-right: 10px;
+.footer h6{
+    font: var( --lumo-font-size-l);
+    color: #fff;
+    letter-spacing: 0.5px;
 }
 
-.title{
-    font-size: var(--lumo-font-size-xs);
-    margin-bottom: 0px;
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
-    color: white;
-}

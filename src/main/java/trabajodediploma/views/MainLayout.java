@@ -127,7 +127,7 @@ public class MainLayout extends AppLayout {
         this.passwordEncoder = passwordEncoder;
         setPrimarySection(Section.DRAWER);
         addToNavbar(true, createHeaderContent());
-        addToDrawer(createDrawerContent());
+        addToDrawer(createDrawerContent());        
     }
     //barra de menu
     private Component createHeaderContent() {
