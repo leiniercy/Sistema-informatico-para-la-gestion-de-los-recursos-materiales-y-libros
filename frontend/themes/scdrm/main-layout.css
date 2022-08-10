@@ -132,6 +132,11 @@
     align-items: center;
 }
 
+.div-toggle-title img{
+    width: 200px;
+    height: 50px;
+}
+
 .modificar-clave-view{
     width: 20em;
     display: flex;

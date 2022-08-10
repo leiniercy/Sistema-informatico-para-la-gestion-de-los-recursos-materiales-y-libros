@@ -11,5 +11,6 @@
     font: var( --lumo-font-size-l);
     color: #fff;
     letter-spacing: 0.5px;
+    margin: 10px;
 }
 

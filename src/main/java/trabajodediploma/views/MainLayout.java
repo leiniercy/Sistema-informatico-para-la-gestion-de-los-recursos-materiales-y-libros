@@ -13,6 +13,7 @@ import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.ListItem;
 import com.vaadin.flow.component.html.Nav;
 import com.vaadin.flow.component.html.Span;
@@ -52,7 +53,6 @@ import trabajodediploma.views.tarjetaprestamo.TarjetaPrestamoView;
  */
 public class MainLayout extends AppLayout {
 
-    private H1 viewTitle;
     private AuthenticatedUser authenticatedUser;
     private AccessAnnotationChecker accessChecker;
     private UserService userService;
@@ -136,14 +136,8 @@ public class MainLayout extends AppLayout {
         toggle.addClassNames("toggle", "text-secondary");
         toggle.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
         toggle.getElement().setAttribute("aria-label", "Menu toggle");
-
-        viewTitle = new H1();
-        viewTitle.addClassNames("h1-title", "m-0", "text-l");
-        viewTitle.getStyle()
-                .set("font-size", "var(--lumo-font-size-l)")
-                .set("margin", "0");
-
-        titleDiv = new Div(toggle, viewTitle);
+        Image iconPage = new Image("images/pageLogo.png", "Logo");                
+        titleDiv = new Div(toggle, iconPage); 
         titleDiv.addClassName("div-toggle-title");
 
         Div layout = new Div();
@@ -265,16 +259,4 @@ public class MainLayout extends AppLayout {
         modificarClave.open();
     }
 
-    //
-    @Override
-    protected void afterNavigation() {
-        super.afterNavigation();
-        viewTitle.setText(getCurrentPageTitle());
-    }
-
-    //
-    private String getCurrentPageTitle() {
-        PageTitle title = getContent().getClass().getAnnotation(PageTitle.class);
-        return title == null ? "" : title.value();
-    }
 }
