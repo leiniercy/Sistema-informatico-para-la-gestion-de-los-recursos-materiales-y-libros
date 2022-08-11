@@ -10,8 +10,14 @@ import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Image;
+import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.select.Select;
+import com.vaadin.flow.component.tabs.Tab;
+import com.vaadin.flow.component.tabs.Tabs;
+import com.vaadin.flow.component.tabs.TabsVariant;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
@@ -40,18 +46,18 @@ public class CatalogoView extends Div {
 
     List<Libro> libros;
     LibroService libroService;
-    Select<String> sortBy;
     TextField filtrar;
     Div content;
     private Div navBar;
-    private H1 titulo;
-    private H2 autor;
-    private H3 volumen;
-    private H3 tomo;
-    private H3 parte;
+    private String imagen;
+    private String titulo;
+    private String autor;
+    private String volumen;
+    private String tomo;
+    private String parte;
     private StreamResource source;
     private MyFooter footer;
-    private Div tabContainer;
+    private Div div_frase;
 
     public CatalogoView(@Autowired LibroService libroService) {
         addClassNames("catalogo-view");
@@ -60,43 +66,24 @@ public class CatalogoView extends Div {
         this.libros = libroService.findAll();
         Configuracion();
         barraDeNavegacion();
-        post(libros);
-        add(navBar, content, tabContainer, footer);
+        crearTarjetas();
+        frase();
+        add(navBar, content, div_frase, footer);
     }
 
     private void Configuracion() {
         navBar = new Div();
-        navBar.addClassName("div-nav-bar");
+        navBar.addClassName("div_nav_bar");
         content = new Div();
-        content.addClassName("div-content");
-        tabContainer = new Div();
-        tabContainer.addClassName("div-tab-cotainer");
+        content.addClassName("div_container");
+        div_frase = new Div();
+        div_frase.addClassName("div_frase");
     }
 
     private void barraDeNavegacion() {
-        sortBy = new Select<>();
-        sortBy.addClassName("div-nav-bar-select");
-        sortBy.setLabel("Ordenar por");
-        sortBy.setItems("Orden Alfabético", "Asignatura");
-        sortBy.addValueChangeListener(event -> {
-            if (sortBy.getValue().isEmpty()) {
-                libros = libroService.findAll();
-                content.removeAll();
-                post(libros);
-            } else if (sortBy.getValue().equals("Orden Alfabético")) {
-                /* Ordenar por Titulo */
-                content.removeAll();
-                post(libros);
-                libros = libroService.ordenarAlfabeticamente();
-            } else if (sortBy.getValue().equals("Asignatura")) {
-
-            }
-        });
-
         filtrar = new TextField();
-        filtrar.addClassName("div-nav-bar-filtrar");
-        filtrar.setLabel("Filtrar por");
-        filtrar.setPlaceholder("");
+        filtrar.addClassName("div_nav_bar__filtrar");
+        filtrar.setPlaceholder("Filtrar...");
         filtrar.setPrefixComponent(VaadinIcon.SEARCH.create());
         filtrar.setClearButtonVisible(true);
         filtrar.setValueChangeMode(ValueChangeMode.EAGER);
@@ -104,7 +91,7 @@ public class CatalogoView extends Div {
             if (filtrar.getValue().isEmpty()) {
                 libros = libroService.findAll();
                 content.removeAll();
-                post(libros);
+                crearTarjetas();
             } else {
                 libros = libros.parallelStream()
                         .filter(lib -> StringUtils.containsIgnoreCase(lib.getAutor(), filtrar.getValue())
@@ -115,65 +102,69 @@ public class CatalogoView extends Div {
                                 || StringUtils.containsIgnoreCase(Integer.toString(lib.getParte()), filtrar.getValue()))
                         .collect(Collectors.toList());
                 content.removeAll();
-                post(libros);
+                crearTarjetas();
             }
         });
-        navBar.add(filtrar, sortBy);
+        navBar.add(filtrar);
     }
 
-    private void post(List<Libro> libros) {
+    private void crearTarjetas() {
 
         for (int i = 0; i < libros.size(); i++) {
-
-            Image imagen = new Image(libros.get(i).getImagen(), libros.get(i).getTitulo());
-            imagen.addClassName("imagen");
-            Div imagenDiv = new Div(imagen);
-            imagenDiv.addClassName("imagen-div");
-            Div imagenContainerDiv = new Div(imagenDiv);
-            imagenContainerDiv.addClassName("imagen-div-div");
-
-            Div info = new Div();
-            info.addClassName("info");
-
-            titulo = new H1("Título: " + libros.get(i).getTitulo());
-            autor = new H2("Autor: " + libros.get(i).getAutor());
-            volumen = new H3("Vólumen: " + libros.get(i).getVolumen().toString());
-            tomo = new H3("Tomo: " + libros.get(i).getTomo().toString());
-            parte = new H3("Parte: " + libros.get(i).getParte().toString());
-
-            info.add(titulo, autor);
-            if (libros.get(i).getVolumen() != null) {
-                info.add(volumen);
-            } else if (libros.get(i).getParte() != null) {
-                info.add(parte);
-            } else if (libros.get(i).getTomo() != null) {
-                info.add(tomo);
-            }
-            // int pos = i;
-            // Button leerButton = new Button("LEER");
-            // leerButton.addClassName("leer-button");
-            // leerButton.addClickListener(event -> {
-            // leerDocumento(pos);
-            // });
-
             leerDocumento(i);
-            Anchor leerButton = new Anchor(source, "LEER");
-            leerButton.addClassName("leer-button");
-            leerButton.setTarget("_BLANK");
+            Div target = new Div();
+            target.addClassName("target");
+            Div card = new Div();
+            card.addClassName("target__div__card");
+            Anchor link = new Anchor(source, "LEER");
+            link.addClassName("target__link");
+            link.setTarget("_BLANK");
+            Boolean band = false;
 
-            Div leerDiv = new Div(leerButton);
-            leerDiv.addClassName("leer-div");
+            imagen = libros.get(i).getImagen();
+            titulo = new String("Título: " + libros.get(i).getTitulo());
+            autor = new String("Autor: " + libros.get(i).getAutor());
+           
+            if (libros.get(i).getVolumen() != null && band == false) {
+                volumen = new String("Vólumen: " + libros.get(i).getVolumen().toString());
+                card = crearCard(imagen, titulo, titulo, autor, volumen);
+                band = true;
+            } else if (libros.get(i).getParte() != null && band == false) {
+                parte = new String("Parte: " + libros.get(i).getParte().toString());
+                card = crearCard(imagen, titulo, titulo, autor, parte);
+                band = true;
+            } else if (libros.get(i).getTomo() != null && band == false) {
+                tomo = new String("Tomo: " + libros.get(i).getTomo().toString());
+                card = crearCard(imagen, titulo, titulo, autor, tomo);
+                band = true;
+            }
 
-            Div post = new Div(imagenContainerDiv, info, leerDiv);
-            post.addClassName("post");
-
-            // content.add(post);
+            target.add(card, link);
+            content.add(target);
         }
-
     }
 
-    private void crearpost(String titulo, String autor, String volumen, String parte, String tomo) {
+    private void frase() {
+        H1 frase = new H1("Haz de los obstáculos escalones para aquello que quieres alcanzar.");
+        div_frase.add(frase);
+    }
 
+    private Div crearCard(String img, String img_alt, String titulo, String autor, String volumen) {
+        Div card = new Div();
+        card.addClassName("target__div__card");
+
+        Image imagen = new Image(img, img_alt);
+        card.add(imagen);
+
+        Div card__content = new Div();
+        card__content.addClassName("target__div__card__content");
+        card.add(card__content);
+
+        H2 card__title = new H2(titulo);
+        Paragraph card__description1 = new Paragraph(autor);
+        Paragraph card__description2 = new Paragraph(volumen);
+        card__content.add(card__title, card__description1, card__description2);
+        return card;
     }
 
     private void leerDocumento(int pos) {
@@ -185,10 +176,12 @@ public class CatalogoView extends Div {
                 InputStream targetStream = new FileInputStream(initialFile);
                 return targetStream;
             } catch (FileNotFoundException ex) {
-                Logger.getLogger(CatalogoView.class.getName()).log(Level.SEVERE, null, ex);
+                //Logger.getLogger(CatalogoView.class.getName()).log(Level.SEVERE, null, ex);
+                Notification notification = Notification.show("Libro no disponible", 5000,
+                Notification.Position.MIDDLE);
+                notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
                 return null;
             }
         });
     }
-
 }

@@ -169,7 +169,7 @@ public class InicioView extends Div {
         "Desarrollador",
         "Desarrollador",
         "Leinier Caraballo Yanes",
-        "email: leiniercy@estudiantes.uci.cu",
+        "Email: leiniercy@estudiantes.uci.cu",
         "https://correo.uci.cu/");
         card_contact.addClassName("seccion3__div__card");
         div__card_contact.add(card_contact);
@@ -192,7 +192,7 @@ public class InicioView extends Div {
         H2 card__title = new H2(card_title);
         Paragraph card__description1 = new Paragraph(card_description1);
         Paragraph card__description2 = new Paragraph(card_description2);
-        Anchor card__enlace = new Anchor(card_enlace,"Leer más...");
+        Anchor card__enlace = new Anchor(card_enlace,"Más información...");
         card__content.add(card__title, card__description1,card__description2, card__enlace);
 
         return card;
