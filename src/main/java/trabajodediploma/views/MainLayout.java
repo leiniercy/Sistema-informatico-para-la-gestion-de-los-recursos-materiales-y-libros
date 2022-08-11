@@ -65,6 +65,7 @@ public class MainLayout extends AppLayout {
     private Dialog modificarPerfil;
     private Dialog modificarClave;
     private User user;
+    private Div header;
 
     /**
      * A simple navigation item component, based on ListItem element.
@@ -164,18 +165,16 @@ public class MainLayout extends AppLayout {
             Span name = new Span(user.getName());
             name.addClassNames("span-name", "font-medium", "text-s", "text-secondary");
             layout.add(avatar, name);
-
+            header = new Div(titleDiv, layout);
         } else {
 
             Anchor loginLink = new Anchor(/*"login", "Sign in"*/);
+            loginLink.addClassName("login__link");
             loginLink.setHref("login");
-            loginLink.add(new Span("Acceder"));
-            layout.add(loginLink);
-            layout.addClassNames("bg-base", "border-b", "border-contrast-10", "box-border", "rounded-l");
+            loginLink.add("Acceder");
+            header = new Div(titleDiv,loginLink);    
         }
-
-        Div header = new Div(titleDiv, layout);
-        header.addClassNames("div-header", "bg-primary");
+        header.addClassNames("div-header");
         return header;
     }
     //barra de menu desplegable lateral izquierda

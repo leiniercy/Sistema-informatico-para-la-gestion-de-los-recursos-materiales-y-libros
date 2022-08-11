@@ -31,7 +31,7 @@ import trabajodediploma.data.tools.EmailSenderService;
  */
 @SpringBootApplication
 @Theme(value = "scdrm")
-@PWA(name = "SCDRM", shortName = "SCDRM", offlineResources = {"images/logo.png"})
+@PWA(name = "GENIUS", shortName = "GENIUS", offlineResources = {"images/logo.png"})
 @NpmPackage(value = "line-awesome", version = "1.3.0")
 public class Application extends SpringBootServletInitializer implements AppShellConfigurator {
 

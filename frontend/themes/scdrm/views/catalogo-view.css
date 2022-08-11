@@ -1,120 +1,41 @@
-.catalogo-view {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
+.catalogo-view{
+height: 100%;
+width: 100%;    
+display: flex;
+flex-direction: column;
+flex-wrap: nowrap;
 }
-.catalogo-view .footer{
-
+/* barra de herrmientas */
+.div-nav-bar{
+background-color: #fff;
+flex-grow: 1;
+flex-basis: 80px;
+flex-shrink: 0;
+display: flex;
+flex-direction: row;
+justify-content: flex-end;
 }
-/*Barra de navegacion*/
-.header{
-    width: 100%;
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-end;
-    align-items: baseline;
+.div-nav-bar-select{
+/* width: 120px; */
+min-height: var(--lumo-text-field-size, var(--lumo-size-s) );
 }
-.header .select{
-    margin-right: 10px; 
+.div-nav-bar-filtrar{
+    /* width: 120px; */
 }
-.header .filtrar{
-    margin-right: 10px;
-    font-family: aria-label;
+/* barra de herrmientas */
+/* post */
+.div-content{
+    background-color: blueviolet;
+    flex-basis: 400px;
+    flex-grow: 4;
+    flex-shrink: 0;
 }
-
-
-/*Libros Card*/
-.content{
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    width: 100%;
+/* post */
+/* Tabs */
+.div-tab-cotainer{
+    background-color: aquamarine;
+    flex-grow: 1;
+    flex-basis: 80px;
+    flex-shrink: 0;
 }
-
-.post{
-    margin-left: 20px;
-    margin-top: 20px;
-    height: 450px;
-    width: 350px;
-    display: flex;
-    flex-direction: column;
-    border: 2px solid  rgb(50, 102, 171);
-}
-
-.post:hover{
-    border-color:#8000ff;
-    box-shadow: 0px 0px 10px #8000ff; 
-}
-
-.post:focus{
-    border-color:#8000ff;
-    box-shadow: 0px 0px 10px #8000ff; 
-}
-
-.imagen-div-div{
-    height: 300px;
-    background-color: rgb(50, 102, 171);
-    display: flex;
-    overflow: hidden;
-    justify-content: center;
-
-}
-.imagen-div{
-    padding-top: 5px;
-    max-width: 300px;
-    max-height: 220px;
-
-}
-
-.imagen-div .imagen{
-    height: 100%;
-    width: 100%;
-    margin: 5px;
-    object-fit: fill;
-    border-radius: 10%;
-}
-.imagen{
-    width: 300px;
-    max-width: 300px;
-}
-
-.info{
-    height: 200px;
-    font-family: sans-serif;
-    margin-left: 20px;
-    letter-spacing: 1px;
-}
-
-.info h1{ 
-    font-size: 20px;
-
-}
-.info h2, h3{ 
-    font-size: 15px;
-}
-
-.leer-div{
-    display: flex;
-    justify-content: center;
-    padding: 10px;
-}
-
-.leer-div .leer-button{
-    width: 400px;
-    height: 30px;
-    background-color: rgb(50, 102, 171);
-    color: #fff;
-    text-decoration: none;
-    text-align: center;
-}
-/*
-.leer-button:hover {
-  color: rgb(0,0,255);
-  background-color: transparent;
-  text-decoration: underline;
-}*/
-.leer-button:active {
-    color: #ffffff;
-    background-color: var(--lumo-primary-color-50pct);
-    text-decoration: underline;
-}
+/* Tabs */

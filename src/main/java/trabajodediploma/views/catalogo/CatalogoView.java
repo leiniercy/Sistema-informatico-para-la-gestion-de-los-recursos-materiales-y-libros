@@ -1,6 +1,5 @@
 package trabajodediploma.views.catalogo;
 
-
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
@@ -44,7 +43,7 @@ public class CatalogoView extends Div {
     Select<String> sortBy;
     TextField filtrar;
     Div content;
-    private Div header;
+    private Div navBar;
     private H1 titulo;
     private H2 autor;
     private H3 volumen;
@@ -52,30 +51,31 @@ public class CatalogoView extends Div {
     private H3 parte;
     private StreamResource source;
     private MyFooter footer;
+    private Div tabContainer;
 
     public CatalogoView(@Autowired LibroService libroService) {
         addClassNames("catalogo-view");
-//        footer = new MyFooter();
-//        footer.addClassName("footer");
+        footer = new MyFooter();
         this.libroService = libroService;
         this.libros = libroService.findAll();
         Configuracion();
         barraDeNavegacion();
         post(libros);
-        add(header, content/*,footer*/);
+        add(navBar, content, tabContainer, footer);
     }
 
     private void Configuracion() {
-        header = new Div();
-        header.addClassName("header");
+        navBar = new Div();
+        navBar.addClassName("div-nav-bar");
         content = new Div();
-        content.addClassName("content");
-
+        content.addClassName("div-content");
+        tabContainer = new Div();
+        tabContainer.addClassName("div-tab-cotainer");
     }
 
     private void barraDeNavegacion() {
         sortBy = new Select<>();
-        sortBy.addClassName("select");
+        sortBy.addClassName("div-nav-bar-select");
         sortBy.setLabel("Ordenar por");
         sortBy.setItems("Orden Alfabético", "Asignatura");
         sortBy.addValueChangeListener(event -> {
@@ -84,7 +84,7 @@ public class CatalogoView extends Div {
                 content.removeAll();
                 post(libros);
             } else if (sortBy.getValue().equals("Orden Alfabético")) {
-                /*Ordenar por Titulo*/
+                /* Ordenar por Titulo */
                 content.removeAll();
                 post(libros);
                 libros = libroService.ordenarAlfabeticamente();
@@ -94,7 +94,7 @@ public class CatalogoView extends Div {
         });
 
         filtrar = new TextField();
-        filtrar.addClassName("filtrar");
+        filtrar.addClassName("div-nav-bar-filtrar");
         filtrar.setLabel("Filtrar por");
         filtrar.setPlaceholder("");
         filtrar.setPrefixComponent(VaadinIcon.SEARCH.create());
@@ -108,17 +108,17 @@ public class CatalogoView extends Div {
             } else {
                 libros = libros.parallelStream()
                         .filter(lib -> StringUtils.containsIgnoreCase(lib.getAutor(), filtrar.getValue())
-                        || StringUtils.containsIgnoreCase(lib.getTitulo(), filtrar.getValue())
-                        || StringUtils.containsIgnoreCase(Integer.toString(lib.getVolumen()), filtrar.getValue())
-                        || StringUtils.containsIgnoreCase(Integer.toString(lib.getTomo()), filtrar.getValue())
-                        || StringUtils.containsIgnoreCase(Integer.toString(lib.getParte()), filtrar.getValue())
-                        )
+                                || StringUtils.containsIgnoreCase(lib.getTitulo(), filtrar.getValue())
+                                || StringUtils.containsIgnoreCase(Integer.toString(lib.getVolumen()),
+                                        filtrar.getValue())
+                                || StringUtils.containsIgnoreCase(Integer.toString(lib.getTomo()), filtrar.getValue())
+                                || StringUtils.containsIgnoreCase(Integer.toString(lib.getParte()), filtrar.getValue()))
                         .collect(Collectors.toList());
                 content.removeAll();
                 post(libros);
             }
         });
-        header.add(filtrar, sortBy);
+        navBar.add(filtrar, sortBy);
     }
 
     private void post(List<Libro> libros) {
@@ -149,35 +149,38 @@ public class CatalogoView extends Div {
             } else if (libros.get(i).getTomo() != null) {
                 info.add(tomo);
             }
-//            int pos = i;
-//            Button leerButton = new Button("LEER");
-//            leerButton.addClassName("leer-button");
-//            leerButton.addClickListener(event -> {
-//                leerDocumento(pos);
-//            });
-            
+            // int pos = i;
+            // Button leerButton = new Button("LEER");
+            // leerButton.addClassName("leer-button");
+            // leerButton.addClickListener(event -> {
+            // leerDocumento(pos);
+            // });
+
             leerDocumento(i);
             Anchor leerButton = new Anchor(source, "LEER");
             leerButton.addClassName("leer-button");
             leerButton.setTarget("_BLANK");
-            
-            
+
             Div leerDiv = new Div(leerButton);
             leerDiv.addClassName("leer-div");
 
             Div post = new Div(imagenContainerDiv, info, leerDiv);
             post.addClassName("post");
 
-            content.add(post);
+            // content.add(post);
         }
+
+    }
+
+    private void crearpost(String titulo, String autor, String volumen, String parte, String tomo) {
 
     }
 
     private void leerDocumento(int pos) {
         source = new StreamResource(libros.get(pos).getTitulo() + ".pdf", () -> {
-            String path = "libros/"+libros.get(pos).getTitulo()+".pdf";
+            String path = "libros/" + libros.get(pos).getTitulo() + ".pdf";
             try {
-                
+
                 File initialFile = new File(path);
                 InputStream targetStream = new FileInputStream(initialFile);
                 return targetStream;

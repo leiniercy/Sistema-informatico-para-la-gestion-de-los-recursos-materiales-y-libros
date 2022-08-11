@@ -148,25 +148,54 @@ public class InicioView extends Div {
         Div seccion3 = new Div();
         seccion3.addClassName("seccion3");
 
-    
-        Div seccion3ImagenContainer = new Div();
-        seccion3ImagenContainer.addClassName("seccion3-imagen-container");
-        Div seccion3Imagen = new Div();
-        seccion3Imagen.addClassName("seccion3-imagen");
-        Image imagen = new Image("images/uci.png", "Universidad de las Ciencias Informáticas");
-        seccion3Imagen.add(imagen);
-        seccion3ImagenContainer.add(seccion3Imagen);
-    
+        H2 seccion3_Title = new H2("Acerca de nosotros");
 
-        Div seccion3Info = new Div();
-        seccion3Info.addClassName("seccion3-info");
-        H2 seccion3Title = new H2("Acerca de nosotros");
-        Paragraph seccion3Informacion = new Paragraph("Centro de estudios universitarios radicado en La Habana, Cuba, en el municipio de La Lisa. Nacido como un proyecto de la Revolución Cubana, denominado al principio 'Proyecto Futuro', con dos objetivos: informatizar el país y desarrollar la industria del Software para contribuir al desarrollo económico del mismo.");
-        Anchor seccion3Enlace = new Anchor("https://www.uci.cu/","Leer más...");
-        seccion3Info.add(seccion3Title, seccion3Informacion, seccion3Enlace);
+        Div div__card_university = new Div();
+        div__card_university.addClassName("seccion3__div");
 
-        seccion3.add(seccion3ImagenContainer, seccion3Info);
+        Div div__card_contact = new Div();
+        div__card_contact.addClassName("seccion3__div");
+
+        Div card_university = crearCard("images/uci.png",
+        "Universidad de las Ciencias Informáticas",
+        "UCI",
+        "Universidad de las Ciencias Informáticas",
+        "Centro de estudios universitarios, Cuba.",
+        "https://www.uci.cu/");
+        card_university.addClassName("seccion3__card");
+        div__card_university.add(card_university);
+
+        Div card_contact = crearCard("images/contacto.png",
+        "Desarrollador",
+        "Desarrollador",
+        "Leinier Caraballo Yanes",
+        "email: leiniercy@estudiantes.uci.cu",
+        "https://correo.uci.cu/");
+        card_contact.addClassName("seccion3__div__card");
+        div__card_contact.add(card_contact);
+
+        seccion3.add(seccion3_Title,div__card_university, div__card_contact);
         return seccion3;
+    }
+    private Div crearCard( String img , String img_alt,  String card_title, String card_description1,String card_description2,String card_enlace  ){
+        
+        Div card = new Div();
+        card.addClassName("seccion3__div__card");
+        
+        Image imagen = new Image(img, img_alt);
+        card.add(imagen);
+        
+        Div card__content = new Div();
+        card__content.addClassName("seccion3__div__card__content");
+        card.add(card__content);
+    
+        H2 card__title = new H2(card_title);
+        Paragraph card__description1 = new Paragraph(card_description1);
+        Paragraph card__description2 = new Paragraph(card_description2);
+        Anchor card__enlace = new Anchor(card_enlace,"Leer más...");
+        card__content.add(card__title, card__description1,card__description2, card__enlace);
+
+        return card;
     }
 
     private Component Seccion4() {
