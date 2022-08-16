@@ -18,6 +18,7 @@ import com.vaadin.flow.shared.Registration;
 import trabajodediploma.data.entity.DestinoFinal;
 import trabajodediploma.data.entity.Trabajador;
 import trabajodediploma.data.entity.Modulo;
+
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
@@ -29,6 +30,7 @@ public class TarjetaDestinoFinal_TrabajadorFrom  extends FormLayout{
     ComboBox<Trabajador> trabajador = new ComboBox<>("Trabajador");
     ComboBox<Modulo> modulo = new ComboBox<>("Modulo");
     DatePicker fecha = new DatePicker("Fecha Entrega");
+    
    
     Button save = new Button("Añadir", VaadinIcon.PLUS.create());
     Button close = new Button("Cancelar", VaadinIcon.ERASER.create());
@@ -48,9 +50,9 @@ public class TarjetaDestinoFinal_TrabajadorFrom  extends FormLayout{
         /*Libros*/
         modulo.setItems(Modulos);
         modulo.setItemLabelGenerator(Modulo::getNombre);
-        /*fecha de entrega*/
+        /*Fecha de entrega*/
         fecha.setMin(LocalDate.now(ZoneId.systemDefault()));
-        
+
         add(trabajador, modulo, fecha, createButtonsLayout());
 
     }

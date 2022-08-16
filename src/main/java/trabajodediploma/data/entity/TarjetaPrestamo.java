@@ -31,12 +31,13 @@ public class TarjetaPrestamo extends AbstractEntity {
     @EqualsAndHashCode.Include
     @ToString.Include
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "estudiante_id",  updatable = true, unique = false)
+    @ManyToOne()
     private Estudiante estudiante;
 
     @NotNull(message = "El campo no debe estar vacío")
-    @JoinColumn(name = "libro_id", nullable = false, updatable = false)
-    @ManyToOne(optional = false, fetch = FetchType.EAGER)
+    @JoinColumn(name = "libro_id", nullable = false, updatable = true, unique = false)
+    @ManyToOne(optional = false)
     private Libro libro;
 
     @NotNull(message = "El campo no debe estar vacío")
@@ -45,6 +46,7 @@ public class TarjetaPrestamo extends AbstractEntity {
     @Column(name = "fechaDevolucion")
     private LocalDate fechaDevolucion;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "trabajador_id",  updatable = true, unique = false)
+    @ManyToOne()
     private Trabajador trabajador;
 }

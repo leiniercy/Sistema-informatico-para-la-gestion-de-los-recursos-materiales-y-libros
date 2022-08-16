@@ -48,7 +48,7 @@ import trabajodediploma.views.footer.MyFooter;
 @RolesAllowed("RESP_ALMACEN")
 public class LibroView extends Div {
 
-    private Grid<Libro> grid = new Grid<>(Libro.class, false);
+    private Grid<Libro> grid;
     LibroService libroService;
     GridListDataView<Libro> gridListDataView;
     Grid.Column<Libro> imagenColumn;
@@ -120,7 +120,10 @@ public class LibroView extends Div {
     /* Tabla */
     /* Configuracion de la tabla */
     private void configureGrid() {
+        
+        grid = new Grid<>(Libro.class, false);
         grid.setClassName("libro-grid");
+        grid.addColumn("id");
         LitRenderer<Libro> imagenRenderer = LitRenderer.<Libro>of("<img style='height: 64px' src=${item.imagen} />")
                 .withProperty("imagen", Libro::getImagen);
         imagenColumn = grid.addColumn(imagenRenderer).setHeader("Imagen").setAutoWidth(true);
@@ -151,7 +154,7 @@ public class LibroView extends Div {
         headerRow.getCell(precioColumn).setComponent(filterPrecio);
 
         gridListDataView = grid.setItems(libroService.findAll());
-        grid.setAllRowsVisible(true);
+        //grid.setAllRowsVisible(true);
         grid.setSizeFull();
         grid.setWidthFull();
         grid.setHeightFull();

@@ -1,6 +1,9 @@
 package trabajodediploma.data.entity;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -44,10 +47,19 @@ public class Modulo extends AbstractEntity {
     @Column(name = "nombre", nullable = false)
     private String nombre;
 
-    @ManyToMany
-    @JoinTable(name = "modulo_recurosMateriales", joinColumns = @JoinColumn(name = "modulo_id"), inverseJoinColumns = @JoinColumn(name = "material_id"))
-    @ElementCollection(fetch = FetchType.EAGER)
-    private List<RecursoMaterial> recursosMateriales;
+    @ManyToMany()
+    @JoinTable(name = "modulo_recurosMateriales", 
+    joinColumns = @JoinColumn(name = "modulo_id", nullable = false), 
+    inverseJoinColumns = @JoinColumn(name = "material_id", unique = false, nullable = false, updatable = true))
+    private Set<RecursoMaterial> recursosMateriales;
+
+    public void addMaterial(RecursoMaterial material){
+        if(this.recursosMateriales == null){
+            this.recursosMateriales = new HashSet<>();
+        }
+        
+        this.recursosMateriales.add(material);
+    }
 
     @OneToMany(mappedBy = "modulo")
     List<DestinoFinal> destinosFinales;

@@ -1,23 +1,15 @@
 package trabajodediploma.views.catalogo;
 
-import com.itextpdf.kernel.pdf.PdfDocument;
-import com.itextpdf.kernel.pdf.PdfWriter;
-import com.itextpdf.layout.Document;
-import com.vaadin.flow.component.button.Button;
+
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
-import com.vaadin.flow.component.select.Select;
-import com.vaadin.flow.component.tabs.Tab;
-import com.vaadin.flow.component.tabs.Tabs;
-import com.vaadin.flow.component.tabs.TabsVariant;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
@@ -29,8 +21,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,9 +55,9 @@ public class CatalogoView extends Div {
         this.libroService = libroService;
         this.libros = libroService.findAll();
         Configuracion();
-        barraDeNavegacion();
-        crearTarjetas();
-        frase();
+        BarraDeNavegacion();
+        CrearTarjetas();
+        Frase();
         add(navBar, content, div_frase, footer);
     }
 
@@ -80,7 +70,7 @@ public class CatalogoView extends Div {
         div_frase.addClassName("div_frase");
     }
 
-    private void barraDeNavegacion() {
+    private void BarraDeNavegacion() {
         filtrar = new TextField();
         filtrar.addClassName("div_nav_bar__filtrar");
         filtrar.setPlaceholder("Filtrar...");
@@ -91,7 +81,7 @@ public class CatalogoView extends Div {
             if (filtrar.getValue().isEmpty()) {
                 libros = libroService.findAll();
                 content.removeAll();
-                crearTarjetas();
+                CrearTarjetas();
             } else {
                 libros = libros.parallelStream()
                         .filter(lib -> StringUtils.containsIgnoreCase(lib.getAutor(), filtrar.getValue())
@@ -102,17 +92,18 @@ public class CatalogoView extends Div {
                                 || StringUtils.containsIgnoreCase(Integer.toString(lib.getParte()), filtrar.getValue()))
                         .collect(Collectors.toList());
                 content.removeAll();
-                crearTarjetas();
+                CrearTarjetas();
             }
         });
         navBar.add(filtrar);
     }
 
-    private void crearTarjetas() {
-
+    private void CrearTarjetas() {
+        
         for (int i = 0; i < libros.size(); i++) {
-            leerDocumento(i);
+            LeerDocumento(i);   
             Div target = new Div();
+            target.setId("target"+Integer.toString(i));
             target.addClassName("target");
             Div card = new Div();
             card.addClassName("target__div__card");
@@ -127,29 +118,29 @@ public class CatalogoView extends Div {
            
             if (libros.get(i).getVolumen() != null && band == false) {
                 volumen = new String("Vólumen: " + libros.get(i).getVolumen().toString());
-                card = crearCard(imagen, titulo, titulo, autor, volumen);
+                card = CrearCard(imagen, titulo, titulo, autor, volumen);
                 band = true;
             } else if (libros.get(i).getParte() != null && band == false) {
                 parte = new String("Parte: " + libros.get(i).getParte().toString());
-                card = crearCard(imagen, titulo, titulo, autor, parte);
+                card = CrearCard(imagen, titulo, titulo, autor, parte);
                 band = true;
             } else if (libros.get(i).getTomo() != null && band == false) {
                 tomo = new String("Tomo: " + libros.get(i).getTomo().toString());
-                card = crearCard(imagen, titulo, titulo, autor, tomo);
+                card = CrearCard(imagen, titulo, titulo, autor, tomo);
                 band = true;
             }
-
+            
             target.add(card, link);
-            content.add(target);
+            content.add(target);     
         }
     }
 
-    private void frase() {
+    private void Frase() {
         H1 frase = new H1("Haz de los obstáculos escalones para aquello que quieres alcanzar.");
         div_frase.add(frase);
     }
 
-    private Div crearCard(String img, String img_alt, String titulo, String autor, String volumen) {
+    private Div CrearCard(String img, String img_alt, String titulo, String autor, String volumen) {
         Div card = new Div();
         card.addClassName("target__div__card");
 
@@ -167,7 +158,7 @@ public class CatalogoView extends Div {
         return card;
     }
 
-    private void leerDocumento(int pos) {
+    private void LeerDocumento(int pos) {
         source = new StreamResource(libros.get(pos).getTitulo() + ".pdf", () -> {
             String path = "libros/" + libros.get(pos).getTitulo() + ".pdf";
             try {

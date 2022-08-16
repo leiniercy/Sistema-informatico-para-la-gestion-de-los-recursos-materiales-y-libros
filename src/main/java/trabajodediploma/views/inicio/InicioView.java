@@ -91,8 +91,40 @@ public class InicioView extends Div {
         estudiantes = estudianteService.findAll();
         trabajadores = trabajadorService.findAll();
         Configuracion();
+        Optional<User> maybeUser = authenticatedUser.get();
+        if (maybeUser.isPresent()) {
+            user = maybeUser.get();
+            /*crear perfil*/
+            dialog = new Dialog();
+            crearPerfil = new CrearInformacionPerfilView(user, estudianteService, trabajadorService, areaService, grupoService, dialog);
+            /*Fin -> crear perfil
+            * Header crear  perfil usuario*/
+            Button closeButton = new Button(new Icon("lumo", "cross"), (e) -> dialog.close());
+            closeButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+            Span title = new Span("Perfil");
+            Div titleDiv = new Div(title);
+            titleDiv.addClassName("div-perfil-title");
+            Div buttonDiv = new Div(closeButton);
+            buttonDiv.addClassName("div-perfil-button");
+            header = new Div(titleDiv, buttonDiv);
+            header.addClassName("div-perfil-header");
+            dialog.add(header, crearPerfil);
+            /*Fin -> Header crear perfil usuario*/
+            estudiantes = estudiantes.parallelStream().filter(event -> event.getUser().getUsername().equals(user.getUsername())).collect(Collectors.toList());
+            trabajadores = trabajadores.parallelStream().filter(event -> event.getUser().getUsername().equals(user.getUsername())).collect(Collectors.toList());
 
-        add(container/*,footer*/);
+            if (estudiantes.size() == 0 && trabajadores.size() == 0) {
+                dialog.open();
+                add(container/*,footer*/);
+            } else {
+                add(container/*,footer*/);
+            }
+
+        } else {
+            add(container/*,footer*/);
+        }
+
+        // add(container/*,footer*/);
     }
 
     private void Configuracion() {
@@ -177,6 +209,7 @@ public class InicioView extends Div {
         seccion3.add(seccion3_Title,div__card_university, div__card_contact);
         return seccion3;
     }
+    
     private Div crearCard( String img , String img_alt,  String card_title, String card_description1,String card_description2,String card_enlace  ){
         
         Div card = new Div();

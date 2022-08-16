@@ -29,14 +29,16 @@ import trabajodediploma.data.entity.RecursoMaterial;
 public class ModuloForm extends FormLayout {
 
     private Modulo modulo;
+    private List<RecursoMaterial> materiales;
     TextField nombre = new TextField();
-    //MultiSelectListBox<RecursoMaterial> recursosMateriales = new MultiSelectListBox<>();
+    MultiSelectListBox<RecursoMaterial> recursosMateriales = new MultiSelectListBox<>();
     Button save = new Button("Añadir", VaadinIcon.PLUS.create());
     Button close = new Button("Cancelar", VaadinIcon.ERASER.create());
     BeanValidationBinder<Modulo> binder = new BeanValidationBinder<>(Modulo.class);
 
     public ModuloForm(List<RecursoMaterial> materiales) {
         addClassName("modulo-form");
+        this.materiales = materiales;
         binder.bindInstanceFields(this);
         // Config form
         // nombre
@@ -50,10 +52,12 @@ public class ModuloForm extends FormLayout {
             event.getSource().setHelperText(event.getValue().length() + "/" + 100);
         });
         // Recursos Materiales
-        //recursosMateriales.setItems(new HashSet<>(materiales));
-        //recursosMateriales.setRenderer(new ComponentRenderer<>(material -> new Text(material.getDescripcion())));
+        recursosMateriales.setItems(materiales);
+        recursosMateriales.setItemLabelGenerator(RecursoMaterial::getDescripcion);
+       // recursosMateriales.setRenderer(new ComponentRenderer<>(material -> new Text(material.getDescripcion())));
+        recursosMateriales.setHeight("80px");
 
-        add(nombre, /*recursosMateriales,*/createButtonsLayout());
+        add(nombre, recursosMateriales,createButtonsLayout());
     }
 
     private HorizontalLayout createButtonsLayout() {
@@ -83,8 +87,7 @@ public class ModuloForm extends FormLayout {
     private void validateAndSave() {
         try {
             binder.writeBean(modulo);
-            this.modulo.setNombre(nombre.getValue());
-           
+            this.modulo.setRecursosMateriales(recursosMateriales.getValue());    
             fireEvent(new SaveEvent(this, modulo));
         } catch (ValidationException e) {
             e.printStackTrace();

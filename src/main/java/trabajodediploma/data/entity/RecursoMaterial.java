@@ -1,6 +1,8 @@
 package trabajodediploma.data.entity;
 
 import java.util.List;
+import java.util.Set;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToMany;
@@ -38,11 +40,10 @@ public class RecursoMaterial extends AbstractEntity {
     private String unidadMedida;
     
     @Column
-    @Max(message = "Máximo 5", value = 5)
     @Min(message = "Mínimo 1", value = 1)
     private Integer cantidad;
     
     @ManyToMany(mappedBy = "recursosMateriales")
-    List<Modulo> modulos;
+    Set<Modulo> modulos;
 
 }

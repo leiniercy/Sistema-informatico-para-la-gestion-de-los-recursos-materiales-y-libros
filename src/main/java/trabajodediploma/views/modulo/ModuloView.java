@@ -19,11 +19,15 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -34,6 +38,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import trabajodediploma.data.entity.Modulo;
+import trabajodediploma.data.entity.RecursoMaterial;
 import trabajodediploma.data.service.ModuloService;
 import trabajodediploma.data.service.RecursoMaterialService;
 import trabajodediploma.views.MainLayout;
@@ -63,13 +68,14 @@ public class ModuloView extends Div {
     public ModuloView(
             @Autowired ModuloService moduloService,
             @Autowired RecursoMaterialService materialService) {
+
         addClassNames("modulo-view");
         this.moduloService = moduloService;
         this.materialService = materialService;
         Filtros();
         configureGrid();
         configureForm();
-        footer=new MyFooter();
+        footer = new MyFooter();
         add(menuBar(), getContent(), footer);
         updateList();
         closeEditor();
@@ -107,8 +113,11 @@ public class ModuloView extends Div {
         nombreColumn = grid.addColumn(Modulo::getNombre).setHeader("Nombre").setAutoWidth(true)
                 .setSortable(true);
 
-        materialesColumn = grid.addColumn(Modulo::getRecursosMateriales).setHeader("Materiales").setAutoWidth(true)
-                .setSortable(true);
+        materialesColumn = grid.addColumn(new ComponentRenderer<>(TextArea::new, (textArea, modulo) -> {   
+            textArea.setReadOnly(true);            
+            textArea.setWidth("100%");
+            
+        })).setHeader("Materiales").setAutoWidth(true);
 
         editColumn = grid.addComponentColumn(modulo -> {
             Button editButton = new Button(VaadinIcon.EDIT.create());
@@ -162,7 +171,7 @@ public class ModuloView extends Div {
         buttons.add(refreshButton, watchColumns(), deleteButton, addButton);
         if (moduloService.count() == 1) {
             total = new Html("<span>Total: <b>" + moduloService.count() + "</b> modulo</span>");
-        } else if ( moduloService.count() == 0 || moduloService.count() > 1) {
+        } else if (moduloService.count() == 0 || moduloService.count() > 1) {
             total = new Html("<span>Total: <b>" + moduloService.count() + "</b> modulos</span>");
         }
         toolbar = new HorizontalLayout(buttons, total);
@@ -190,7 +199,7 @@ public class ModuloView extends Div {
                 toolbar.remove(total);
                 if (moduloService.count() == 1) {
                     total = new Html("<span>Total: <b>" + moduloService.count() + "</b> modulo</span>");
-                } else if ( moduloService.count() == 0 || moduloService.count() > 1) {
+                } else if (moduloService.count() == 0 || moduloService.count() > 1) {
                     total = new Html("<span>Total: <b>" + moduloService.count() + "</b> modulos</span>");
                 }
                 toolbar.addComponentAtIndex(1, total);
@@ -226,7 +235,7 @@ public class ModuloView extends Div {
         ColumnToggleContextMenu columnToggleContextMenu = new ColumnToggleContextMenu(
                 menuButton);
         columnToggleContextMenu.addColumnToggleItem("Código", nombreColumn);
-        columnToggleContextMenu.addColumnToggleItem("Descripción", materialesColumn);
+        // columnToggleContextMenu.addColumnToggleItem("Descripción", materialesColumn);
         return menuButton;
     }
 
@@ -287,7 +296,7 @@ public class ModuloView extends Div {
             toolbar.remove(total);
             if (moduloService.count() == 1) {
                 total = new Html("<span>Total: <b>" + moduloService.count() + "</b> modulo</span>");
-            } else if ( moduloService.count() == 0 || moduloService.count() > 1) {
+            } else if (moduloService.count() == 0 || moduloService.count() > 1) {
                 total = new Html("<span>Total: <b>" + moduloService.count() + "</b> modulos</span>");
             }
             toolbar.addComponentAtIndex(1, total);
@@ -311,7 +320,7 @@ public class ModuloView extends Div {
 
     private void addModulo() {
         grid.asMultiSelect().clear();
-        editModulo( new Modulo());
+        editModulo(new Modulo());
     }
 
     private void closeEditor() {

@@ -38,9 +38,9 @@ public class Libro extends AbstractEntity {
     private String imagen;
     
     @NotBlank(message = "Campo requerido")
-    @Pattern(regexp = "^[a-zA-ZÀ-ÿ\\u00f1\\u00d1]+(\\s*[a-zA-ZÀ-ÿ\\u00f1\\u00d1]*)*[a-zA-ZÀ-ÿ\\u00f1\\u00d1]+$", message = "El título es incorrecto, use solo letras")
+    @Pattern(regexp = "^[a-zA-ZÀ-ÿ\\u00f1\\u00d1]+(\\s*[ a-zA-Z0-9 À-ÿ\\u00f1\\u00d1 /#@$¿?!¡()-_,.]*)*[a-zA-Z0-9 À-ÿ\\u00f1\\u00d1 /#@$¿?!¡()-_,. ]+$", message = "El título es incorrecto, solo puede utlizar los siguientes caracteres especiales /#@$¿?!¡()-_,.")
     @Size(min = 2, max = 255, message = "Debe tener mínimo 2 caracteres")
-    @Column(unique = true, nullable=false)
+    @Column(nullable=false)
     private String titulo;
 
     @NotBlank(message = "Campo requerido")
