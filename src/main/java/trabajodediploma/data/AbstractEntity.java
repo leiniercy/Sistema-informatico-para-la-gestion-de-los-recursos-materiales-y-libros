@@ -12,7 +12,7 @@ public abstract class AbstractEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Nonnull
-    private Integer id;
+    protected Integer id;
 
     public Integer getId() {
         return id;

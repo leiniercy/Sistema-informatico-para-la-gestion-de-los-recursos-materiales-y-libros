@@ -1,16 +1,92 @@
 .tarjeta-prestamo-view {
-    display: block;
-    height: 100%;
-    width: 100%;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  height: 100%;
+  width: 100%;
+}
+/*Header Dialog*/
+.div-dialog-header {
+  position: relative;
+  width: 100%;
+  margin-bottom: 50px;
 }
 
+.div-dialog-title {
+  position: absolute;
+  top: 8px;
+  left: 16px;
+  font-size: 18px;
+}
+
+.div-dialog-button {
+  position: absolute;
+  top: 8px;
+  right: 16px;
+  font-size: 18px;
+}
+/*Fin -> Header Dialog*/
+
+.barra_navegacion {
+  height: 60px;
+}
+
+.barra_navegacion__tabs {
+  width: max-content;
+  margin-top: 10px;
+}
+
+.barra_navegacion__tabs__tab1:active,
+.barra_navegacion__tabs__tab2:active {
+  border-top: 2px solid var(--lumo-primary-text-color);
+  border-right: 2px solid var(--lumo-primary-text-color);
+  border-left: 2px solid var(--lumo-primary-text-color);
+  color: var(--lumo-primary-text-color);
+}
+
+.container {
+  height: 90%;
+}
+/*Grid Estudiante, Trabajador*/
+.container___estudiante_grid,
+.container___trabajador_grid,
+.container___estudiante_grid__div,
+.container___trabajador_grid__div,
+.container___trabajador_grid__div__table,
+.container___estudiante_grid__div__table {
+  height: 100%;
+  width: 100%;
+}
+/*Fin -> Grid Estudiante, Trabajador*/
+/*Tarjeta Personal Estudiante, Trabajador*/
+.container__tarjeta{
+  width: 100%;
+  height: 100%;
+}
+.container__tarjeta .content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+}
+.container__tarjeta .content .grid-content {
+  height: 100%;
+  flex-grow: 3;
+}
+.container__tarjeta .content .table_info{
+  font-family: var(--lumo-font-famil);
+  font-size: var(--lumo-font-size-l);
+  color: var( --lumo-primary-text-color);
+}
+/*Fin -> Tarjeta Personal Estudiante, Trabajador*/
 .tarjeta-prestamo-view .button-layout {
-    width: 100%;
-    flex-wrap: wrap;
-    background-color: var(--lumo-contrast-5pct);
-    padding-bottom: var(--lumo-space-s);
-    padding-top: var(--lumo-space-s);
-    padding-left: var(--lumo-space-l);
-    padding-right: var(--lumo-space-l);
-    gap: var(--lumo-space-m);
+  width: 100%;
+  flex-wrap: wrap;
+  background-color: var(--lumo-contrast-5pct);
+  padding-bottom: var(--lumo-space-s);
+  padding-top: var(--lumo-space-s);
+  padding-left: var(--lumo-space-l);
+  padding-right: var(--lumo-space-l);
+  gap: var(--lumo-space-m);
 }

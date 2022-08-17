@@ -18,6 +18,7 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import org.springframework.context.event.EventListener;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import trabajodediploma.data.Rol;
+import trabajodediploma.data.entity.TarjetaPrestamoEstudiante;
 import trabajodediploma.data.entity.User;
 import trabajodediploma.data.repository.UserRepository;
 import trabajodediploma.data.tools.EmailSenderService;

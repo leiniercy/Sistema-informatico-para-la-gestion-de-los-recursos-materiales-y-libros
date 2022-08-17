@@ -6,18 +6,17 @@
 package trabajodediploma.views.tarjetaprestamo;
 
 import com.vaadin.flow.component.Html;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.dataview.GridListDataView;
-import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import org.springframework.beans.factory.annotation.Autowired;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.HeaderRow;
+import com.vaadin.flow.component.grid.dataview.GridListDataView;
+import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.H6;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
@@ -25,20 +24,23 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.LocalDateRenderer;
 import java.time.format.DateTimeFormatter;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
-import trabajodediploma.data.service.LibroService;
-import trabajodediploma.data.service.TarjetaPrestamoService;
-import trabajodediploma.data.service.TrabajadorService;
+import org.springframework.beans.factory.annotation.Autowired;
 import trabajodediploma.data.entity.Trabajador;
 import trabajodediploma.data.entity.Libro;
 import trabajodediploma.data.entity.TarjetaPrestamo;
+import trabajodediploma.data.entity.TarjetaPrestamoTrabajador;
+import trabajodediploma.data.service.TrabajadorService;
+import trabajodediploma.data.service.LibroService;
+import trabajodediploma.data.service.TarjetaPrestamoService;
 
 /**
  *
@@ -52,8 +54,7 @@ public class TarjetaPrestamoTrabajadorView extends Div {
     Grid.Column<TarjetaPrestamo> fechaEntregaColumn;
     Grid.Column<TarjetaPrestamo> fechaDevolucionColumn;
     Grid.Column<TarjetaPrestamo> editColumn;
-
-    TabajadorGrid trabajadorGrid;
+    TrabajadorGrid trabajadorGrid;
     Trabajador trabajador;
     List<Libro> libros;
     List<TarjetaPrestamo> prestamos;
@@ -66,9 +67,10 @@ public class TarjetaPrestamoTrabajadorView extends Div {
     private DatePicker devolucionFilter;
     private Html total;
     private HorizontalLayout info;
+    private Div content;
     private Div header;
     private Dialog dialog;
-    private Div content;
+    private TarjetaPrestamoTrabajador tarjetaTrabajador;
 
     public TarjetaPrestamoTrabajadorView(
             Trabajador trabajador,
@@ -76,20 +78,18 @@ public class TarjetaPrestamoTrabajadorView extends Div {
             @Autowired TrabajadorService trabajadorService,
             @Autowired LibroService libroService) {
 
-        addClassName("tarjeta-trabajador");
+        addClassName("container__tarjeta");
         this.trabajador = trabajador;
         this.prestamoService = prestamoService;
         this.trabajadorService = trabajadorService;
         this.libroService = libroService;
         this.libros = libroService.findAll();
-        this.prestamos = prestamoService.findAll();
-
-        configureGrid();
+        prestamos = new LinkedList<>();
+        updateList();
         configureForm();
+        configureGrid();
         getContent();
         add(content);
-        updateList();
-        closeEditor();
     }
 
     /* Contenido de la vista */
@@ -118,7 +118,13 @@ public class TarjetaPrestamoTrabajadorView extends Div {
 
     private HorizontalLayout informacionTabla() {
         info = new HorizontalLayout();
-        total = new Html("<span>Total: <b>" + prestamos.size() + "</b> libros</span>");
+        info.addClassName("table_info");
+
+        if (prestamos.size() == 1) {
+            total = new Html("<span>Total: <b>" + prestamos.size() + "</b> libro</span>");
+        } else if (prestamos.size() == 0 || prestamos.size() > 1) {
+            total = new Html("<span>Total: <b>" + prestamos.size() + "</b> libros</span>");
+        }
         info.add(total);
         return info;
     }
@@ -126,10 +132,10 @@ public class TarjetaPrestamoTrabajadorView extends Div {
     /* Tabla */
     /* Configuracion de la tabla */
     private void configureGrid() {
-        grid.setClassName("tarjeta-trabajador-grid");
+        grid.setClassName("container__tarjeta_trabajador__grid");
         libroColumn = grid.addColumn(new ComponentRenderer<>(tarjeta -> {
             HorizontalLayout hl = new HorizontalLayout();
-            hl.setAlignItems(FlexComponent.Alignment.CENTER);
+            hl.setAlignItems(Alignment.CENTER);
             Image img = new Image(tarjeta.getLibro().getImagen(), "");
             img.setHeight("3.5rem");
             Span span = new Span();
@@ -149,9 +155,10 @@ public class TarjetaPrestamoTrabajadorView extends Div {
                         DateTimeFormatter.ofPattern("dd/MM/yyyy")))
                 .setComparator(tarjeta -> tarjeta.getFechaDevolucion()).setHeader("Fecha de Devolución")
                 .setAutoWidth(true).setSortable(true);
-        editColumn = grid.addComponentColumn(libro -> {
+        editColumn = grid.addComponentColumn(target -> {
             Button editButton = new Button(VaadinIcon.EDIT.create());
-            editButton.addClickListener(event -> this.editLibro(libro));
+            editButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+            editButton.addClickListener(e -> this.editLibro((TarjetaPrestamoTrabajador) target));
             return editButton;
         }).setFlexGrow(0);
 
@@ -162,9 +169,7 @@ public class TarjetaPrestamoTrabajadorView extends Div {
         headerRow.getCell(fechaEntregaColumn).setComponent(entregaFilter);
         headerRow.getCell(fechaDevolucionColumn).setComponent(devolucionFilter);
 
-        gridListDataView = grid.setItems(
-                prestamos.parallelStream().filter(t -> t.getTrabajador().equals(trabajador))
-                        .collect(Collectors.toList()));
+        gridListDataView = grid.setItems(prestamos);
         grid.setAllRowsVisible(true);
         grid.setSizeFull();
         grid.setWidthFull();
@@ -178,12 +183,22 @@ public class TarjetaPrestamoTrabajadorView extends Div {
 
     private void refreshGrid() {
         grid.setVisible(true);
-        grid.setItems(prestamos.parallelStream().filter(event -> event.getTrabajador().equals(trabajador))
-                .collect(Collectors.toList()));
+        prestamos.clear();
+        prestamoService.findAll().parallelStream().forEach((tarjeta) -> {
+            if (tarjeta instanceof TarjetaPrestamoTrabajador) {
+                tarjetaTrabajador = (TarjetaPrestamoTrabajador) tarjeta;
+                if (tarjetaTrabajador.getTrabajador().equals(trabajador)){
+                prestamos.add(tarjetaTrabajador);
+                }
+            }
+        });
+        grid.setItems(prestamos);
     }
 
     /* Filtros */
     private void Filtros() {
+
+        updateList();
 
         libroFilter = new ComboBox<>();
         libroFilter.setItems(libros);
@@ -193,8 +208,8 @@ public class TarjetaPrestamoTrabajadorView extends Div {
         libroFilter.setWidth("100%");
         libroFilter.addValueChangeListener(event -> {
             if (libroFilter.getValue() == null) {
-                gridListDataView = grid.setItems(prestamos.parallelStream()
-                        .filter(t -> t.getTrabajador().equals(trabajador)).collect(Collectors.toList()));
+                gridListDataView = grid
+                        .setItems(prestamos);
             } else {
                 gridListDataView.addFilter(tarjeta -> areLibroEqual(tarjeta, libroFilter));
             }
@@ -206,8 +221,8 @@ public class TarjetaPrestamoTrabajadorView extends Div {
         entregaFilter.setWidth("100%");
         entregaFilter.addValueChangeListener(event -> {
             if (entregaFilter.getValue() == null) {
-                gridListDataView = grid.setItems(prestamos.parallelStream()
-                        .filter(t -> t.getTrabajador().equals(trabajador)).collect(Collectors.toList()));
+                gridListDataView = grid
+                        .setItems(prestamos);
             } else {
                 gridListDataView.addFilter(tarjeta -> areFechaInicioEqual(tarjeta, entregaFilter));
             }
@@ -219,8 +234,8 @@ public class TarjetaPrestamoTrabajadorView extends Div {
         devolucionFilter.setWidth("100%");
         devolucionFilter.addValueChangeListener(event -> {
             if (devolucionFilter.getValue() == null) {
-                gridListDataView = grid.setItems(prestamos.parallelStream()
-                        .filter(t -> t.getTrabajador().equals(trabajador)).collect(Collectors.toList()));
+                gridListDataView = grid
+                        .setItems(prestamos);
             } else {
                 gridListDataView.addFilter(tarjeta -> areFechaFinEqual(tarjeta, devolucionFilter));
             }
@@ -253,25 +268,27 @@ public class TarjetaPrestamoTrabajadorView extends Div {
         }
         return true;
     }
-
     /* Fin-Filtros */
 
     /* Barra de menu */
     private HorizontalLayout menuBar() {
         HorizontalLayout buttons = new HorizontalLayout();
         Button refreshButton = new Button(VaadinIcon.REFRESH.create(), click -> refreshGrid());
-        refreshButton.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
+        refreshButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         Button deleteButton = new Button(VaadinIcon.TRASH.create(), click -> deleteLibro());
-        deleteButton.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
+        deleteButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         Button addButton = new Button(VaadinIcon.PLUS.create(), click -> addLibro());
-        addButton.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
+        addButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         buttons.add(refreshButton, deleteButton, addButton);
 
-        Button salirButton = new Button(trabajador.getNombreApellidos(), new Icon(VaadinIcon.ARROW_RIGHT),
+        H6 nombreTrabajador = new H6();
+        nombreTrabajador.add(trabajador.getNombreApellidos());
+        Button salirButton = new Button(new Icon(VaadinIcon.ARROW_RIGHT),
                 click -> volverAtras());
         salirButton.setIconAfterText(true);
         salirButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
-        HorizontalLayout personalInfo = new HorizontalLayout(salirButton);
+        nombreTrabajador.add(salirButton);
+        HorizontalLayout personalInfo = new HorizontalLayout(nombreTrabajador);
         personalInfo.setAlignItems(FlexComponent.Alignment.CENTER);
 
         HorizontalLayout toolbar = new HorizontalLayout(buttons, personalInfo);
@@ -286,7 +303,7 @@ public class TarjetaPrestamoTrabajadorView extends Div {
     }
 
     public void volverAtras() {
-        trabajadorGrid = new TabajadorGrid(prestamoService, trabajadorService, libroService);
+        trabajadorGrid = new TrabajadorGrid(prestamoService, trabajadorService, libroService);
         content.removeAll();
         content.add(trabajadorGrid);
     }
@@ -302,13 +319,18 @@ public class TarjetaPrestamoTrabajadorView extends Div {
             } else {
                 deleteItems(grid.getSelectedItems().size(), grid.getSelectedItems());
                 refreshGrid();
+                updateList();
                 info.remove(total);
-                total = new Html("<span>Total: <b>" + libros.size() + "</b> libros</span>");
+                if (prestamos.size() == 1) {
+                    total = new Html("<span>Total: <b>" + prestamos.size() + "</b> libro</span>");
+                } else if (prestamos.size() == 0 || prestamos.size() > 1) {
+                    total = new Html("<span>Total: <b>" + prestamos.size() + "</b> libros</span>");
+                }
                 info.add(total);
             }
 
-        } catch (Exception event) {
-            event.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
             Notification notification = Notification.show("Ocurrió un problema al intentar eliminar el libro", 5000,
                     Notification.Position.MIDDLE);
             ;
@@ -328,21 +350,29 @@ public class TarjetaPrestamoTrabajadorView extends Div {
         notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
     }
 
+    // Configuracion del Formulario
     private void configureForm() {
         form = new TarjetaPrestamoTrabajadorForm(trabajador, libros);
         form.setWidth("25em");
         form.addListener(TarjetaPrestamoTrabajadorForm.SaveEvent.class, this::saveLibro);
-        form.addListener(TarjetaPrestamoTrabajadorForm.CloseEvent.class, event -> closeEditor());
+        form.addListener(TarjetaPrestamoTrabajadorForm.CloseEvent.class, e -> closeEditor());
     }
 
     private void saveLibro(TarjetaPrestamoTrabajadorForm.SaveEvent event) {
-
-        prestamos = prestamos.parallelStream()
-                .filter(lib -> event.getTarjetaPrestamo().getLibro().equals(lib.getLibro())
-                        && event.getTarjetaPrestamo().getTrabajador().equals(lib.getTrabajador())
-                        && event.getTarjetaPrestamo().getFechaPrestamo().equals(lib.getFechaPrestamo())
-                        && event.getTarjetaPrestamo().getFechaDevolucion().equals(lib.getFechaDevolucion()))
-                .collect(Collectors.toList());
+        prestamos.clear();
+        prestamoService.findAll().parallelStream()
+                .filter(target -> target instanceof TarjetaPrestamoTrabajador
+                        && event.getTarjetaPrestamo().getLibro().equals(target.getLibro())
+                        && event.getTarjetaPrestamo().getFechaPrestamo().equals(target.getFechaPrestamo())
+                        && event.getTarjetaPrestamo().getFechaDevolucion().equals(target.getFechaDevolucion()))
+                .forEach((tarjeta) -> {
+                    if (tarjeta instanceof TarjetaPrestamoTrabajador) {
+                        tarjetaTrabajador = (TarjetaPrestamoTrabajador) tarjeta;
+                        if (tarjetaTrabajador.getTrabajador().equals(trabajador)){
+                        prestamos.add(tarjetaTrabajador);
+                        }
+                    }
+                });
 
         if (prestamos.size() != 0) {
             Notification notification = Notification.show(
@@ -366,16 +396,20 @@ public class TarjetaPrestamoTrabajadorView extends Div {
                         Notification.Position.BOTTOM_START);
                 notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
             }
-            info.remove(total);
-            total = new Html("<span>Total: <b>" + libros.size() + "</b> libros</span>");
-            info.add(total);
             updateList();
+            info.remove(total);
+            if (prestamos.size() == 1) {
+                total = new Html("<span>Total: <b>" + prestamos.size() + "</b> libro</span>");
+            } else if (prestamos.size() == 0 || prestamos.size() > 1) {
+                total = new Html("<span>Total: <b>" + prestamos.size() + "</b> libros</span>");
+            }
+            info.add(total);
             closeEditor();
         }
 
     }
 
-    public void editLibro(TarjetaPrestamo tarjeta) {
+    public void editLibro(TarjetaPrestamoTrabajador tarjeta) {
         if (tarjeta == null) {
             closeEditor();
         } else {
@@ -388,7 +422,7 @@ public class TarjetaPrestamoTrabajadorView extends Div {
 
     void addLibro() {
         grid.asMultiSelect().clear();
-        editLibro(new TarjetaPrestamo());
+        editLibro(new TarjetaPrestamoTrabajador());
     }
 
     private void closeEditor() {
@@ -399,8 +433,16 @@ public class TarjetaPrestamoTrabajadorView extends Div {
     }
 
     private void updateList() {
-        grid.setItems(prestamoService.findAll().parallelStream()
-                .filter(event -> event.getTrabajador().equals(trabajador)).collect(Collectors.toList()));
+        prestamos.clear();
+        prestamoService.findAll().parallelStream().forEach((tarjeta) -> {
+            if (tarjeta instanceof TarjetaPrestamoTrabajador) {
+                tarjetaTrabajador = (TarjetaPrestamoTrabajador) tarjeta;
+                if (tarjetaTrabajador.getTrabajador().equals(trabajador)){
+                prestamos.add(tarjetaTrabajador);
+                }
+            }
+        });
+        grid.setItems(prestamos);
     }
     /* Fin-Barra de menu */
 

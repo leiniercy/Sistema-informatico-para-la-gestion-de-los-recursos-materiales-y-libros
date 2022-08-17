@@ -6,6 +6,7 @@
 package trabajodediploma.views.tarjetaprestamo;
 
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.HeaderRow;
@@ -17,17 +18,17 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import trabajodediploma.data.entity.Trabajador;
+import trabajodediploma.data.service.TrabajadorService;
 import trabajodediploma.data.service.LibroService;
 import trabajodediploma.data.service.TarjetaPrestamoService;
-import trabajodediploma.data.service.TrabajadorService;
 
 /**
  *
  * @author leinier
  */
-public class TabajadorGrid extends Div {
+public class TrabajadorGrid extends Div {
 
-    private Grid<Trabajador> gridTrabajador = new Grid<>(Trabajador.class, false);
+    private Grid<Trabajador> gridTrabajadors = new Grid<>(Trabajador.class, false);
 
     TarjetaPrestamoTrabajadorView tarjetaTrabajador;
     TarjetaPrestamoService prestamoService;
@@ -41,14 +42,16 @@ public class TabajadorGrid extends Div {
     private TextField nombreFilter;
     private Div content;
 
-    public TabajadorGrid(@Autowired TarjetaPrestamoService prestamoService, @Autowired TrabajadorService trabajadorService,
+    public TrabajadorGrid(@Autowired TarjetaPrestamoService prestamoService, @Autowired TrabajadorService trabajadorService,
             @Autowired LibroService libroService) {
+        addClassName("container___trabajador_grid");           
         this.prestamoService = prestamoService;
         this.trabajadorService = trabajadorService;
         this.libroService = libroService;
         configureGrid();
         content = new Div();
-        content.add(gridTrabajador);
+        content.addClassName("container___trabajador_grid__div");
+        content.add(gridTrabajadors);
 
         add(content);
 
@@ -56,26 +59,27 @@ public class TabajadorGrid extends Div {
 
     private void configureGrid() {
 
-        gridTrabajador.setClassName("tarjera-prestamo-trabajador-grid");
-        nombreColumn = gridTrabajador.addColumn(Trabajador::getNombreApellidos).setHeader("Nombre").setAutoWidth(true).setSortable(true);
-        tarjetaColumn = gridTrabajador.addComponentColumn(event -> {
+        gridTrabajadors.setClassName("container___trabajador_grid__div__table");
+        nombreColumn = gridTrabajadors.addColumn(Trabajador::getNombreApellidos).setHeader("Nombre").setAutoWidth(true).setSortable(true);
+        tarjetaColumn = gridTrabajadors.addComponentColumn(event -> {
             Button cardButton = new Button("Tarjeta");
+            cardButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
             cardButton.addClickListener(e -> this.editCard(event));
             return cardButton;
         }).setAutoWidth(true);
 
         Filters();
-        HeaderRow headerRow = gridTrabajador.appendHeaderRow();
+        HeaderRow headerRow = gridTrabajadors.appendHeaderRow();
         headerRow.getCell(nombreColumn).setComponent(nombreFilter);
-
-        gridListDataView = gridTrabajador.setItems(trabajadorService.findAll());
-        gridTrabajador.setAllRowsVisible(true);
-        gridTrabajador.setSizeFull();
-        gridTrabajador.setWidthFull();
-        gridTrabajador.setHeightFull();
-        gridTrabajador.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS);
-        gridTrabajador.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
-        gridTrabajador.addThemeVariants(GridVariant.LUMO_WRAP_CELL_CONTENT);
+        
+        gridListDataView = gridTrabajadors.setItems(trabajadorService.findAll());
+        gridTrabajadors.setAllRowsVisible(true);
+        gridTrabajadors.setSizeFull();
+        gridTrabajadors.setWidthFull();
+        gridTrabajadors.setHeightFull();
+        gridTrabajadors.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS);
+        gridTrabajadors.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
+        gridTrabajadors.addThemeVariants(GridVariant.LUMO_WRAP_CELL_CONTENT);
     }
 
     private void Filters() {
@@ -87,13 +91,13 @@ public class TabajadorGrid extends Div {
         nombreFilter.setValueChangeMode(ValueChangeMode.LAZY);
         nombreFilter.addValueChangeListener(
                 event -> gridListDataView
-                        .addFilter(trabajador -> StringUtils.containsIgnoreCase(trabajador.getNombreApellidos(), nombreFilter.getValue()))
+                        .addFilter(trabajador -> StringUtils.containsIgnoreCase(trabajador.getUser().getName(), nombreFilter.getValue()))
         );
     }
 
-    public void editCard(Trabajador trabajador) {
+    public void editCard(Trabajador e) {
         content.removeAll();
-        tarjetaTrabajador = new TarjetaPrestamoTrabajadorView(trabajador,prestamoService, trabajadorService,libroService);
+        tarjetaTrabajador = new TarjetaPrestamoTrabajadorView(e,prestamoService, trabajadorService,libroService);
         tarjetaTrabajador.setWidthFull();
         content.add(tarjetaTrabajador);
     }

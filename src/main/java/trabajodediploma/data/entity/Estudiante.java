@@ -72,7 +72,7 @@ public class Estudiante extends AbstractEntity {
     List<DestinoFinal> destinoFinal;
 
     @OneToMany(mappedBy = "estudiante")
-    List<TarjetaPrestamo> tarjetaPrestamo;
+    List<TarjetaPrestamoEstudiante> tarjetaPrestamo;
     
     public String getNombreApellidos() {
         return user.getName();

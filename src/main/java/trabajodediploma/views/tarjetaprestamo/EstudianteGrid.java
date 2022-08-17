@@ -6,6 +6,7 @@
 package trabajodediploma.views.tarjetaprestamo;
 
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.HeaderRow;
@@ -39,16 +40,17 @@ public class EstudianteGrid extends Div {
     Grid.Column<Estudiante> tarjetaColumn;
 
     private TextField nombreFilter;
-    private TextField apellidosFilter;
     private Div content;
 
     public EstudianteGrid(@Autowired TarjetaPrestamoService prestamoService, @Autowired EstudianteService estudianteService,
             @Autowired LibroService libroService) {
+        addClassName("container___estudiante_grid");           
         this.prestamoService = prestamoService;
         this.estudianteService = estudianteService;
         this.libroService = libroService;
         configureGrid();
         content = new Div();
+        content.addClassName("container___estudiante_grid__div");
         content.add(gridEstudiantes);
 
         add(content);
@@ -57,10 +59,11 @@ public class EstudianteGrid extends Div {
 
     private void configureGrid() {
 
-        gridEstudiantes.setClassName("tarjera-prestamo-estudiante-grid");
+        gridEstudiantes.setClassName("container___estudiante_grid__div__table");
         nombreColumn = gridEstudiantes.addColumn(Estudiante::getNombreApellidos).setHeader("Nombre").setAutoWidth(true).setSortable(true);
         tarjetaColumn = gridEstudiantes.addComponentColumn(event -> {
             Button cardButton = new Button("Tarjeta");
+            cardButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
             cardButton.addClickListener(e -> this.editCard(event));
             return cardButton;
         }).setAutoWidth(true);

@@ -25,6 +25,7 @@ import java.time.ZoneId;
 import java.util.List;
 import trabajodediploma.data.entity.Libro;
 import trabajodediploma.data.entity.TarjetaPrestamo;
+import trabajodediploma.data.entity.TarjetaPrestamoTrabajador;
 import trabajodediploma.data.entity.Trabajador;
 
 
@@ -34,9 +35,8 @@ import trabajodediploma.data.entity.Trabajador;
  */
 public class TarjetaPrestamoTrabajadorForm extends FormLayout {
 
-    private TarjetaPrestamo tarjetaPrestamo;
-
-    ComboBox<Trabajador> trabajador = new ComboBox<>("Trabajador");
+    private TarjetaPrestamoTrabajador tarjetaPrestamo;
+    private Trabajador trabajador;
     ComboBox<Libro> libro = new ComboBox<>("Libro");
     DatePicker fechaPrestamo = new DatePicker("Fecha Prestamo");
     DatePicker fechaDevolucion = new DatePicker("Fecha Devolucion");
@@ -46,17 +46,12 @@ public class TarjetaPrestamoTrabajadorForm extends FormLayout {
 
     BeanValidationBinder<TarjetaPrestamo> binder = new BeanValidationBinder<>(TarjetaPrestamo.class);
 
-    public TarjetaPrestamoTrabajadorForm(Trabajador t, List<Libro> listLibros) {
-
+    public TarjetaPrestamoTrabajadorForm(Trabajador trabajador, List<Libro> listLibros) {
         addClassNames("tarjeta-trabajador-form");
-        binder.bindInstanceFields(this);
-        
+        this.trabajador = trabajador;
+        binder.bindInstanceFields(this);  
         /*Config form*/
-        
         /*Trabajador*/
-        trabajador.setItems(t);
-        trabajador.setItemLabelGenerator(Trabajador::getNombreApellidos);
-        trabajador.setValue(t);
         /*Libros*/
         libro.setItems(listLibros);
         libro.setItemLabelGenerator(Libro::getTitulo);
@@ -65,7 +60,7 @@ public class TarjetaPrestamoTrabajadorForm extends FormLayout {
         /*fecha de devolucion*/
         fechaDevolucion.setMin(LocalDate.now(ZoneId.systemDefault()));
 
-        add(trabajador, libro, fechaPrestamo, fechaDevolucion, createButtonsLayout());
+        add(libro, fechaPrestamo, fechaDevolucion, createButtonsLayout());
 
     }
 
@@ -81,13 +76,13 @@ public class TarjetaPrestamoTrabajadorForm extends FormLayout {
         close.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         close.addClickShortcut(Key.ESCAPE);
 
-        //binder.addStatusChangeListener(e -> save.setEnabled(binder.isValid()));
+        binder.addStatusChangeListener(e -> save.setEnabled(binder.isValid()));
         buttonlayout.add(save, close);
 
         return buttonlayout;
     }
 
-    public void setTarjetaPrestamo(TarjetaPrestamo tarjetaPrestamo) {
+    public void setTarjetaPrestamo(TarjetaPrestamoTrabajador tarjetaPrestamo) {
         this.tarjetaPrestamo = tarjetaPrestamo;
         binder.readBean(tarjetaPrestamo);
     }
@@ -95,6 +90,7 @@ public class TarjetaPrestamoTrabajadorForm extends FormLayout {
     private void validateAndSave() {
         try {
             binder.writeBean(tarjetaPrestamo);
+            this.tarjetaPrestamo.setTrabajador(trabajador);
             fireEvent(new TarjetaPrestamoTrabajadorForm.SaveEvent(this, tarjetaPrestamo));
         } catch (ValidationException e) {
             e.printStackTrace();
@@ -110,28 +106,27 @@ public class TarjetaPrestamoTrabajadorForm extends FormLayout {
     // Events
     public static abstract class TarjetaPrestamoTrabajadorFormEvent extends ComponentEvent<TarjetaPrestamoTrabajadorForm> {
 
-        private TarjetaPrestamo tarjetaPrestamo;
+        private TarjetaPrestamoTrabajador tarjetaPrestamo;
 
-        protected TarjetaPrestamoTrabajadorFormEvent(TarjetaPrestamoTrabajadorForm source, TarjetaPrestamo tarjetaPrestamo) {
+        protected TarjetaPrestamoTrabajadorFormEvent(TarjetaPrestamoTrabajadorForm source, TarjetaPrestamoTrabajador tarjetaPrestamo) {
             super(source, false);
             this.tarjetaPrestamo = tarjetaPrestamo;
         }
-
-        public TarjetaPrestamo getTarjetaPrestamo() {
+        public TarjetaPrestamoTrabajador getTarjetaPrestamo() {
             return tarjetaPrestamo;
         }
     }
 
     public static class SaveEvent extends TarjetaPrestamoTrabajadorFormEvent {
 
-        SaveEvent(TarjetaPrestamoTrabajadorForm source, TarjetaPrestamo tarjetaPrestamo) {
+        SaveEvent(TarjetaPrestamoTrabajadorForm source, TarjetaPrestamoTrabajador tarjetaPrestamo) {
             super(source, tarjetaPrestamo);
         }
     }
 
     public static class DeleteEvent extends TarjetaPrestamoTrabajadorFormEvent {
 
-        DeleteEvent(TarjetaPrestamoTrabajadorForm source, TarjetaPrestamo tarjetaPrestamo) {
+        DeleteEvent(TarjetaPrestamoTrabajadorForm source, TarjetaPrestamoTrabajador tarjetaPrestamo) {
             super(source, tarjetaPrestamo);
         }
 

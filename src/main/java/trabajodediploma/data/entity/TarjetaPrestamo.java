@@ -31,22 +31,15 @@ public class TarjetaPrestamo extends AbstractEntity {
     @EqualsAndHashCode.Include
     @ToString.Include
 
-    @JoinColumn(name = "estudiante_id",  updatable = true, unique = false)
-    @ManyToOne()
-    private Estudiante estudiante;
-
     @NotNull(message = "El campo no debe estar vacío")
     @JoinColumn(name = "libro_id", nullable = false, updatable = true, unique = false)
     @ManyToOne(optional = false)
-    private Libro libro;
+    protected Libro libro;
 
     @NotNull(message = "El campo no debe estar vacío")
     @Column(name = "fechaPrestamo")
-    private LocalDate fechaPrestamo;
+    protected LocalDate fechaPrestamo;
     @Column(name = "fechaDevolucion")
-    private LocalDate fechaDevolucion;
+    protected LocalDate fechaDevolucion;
 
-    @JoinColumn(name = "trabajador_id",  updatable = true, unique = false)
-    @ManyToOne()
-    private Trabajador trabajador;
 }
