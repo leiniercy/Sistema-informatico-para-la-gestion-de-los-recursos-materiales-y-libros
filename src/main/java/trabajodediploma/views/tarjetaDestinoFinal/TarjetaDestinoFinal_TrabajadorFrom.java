@@ -1,3 +1,4 @@
+
 package trabajodediploma.views.tarjetaDestinoFinal;
 
 import com.vaadin.flow.component.ComponentEvent;
@@ -16,28 +17,32 @@ import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.shared.Registration;
 import trabajodediploma.data.entity.DestinoFinal;
+import trabajodediploma.data.entity.DestinoFinalTrabajador;
 import trabajodediploma.data.entity.Trabajador;
 import trabajodediploma.data.entity.Modulo;
-
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
 
 
+/**
+ *
+ * @author leinier
+ */
+
 public class TarjetaDestinoFinal_TrabajadorFrom  extends FormLayout{
    
-    DestinoFinal tarjeta;
+    DestinoFinalTrabajador tarjeta;
     ComboBox<Trabajador> trabajador = new ComboBox<>("Trabajador");
     ComboBox<Modulo> modulo = new ComboBox<>("Modulo");
     DatePicker fecha = new DatePicker("Fecha Entrega");
-    
    
     Button save = new Button("Añadir", VaadinIcon.PLUS.create());
     Button close = new Button("Cancelar", VaadinIcon.ERASER.create());
 
     BeanValidationBinder<DestinoFinal> binder = new BeanValidationBinder<>(DestinoFinal.class);
 
-    public TarjetaDestinoFinal_TrabajadorFrom(List<Trabajador> trabajadores, List<Modulo> Modulos){
+    public TarjetaDestinoFinal_TrabajadorFrom(List<Trabajador> trabajadors, List<Modulo> modulos){
       
         addClassNames("tarjeta-trabajador-form");
         binder.bindInstanceFields(this);
@@ -45,14 +50,14 @@ public class TarjetaDestinoFinal_TrabajadorFrom  extends FormLayout{
         /*Config form*/
         
         /*Trabajador*/
-        trabajador.setItems(trabajadores);
-        trabajador.setItemLabelGenerator(trab->trab.getUser().getName());
+        trabajador.setItems(trabajadors);
+        trabajador.setItemLabelGenerator(est->est.getUser().getName());
         /*Libros*/
-        modulo.setItems(Modulos);
+        modulo.setItems(modulos);
         modulo.setItemLabelGenerator(Modulo::getNombre);
-        /*Fecha de entrega*/
+        /*fecha de entrega*/
         fecha.setMin(LocalDate.now(ZoneId.systemDefault()));
-
+        
         add(trabajador, modulo, fecha, createButtonsLayout());
 
     }
@@ -75,7 +80,7 @@ public class TarjetaDestinoFinal_TrabajadorFrom  extends FormLayout{
         return buttonlayout;
     }
 
-    public void setDestinoFinal(DestinoFinal tarjeta) {
+    public void setDestinoFinal(DestinoFinalTrabajador tarjeta) {
         this.tarjeta = tarjeta;
         binder.readBean(tarjeta);
     }
@@ -83,6 +88,9 @@ public class TarjetaDestinoFinal_TrabajadorFrom  extends FormLayout{
     private void validateAndSave() {
         try {
             binder.writeBean(tarjeta);
+            this.tarjeta.setTrabajador(trabajador.getValue());
+            this.tarjeta.setModulo(modulo.getValue());
+            this.tarjeta.setFecha(fecha.getValue());
             fireEvent(new TarjetaDestinoFinal_TrabajadorFrom.SaveEvent(this, tarjeta));
         } catch (ValidationException e) {
             e.printStackTrace();
@@ -101,9 +109,9 @@ public class TarjetaDestinoFinal_TrabajadorFrom  extends FormLayout{
 
         private DestinoFinal destinoFinal;
 
-        protected DestinoFinalTrabajadorFormEvent(TarjetaDestinoFinal_TrabajadorFrom source, DestinoFinal destinoFinal) {
+        protected DestinoFinalTrabajadorFormEvent(TarjetaDestinoFinal_TrabajadorFrom source, DestinoFinal DestinoFinal) {
             super(source, false);
-            this.destinoFinal = destinoFinal;
+            this.destinoFinal = DestinoFinal;
         }
 
         public DestinoFinal getDestinoFinal() {
@@ -113,15 +121,15 @@ public class TarjetaDestinoFinal_TrabajadorFrom  extends FormLayout{
 
     public static class SaveEvent extends DestinoFinalTrabajadorFormEvent {
 
-        SaveEvent(TarjetaDestinoFinal_TrabajadorFrom source, DestinoFinal destinoFinal) {
-            super(source, destinoFinal);
+        SaveEvent(TarjetaDestinoFinal_TrabajadorFrom source, DestinoFinal DestinoFinal) {
+            super(source, DestinoFinal);
         }
     }
 
     public static class DeleteEvent extends DestinoFinalTrabajadorFormEvent {
 
-        DeleteEvent(TarjetaDestinoFinal_TrabajadorFrom source, DestinoFinal destinoFinal) {
-            super(source, destinoFinal);
+        DeleteEvent(TarjetaDestinoFinal_TrabajadorFrom source, DestinoFinal DestinoFinal) {
+            super(source, DestinoFinal);
         }
 
     }

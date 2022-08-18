@@ -77,11 +77,10 @@ public class LibroView extends Div {
 
     public LibroView(@Autowired LibroService libroService) {
         this.libroService = libroService;
-        addClassNames("libros-view");
+        addClassNames("libros_view");
         setSizeFull();
         configureGrid();
         configureForm();
-        Filtros();
         myFooter = new MyFooter();
         add(menuBar(), getContent(), myFooter);
         updateList();
@@ -92,13 +91,13 @@ public class LibroView extends Div {
     private Div getContent() {
 
         Div formContent = new Div(form);
-        formContent.addClassName("form-content");
+        formContent.addClassName("form_content");
         Div gridContent = new Div(grid);
-        gridContent.addClassName("grid-content");
+        gridContent.addClassName("grid_content");
 
-        Div content = new Div(gridContent);
-        content.addClassName("content");
-        content.setSizeFull();
+        Div container = new Div(gridContent);
+        container.addClassName("container");
+        container.setSizeFull();
 
         /* Dialog Header */
         Button closeButton = new Button(new Icon("lumo", "cross"), (e) -> dialog.close());
@@ -114,7 +113,7 @@ public class LibroView extends Div {
 
         dialog = new Dialog(header, formContent);
 
-        return content;
+        return container;
     }
 
     /* Tabla */
@@ -123,7 +122,6 @@ public class LibroView extends Div {
         
         grid = new Grid<>(Libro.class, false);
         grid.setClassName("libro-grid");
-        grid.addColumn("id");
         LitRenderer<Libro> imagenRenderer = LitRenderer.<Libro>of("<img style='height: 64px' src=${item.imagen} />")
                 .withProperty("imagen", Libro::getImagen);
         imagenColumn = grid.addColumn(imagenRenderer).setHeader("Imagen").setAutoWidth(true);
@@ -143,6 +141,8 @@ public class LibroView extends Div {
         volumenColumn.setVisible(false);
         tomoColumn.setVisible(false);
         parteColumn.setVisible(false);
+
+        Filtros();
 
         HeaderRow headerRow = grid.appendHeaderRow();
         headerRow.getCell(tituloColumn).setComponent(filterTitle);

@@ -24,6 +24,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.annotation.security.RolesAllowed;
@@ -57,12 +58,12 @@ public class EstadisticasView extends Div {
             @Autowired LibroService libroService,
             @Autowired TarjetaPrestamoService prestamoService
     ) {
-        addClassNames("estadistica-view","felx-container");
+        addClassName("estadistica_view");
         this.libroService = libroService;
         this.prestamoService = prestamoService;
         
         container = new Div();
-        container.addClassNames("felx-item","estadisticas");
+        container.addClassName("estadistica_view__container");
         
         footer = new MyFooter();
         add(getBarraDeMenu());
@@ -91,19 +92,19 @@ public class EstadisticasView extends Div {
             tarjetas = tarjetas.stream().filter(
                     //fecha_inicio <= x <= fecha_fin            
                     event -> event.getFechaPrestamo() != null
-                    &&   (event.getFechaPrestamo().equals(initDate.getValue())
+                    &&   (event.getFechaPrestamo().isEqual(initDate.getValue())
                     || event.getFechaPrestamo().isAfter(initDate.getValue()))
                     &&   event.getFechaDevolucion() != null      
-                    && (event.getFechaDevolucion().equals(endDate.getValue())
+                    && (event.getFechaDevolucion().isEqual(endDate.getValue())
                     || event.getFechaDevolucion().isBefore(endDate.getValue()))
             ).collect(Collectors.toList());
         }
     }
 
     private Component getBoard() {
-        addClassName("basic-board");
+        
         Board board = new Board();
-
+        board.addClassName("estadistica_view__container__basic_board");
         board.addRow(
                 createHighlight("Cantidad real de libros", new Span(String.format("%d", cantRealLibros()))),
                 createHighlight("Cantidad de libros en el álmacen", new Span(String.format("%d", cantRealLibrosAlmacen()))),
@@ -156,8 +157,8 @@ public class EstadisticasView extends Div {
 
     //Graficos de pasteles
     private Component getGraficosPasteles() {
-        addClassName("grafics_key-board");
         Board board = new Board();
+        board.addClassName("estadistica_view__container__grafics_key_board");
         board.addRow(
                 getEstadisticasProrcientoLibros()
         );
@@ -197,12 +198,12 @@ public class EstadisticasView extends Div {
     private Component getBarraDeMenu() {
 
         Div buttons = new Div();
-        buttons.addClassNames("barra-menu-export");
+        buttons.addClassNames("estadistica_view___barra_menu__export");
         Button exportButton = new Button(VaadinIcon.FILE.create());
         buttons.add(exportButton);
 
         Div toolbar = new Div(DatePickerDateRange(), buttons);
-        toolbar.addClassNames("felx-item","barra-menu");
+        toolbar.addClassName("estadistica_view___barra_menu");
         return toolbar;
     }
 

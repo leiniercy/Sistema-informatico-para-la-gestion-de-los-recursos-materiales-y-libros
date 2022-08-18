@@ -1,7 +1,7 @@
 package trabajodediploma.views.tarjetaDestinoFinal;
 
-import com.vaadin.flow.component.html.Div;
 import java.time.format.DateTimeFormatter;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -16,10 +16,11 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -28,6 +29,7 @@ import com.vaadin.flow.data.renderer.LocalDateRenderer;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import trabajodediploma.data.entity.DestinoFinal;
+import trabajodediploma.data.entity.DestinoFinalTrabajador;
 import trabajodediploma.data.entity.Trabajador;
 import trabajodediploma.data.entity.Modulo;
 import trabajodediploma.data.service.DestinoFinalService;
@@ -46,15 +48,16 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
     private ModuloService moduloService;
     private TrabajadorService trabajadorService;
     private DestinoFinalService destinoService;
+    private DestinoFinalTrabajador tarjetaTrabajador;
     private TarjetaDestinoFinal_TrabajadorFrom form;
     private ComboBox<Trabajador> trabajadorFilter;
     private ComboBox<Modulo> moduloFilter;
     private DatePicker entregaFilter;
     private Dialog dialog;
     private Html total;
-    private Div header;
-    private HorizontalLayout buttons;
     private HorizontalLayout toolbar;
+    private HorizontalLayout buttons;
+    private Div header;
 
     public TarjetaDestinoFinal_TrabajadorView(
             ModuloService moduloService,
@@ -63,16 +66,13 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
         this.moduloService = moduloService;
         this.trabajadorService = trabajadorService;
         this.destinoService = destinoService;
-        this.tarjetas = destinoService.findAll();
+        tarjetas = new LinkedList<>();
+        updateList();
         configureGrid();
         configureForm();
         add(menuBar(), getContent());
-        updateList();
-        closeEditor();
-
     }
 
-    /* Contenido de la vista */
     /* Contenido de la vista */
     private Div getContent() {
         Div formContent = new Div(form);
@@ -100,16 +100,17 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
     /* Tabla */
     /* Configuracion de la tabla */
     private void configureGrid() {
-        grid.setClassName("tarjetaDestinoFinal-Trabajador-grid");
+        grid.setClassName("tarjetaDestinoFinal-trabajador-grid");
 
         trabajadorColumn = grid.addColumn(new ComponentRenderer<>(tarjeta -> {
+            tarjetaTrabajador = (DestinoFinalTrabajador) tarjeta;
             HorizontalLayout hl = new HorizontalLayout();
             hl.setAlignItems(Alignment.CENTER);
-            Image img = new Image(tarjeta.getTrabajador().getUser().getProfilePictureUrl(), "");
+            Image img = new Image(tarjetaTrabajador.getTrabajador().getUser().getProfilePictureUrl(), "");
             img.setHeight("3.5rem");
             Span span = new Span();
             span.setClassName("name");
-            span.setText(tarjeta.getTrabajador().getUser().getName());
+            span.setText(tarjetaTrabajador.getTrabajador().getUser().getName());
             hl.add(img, span);
             return hl;
         })).setHeader("Trabajador").setAutoWidth(true).setSortable(true);
@@ -124,8 +125,9 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
                 .setComparator(tarjeta -> tarjeta.getFecha()).setHeader("Fecha de Entrega").setAutoWidth(true)
                 .setSortable(true);
         editColumn = grid.addComponentColumn(tarjeta -> {
+            tarjetaTrabajador = (DestinoFinalTrabajador) tarjeta;
             Button editButton = new Button(VaadinIcon.EDIT.create());
-            editButton.addClickListener(e -> this.editTarjeta(tarjeta));
+            editButton.addClickListener(e -> this.editTarjeta(tarjetaTrabajador));
             return editButton;
         }).setFlexGrow(0);
 
@@ -136,9 +138,7 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
         headerRow.getCell(moduloColumn).setComponent(moduloFilter);
         headerRow.getCell(fechaEntregaColumn).setComponent(entregaFilter);
 
-        gridListDataView = grid.setItems(
-
-        );
+        gridListDataView = grid.setItems( tarjetas );
         grid.setAllRowsVisible(true);
         grid.setSizeFull();
         grid.setWidthFull();
@@ -152,8 +152,16 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
 
     private void refreshGrid() {
         grid.setVisible(true);
-        grid.setItems(destinoService.findAll().parallelStream().filter(e -> e.getTrabajador() != null)
-                .collect(Collectors.toList()));
+        tarjetas.clear();
+        destinoService.findAll().parallelStream().forEach( (target)->{
+            if(target instanceof DestinoFinalTrabajador){
+                tarjetaTrabajador = (DestinoFinalTrabajador) target;
+                if(tarjetaTrabajador.getTrabajador() != null){
+                    tarjetas.add(target);
+                }
+            }
+        });
+        grid.setItems(tarjetas);
     }
 
     /* Filtros */
@@ -167,9 +175,7 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
         trabajadorFilter.setWidth("100%");
         trabajadorFilter.addValueChangeListener(event -> {
             if (trabajadorFilter.getValue() == null) {
-                gridListDataView = grid
-                        .setItems(destinoService.findAll().parallelStream().filter(e -> e.getTrabajador() != null)
-                                .collect(Collectors.toList()));
+                gridListDataView = grid.setItems(tarjetas);
             } else {
                 gridListDataView.addFilter(tarjeta -> areTrabajadorEqual(tarjeta, trabajadorFilter));
             }
@@ -183,9 +189,7 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
         moduloFilter.setWidth("100%");
         moduloFilter.addValueChangeListener(event -> {
             if (moduloFilter.getValue() == null) {
-                gridListDataView = grid
-                        .setItems(destinoService.findAll().parallelStream().filter(e -> e.getTrabajador() != null)
-                                .collect(Collectors.toList()));
+                gridListDataView = grid.setItems(tarjetas);
             } else {
                 gridListDataView.addFilter(des -> StringUtils.containsIgnoreCase(des.getModulo().getNombre(),
                         moduloFilter.getValue().getNombre()));
@@ -198,9 +202,7 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
         entregaFilter.setWidth("100%");
         entregaFilter.addValueChangeListener(event -> {
             if (entregaFilter.getValue() == null) {
-                gridListDataView = grid
-                        .setItems(destinoService.findAll().parallelStream().filter(e -> e.getTrabajador() != null)
-                                .collect(Collectors.toList()));
+                gridListDataView = grid.setItems(tarjetas);
             } else {
                 gridListDataView.addFilter(tarjeta -> areFechaInicioEqual(tarjeta, entregaFilter));
             }
@@ -210,8 +212,9 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
 
     private boolean areTrabajadorEqual(DestinoFinal tarjeta, ComboBox<Trabajador> trabajadorFilter) {
         String trabajadorFilterValue = trabajadorFilter.getValue().getUser().getName();
+        tarjetaTrabajador = (DestinoFinalTrabajador) tarjeta;
         if (trabajadorFilterValue != null) {
-            return StringUtils.equals(tarjeta.getTrabajador().getUser().getName(), trabajadorFilterValue);
+            return StringUtils.equals(tarjetaTrabajador.getTrabajador().getUser().getName(), trabajadorFilterValue);
         }
         return true;
     }
@@ -237,12 +240,9 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
         addButton.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
         buttons.add(refreshButton, deleteButton, addButton);
 
-        total = new Html("<span>Total: <b>"
-        + destinoService.findAll().parallelStream().filter(e -> e.getTrabajador() != null)
-                .collect(Collectors.toList()).size()
-        + "</b></span>");
+        total = new Html("<span>Total: <b>" + tarjetas.size() + "</b></span>");
 
-        toolbar = new HorizontalLayout(buttons,total);
+        toolbar = new HorizontalLayout(buttons, total);
         toolbar.addClassName("toolbar");
         toolbar.setAlignItems(FlexComponent.Alignment.CENTER);
         toolbar.setWidth("100%");
@@ -254,7 +254,6 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
     }
 
     private void deleteTarjeta() {
-
         try {
 
             if (grid.asMultiSelect().isEmpty()) {
@@ -265,10 +264,7 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
                 deleteItems(grid.getSelectedItems().size(), grid.getSelectedItems());
                 refreshGrid();
                 toolbar.remove(total);
-                total = new Html("<span>Total: <b>"
-                        + destinoService.findAll().parallelStream().filter(e -> e.getTrabajador() != null)
-                                .collect(Collectors.toList()).size()
-                        + "</b></span>");
+                total = new Html("<span>Total: <b>"+ tarjetas.size() + "</b></span>");
                 toolbar.addComponentAtIndex(1, total);
                 toolbar.setFlexGrow(1, buttons);
             }
@@ -306,11 +302,7 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
 
     private void saveTarjeta(TarjetaDestinoFinal_TrabajadorFrom.SaveEvent event) {
 
-        tarjetas = tarjetas.parallelStream()
-                .filter(tar -> event.getDestinoFinal().getTrabajador().equals(tar.getTrabajador())
-                        && event.getDestinoFinal().getModulo().equals(tar.getModulo())
-                        && event.getDestinoFinal().getFecha().equals(tar.getFecha()))
-                .collect(Collectors.toList());
+         updateList();
 
         if (tarjetas.size() != 0) {
             Notification notification = Notification.show(
@@ -335,19 +327,16 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
                 notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
             }
             toolbar.remove(total);
-                total = new Html("<span>Total: <b>"
-                        + destinoService.findAll().parallelStream().filter(e -> e.getTrabajador() != null)
-                                .collect(Collectors.toList()).size()
-                        + "</b></span>");
-                toolbar.addComponentAtIndex(1, total);
-                toolbar.setFlexGrow(1, buttons);
+            total = new Html("<span>Total: <b>"+ tarjetas.size()+"</b></span>");
+            toolbar.addComponentAtIndex(1, total);
+            toolbar.setFlexGrow(1, buttons);
             updateList();
             closeEditor();
         }
 
     }
 
-    void editTarjeta(DestinoFinal tarjeta) {
+    void editTarjeta(DestinoFinalTrabajador tarjeta) {
         if (tarjeta == null) {
             closeEditor();
         } else {
@@ -360,7 +349,7 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
 
     void addTarjeta() {
         grid.asMultiSelect().clear();
-        editTarjeta(new DestinoFinal());
+        editTarjeta(new DestinoFinalTrabajador());
     }
 
     private void closeEditor() {
@@ -371,8 +360,16 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
     }
 
     private void updateList() {
-        grid.setItems(destinoService.findAll().parallelStream().filter(e -> e.getTrabajador() != null)
-                .collect(Collectors.toList()));
+        tarjetas.clear();
+        destinoService.findAll().parallelStream().forEach( (target)->{
+            if(target instanceof DestinoFinalTrabajador){
+                tarjetaTrabajador = (DestinoFinalTrabajador) target;
+                if(tarjetaTrabajador.getTrabajador() != null){
+                    tarjetas.add(target);
+                }
+            }
+        });
+        grid.setItems(tarjetas);
     }
     /* Fin-Barra de tarjetas */
 }

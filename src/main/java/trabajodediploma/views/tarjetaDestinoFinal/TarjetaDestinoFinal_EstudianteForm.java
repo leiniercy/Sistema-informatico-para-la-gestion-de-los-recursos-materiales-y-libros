@@ -17,6 +17,7 @@ import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.shared.Registration;
 import trabajodediploma.data.entity.DestinoFinal;
+import trabajodediploma.data.entity.DestinoFinalEstudiante;
 import trabajodediploma.data.entity.Estudiante;
 import trabajodediploma.data.entity.Modulo;
 import java.time.LocalDate;
@@ -31,7 +32,7 @@ import java.util.List;
 
 public class TarjetaDestinoFinal_EstudianteForm  extends FormLayout{
    
-    DestinoFinal tarjeta;
+    DestinoFinalEstudiante tarjeta;
     ComboBox<Estudiante> estudiante = new ComboBox<>("Estudiante");
     ComboBox<Modulo> modulo = new ComboBox<>("Modulo");
     DatePicker fecha = new DatePicker("Fecha Entrega");
@@ -79,7 +80,7 @@ public class TarjetaDestinoFinal_EstudianteForm  extends FormLayout{
         return buttonlayout;
     }
 
-    public void setDestinoFinal(DestinoFinal tarjeta) {
+    public void setDestinoFinal(DestinoFinalEstudiante tarjeta) {
         this.tarjeta = tarjeta;
         binder.readBean(tarjeta);
     }
@@ -87,6 +88,9 @@ public class TarjetaDestinoFinal_EstudianteForm  extends FormLayout{
     private void validateAndSave() {
         try {
             binder.writeBean(tarjeta);
+            this.tarjeta.setEstudiante(estudiante.getValue());
+            this.tarjeta.setModulo(modulo.getValue());
+            this.tarjeta.setFecha(fecha.getValue());
             fireEvent(new TarjetaDestinoFinal_EstudianteForm.SaveEvent(this, tarjeta));
         } catch (ValidationException e) {
             e.printStackTrace();
