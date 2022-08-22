@@ -61,7 +61,7 @@ public class Trabajador extends AbstractEntity {
     private Area area;
     
     @OneToMany(mappedBy = "trabajador")
-    List<DestinoFinal> destinoFinal;
+    List<DestinoFinalTrabajador> destinoFinal;
 
     @OneToMany(mappedBy = "trabajador")
     List<TarjetaPrestamoTrabajador> tarjetaPrestamo;

@@ -1,0 +1,297 @@
+package trabajodediploma.views.tarjeta_personal_prestamo;
+
+import java.time.format.DateTimeFormatter;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
+
+import javax.annotation.security.RolesAllowed;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.commons.lang3.StringUtils;
+
+import com.vaadin.flow.component.Html;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.datepicker.DatePicker;
+import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.grid.HeaderRow;
+import com.vaadin.flow.component.grid.dataview.GridListDataView;
+import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.Image;
+import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
+import com.vaadin.flow.data.renderer.LocalDateRenderer;
+import com.vaadin.flow.router.PageTitle;
+import com.vaadin.flow.router.Route;
+
+import trabajodediploma.data.entity.Estudiante;
+import trabajodediploma.data.entity.Libro;
+import trabajodediploma.data.entity.TarjetaPrestamo;
+import trabajodediploma.data.entity.TarjetaPrestamoEstudiante;
+import trabajodediploma.data.entity.TarjetaPrestamoTrabajador;
+import trabajodediploma.data.entity.Trabajador;
+import trabajodediploma.data.entity.User;
+import trabajodediploma.data.service.EstudianteService;
+import trabajodediploma.data.service.LibroService;
+import trabajodediploma.data.service.TarjetaPrestamoService;
+import trabajodediploma.data.service.TrabajadorService;
+import trabajodediploma.security.AuthenticatedUser;
+import trabajodediploma.views.MainLayout;
+import trabajodediploma.views.footer.MyFooter;
+
+@PageTitle("Tarjeta Personal de Prestamo")
+@Route(value = "tarjeta-personal-prestamo", layout = MainLayout.class)
+@RolesAllowed("USER")
+public class TarjetaPersonalPrestamoView extends Div {
+
+    Grid<TarjetaPrestamo> grid = new Grid<>(TarjetaPrestamo.class, false);
+    GridListDataView<TarjetaPrestamo> gridListDataView;
+    Grid.Column<TarjetaPrestamo> libroColumn;
+    Grid.Column<TarjetaPrestamo> fechaEntregaColumn;
+    Grid.Column<TarjetaPrestamo> fechaDevolucionColumn;
+    Grid.Column<TarjetaPrestamo> editColumn;
+    private Estudiante estudiante;
+    private Trabajador trabajador;
+    private TarjetaPrestamoTrabajador tarjetaTrabajador;
+    private TarjetaPrestamoEstudiante tarjetaEstudiante;
+    private User user;
+    private List<Libro> libros;
+    private List<TarjetaPrestamo> prestamos;
+    private TarjetaPrestamoService prestamoService;
+    private EstudianteService estudiantService;
+    private TrabajadorService trabajadorService;
+    private LibroService libroService;
+    private MyFooter footer;
+    private ComboBox<Libro> libroFilter;
+    private DatePicker entregaFilter;
+    private DatePicker devolucionFilter;
+    private Html total;
+    private Div info;
+    private Div container;
+
+    public TarjetaPersonalPrestamoView(
+            @Autowired AuthenticatedUser authenticatedUser,
+            @Autowired TarjetaPrestamoService prestamoService,
+            @Autowired EstudianteService estudianteService,
+            @Autowired TrabajadorService trabajadorService,
+            @Autowired LibroService libroService) {
+
+        addClassName("tarjeta-personal-perstamo");
+        this.prestamoService = prestamoService;
+        this.estudiantService = estudianteService;
+        this.trabajadorService = trabajadorService;
+        this.libroService = libroService;
+        this.libros = libroService.findAll();
+        prestamos = new LinkedList<>();
+        footer = new MyFooter();
+
+        try {
+            Optional<User> maybeUser = authenticatedUser.get();
+            if (maybeUser.isPresent()) {
+                user = maybeUser.get();
+
+                Optional<Estudiante> e = estudianteService.findAll().stream()
+                        .filter(event -> event.getUser().equals(user))
+                        .findFirst();
+                estudiante = e.get();
+                Optional<Trabajador> t = trabajadorService.findAll().stream()
+                        .filter(event -> event.getUser().equals(user))
+                        .findFirst();
+                trabajador = t.get();
+                if (estudiante == null || trabajador == null) {
+                    Image imageError = new Image("", "Error 202");
+                    imageError.addClassName("container__img");
+                    H1 info = new H1("Información personal no disponible");
+                    info.addClassName("container__h1");
+                    container.add(imageError, info);
+                } else if (estudiante == null) {
+                    updateListEstudiante();
+                    configureGrid();
+                    getContent();
+                } else if (trabajador == null) {
+                    updateListTrabajador();
+                    configureGrid();
+                    getContent();
+                }
+                add(container, footer);
+            }
+
+        } catch (Exception e) {
+            // TODO: handle exception
+            e.printStackTrace();
+        }
+
+    }
+
+    private void getContent() {
+        Div gridContent = new Div(grid);
+        gridContent.addClassName("container__div_grid");
+        container = new Div();
+        container.addClassName("container");
+        container.add(informacionTabla(), gridContent);
+    }
+
+    private Div informacionTabla() {
+        info = new Div();
+        info.addClassName("container__div_info");
+
+        if (prestamos.size() == 1) {
+            total = new Html("<span>Total: <b>" + prestamos.size() + "</b> libro</span>");
+        } else if (prestamos.size() == 0 || prestamos.size() > 1) {
+            total = new Html("<span>Total: <b>" + prestamos.size() + "</b> libros</span>");
+        }
+        info.add(total);
+        return info;
+    }
+
+    private void configureGrid() {
+        grid.setClassName("container__div_grid__tabla");
+        libroColumn = grid.addColumn(new ComponentRenderer<>(tarjeta -> {
+            HorizontalLayout hl = new HorizontalLayout();
+            hl.setAlignItems(Alignment.CENTER);
+            Image img = new Image(tarjeta.getLibro().getImagen(), "");
+            img.setHeight("3.5rem");
+            Span span = new Span();
+            span.setClassName("name");
+            span.setText(tarjeta.getLibro().getTitulo());
+            hl.add(img, span);
+            return hl;
+        })).setHeader("Libro").setAutoWidth(true).setSortable(true);
+
+        fechaEntregaColumn = grid
+                .addColumn(new LocalDateRenderer<>(tarjeta -> tarjeta.getFechaPrestamo(),
+                        DateTimeFormatter.ofPattern("dd/MM/yyyy")))
+                .setComparator(tarjeta -> tarjeta.getFechaPrestamo()).setHeader("Fecha de Prestamo").setAutoWidth(true)
+                .setSortable(true);
+        fechaDevolucionColumn = grid
+                .addColumn(new LocalDateRenderer<>(tarjeta -> tarjeta.getFechaDevolucion(),
+                        DateTimeFormatter.ofPattern("dd/MM/yyyy")))
+                .setComparator(tarjeta -> tarjeta.getFechaDevolucion()).setHeader("Fecha de Devolución")
+                .setAutoWidth(true).setSortable(true);
+
+        Filtros();
+
+        HeaderRow headerRow = grid.appendHeaderRow();
+        headerRow.getCell(libroColumn).setComponent(libroFilter);
+        headerRow.getCell(fechaEntregaColumn).setComponent(entregaFilter);
+        headerRow.getCell(fechaDevolucionColumn).setComponent(devolucionFilter);
+
+        gridListDataView = grid.setItems(prestamos);
+        grid.setSizeFull();
+        grid.setWidthFull();
+        grid.setHeightFull();
+        grid.setSelectionMode(Grid.SelectionMode.MULTI);
+        grid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS);
+        grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
+        grid.addThemeVariants(GridVariant.LUMO_WRAP_CELL_CONTENT);
+
+    }
+
+    private void Filtros() {
+
+        libroFilter = new ComboBox<>();
+        libroFilter.setItems(libros);
+        libroFilter.setItemLabelGenerator(Libro::getTitulo);
+        libroFilter.setPlaceholder("Filtrar");
+        libroFilter.setClearButtonVisible(true);
+        libroFilter.setWidth("100%");
+        libroFilter.addValueChangeListener(event -> {
+            if (libroFilter.getValue() == null) {
+                gridListDataView = grid
+                        .setItems(prestamos);
+            } else {
+                gridListDataView.addFilter(tarjeta -> areLibroEqual(tarjeta, libroFilter));
+            }
+        });
+
+        entregaFilter = new DatePicker();
+        entregaFilter.setPlaceholder("Filter");
+        entregaFilter.setClearButtonVisible(true);
+        entregaFilter.setWidth("100%");
+        entregaFilter.addValueChangeListener(event -> {
+            if (entregaFilter.getValue() == null) {
+                gridListDataView = grid
+                        .setItems(prestamos);
+            } else {
+                gridListDataView.addFilter(tarjeta -> areFechaInicioEqual(tarjeta, entregaFilter));
+            }
+        });
+
+        devolucionFilter = new DatePicker();
+        devolucionFilter.setPlaceholder("Filter");
+        devolucionFilter.setClearButtonVisible(true);
+        devolucionFilter.setWidth("100%");
+        devolucionFilter.addValueChangeListener(event -> {
+            if (devolucionFilter.getValue() == null) {
+                gridListDataView = grid
+                        .setItems(prestamos);
+            } else {
+                gridListDataView.addFilter(tarjeta -> areFechaFinEqual(tarjeta, devolucionFilter));
+            }
+        });
+
+    }
+
+    private boolean areLibroEqual(TarjetaPrestamo tarjeta, ComboBox<Libro> libroFilter) {
+        String libroFilterValue = libroFilter.getValue().getTitulo();
+        if (libroFilterValue != null) {
+            return StringUtils.equals(tarjeta.getLibro().getTitulo(), libroFilterValue);
+        }
+        return true;
+    }
+
+    private boolean areFechaInicioEqual(TarjetaPrestamo tarjeta, DatePicker dateFilter) {
+        String dateFilterValue = dateFilter.getValue().toString();
+        String tareaDate = tarjeta.getFechaPrestamo().toString();
+        if (dateFilterValue != null) {
+            return StringUtils.equals(dateFilterValue, tareaDate);
+        }
+        return true;
+    }
+
+    private boolean areFechaFinEqual(TarjetaPrestamo tarjeta, DatePicker dateFilter) {
+        String dateFilterValue = dateFilter.getValue().toString();
+        String tareaDate = tarjeta.getFechaDevolucion().toString();
+        if (dateFilterValue != null) {
+            return StringUtils.equals(dateFilterValue, tareaDate);
+        }
+        return true;
+    }
+
+    /* Trabajador */
+    private void updateListTrabajador() {
+        prestamos.clear();
+        prestamoService.findAll().parallelStream().forEach((tarjeta) -> {
+            if (tarjeta instanceof TarjetaPrestamoTrabajador) {
+                tarjetaTrabajador = (TarjetaPrestamoTrabajador) tarjeta;
+                if (tarjetaTrabajador.getTrabajador().equals(trabajador)) {
+                    prestamos.add(tarjetaTrabajador);
+                }
+            }
+        });
+        grid.setItems(prestamos);
+    }
+
+    /* Fin -> Trabajador */
+    /* Estudiante */
+    private void updateListEstudiante() {
+        prestamos.clear();
+        prestamoService.findAll().parallelStream().forEach((tarjeta) -> {
+            if (tarjeta instanceof TarjetaPrestamoEstudiante) {
+                tarjetaEstudiante = (TarjetaPrestamoEstudiante) tarjeta;
+                if (tarjetaEstudiante.getEstudiante().equals(estudiante)) {
+                    prestamos.add(tarjetaEstudiante);
+                }
+            }
+        });
+        grid.setItems(prestamos);
+    }
+    /* Fin -> Estudiante */
+}

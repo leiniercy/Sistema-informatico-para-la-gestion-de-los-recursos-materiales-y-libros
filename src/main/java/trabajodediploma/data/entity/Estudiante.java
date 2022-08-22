@@ -69,7 +69,7 @@ public class Estudiante extends AbstractEntity {
     private Grupo grupo;
 
     @OneToMany(mappedBy = "estudiante")
-    List<DestinoFinal> destinoFinal;
+    List<DestinoFinalEstudiante> destinoFinal;
 
     @OneToMany(mappedBy = "estudiante")
     List<TarjetaPrestamoEstudiante> tarjetaPrestamo;

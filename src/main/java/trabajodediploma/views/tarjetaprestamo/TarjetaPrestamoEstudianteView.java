@@ -198,8 +198,6 @@ public class TarjetaPrestamoEstudianteView extends Div {
     /* Filtros */
     private void Filtros() {
 
-        updateList();
-
         libroFilter = new ComboBox<>();
         libroFilter.setItems(libros);
         libroFilter.setItemLabelGenerator(Libro::getTitulo);

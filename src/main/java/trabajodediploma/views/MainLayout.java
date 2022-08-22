@@ -46,6 +46,7 @@ import trabajodediploma.views.modulo.ModuloView;
 import trabajodediploma.views.usuarios.UsuarioView;
 import trabajodediploma.views.recursosmateriales.RecursosMaterialesView;
 import trabajodediploma.views.tarjetaDestinoFinal.TarjetaDestinoFinalView;
+import trabajodediploma.views.tarjeta_personal_prestamo.TarjetaPersonalPrestamoView;
 import trabajodediploma.views.tarjetaprestamo.TarjetaPrestamoView;
 
 /**
@@ -211,6 +212,8 @@ public class MainLayout extends AppLayout {
 
             new MenuItemInfo("Catálogo", "la la-th-list", CatalogoView.class), //
 
+            new MenuItemInfo("Tarjeta Personal", "la la-columns", TarjetaPersonalPrestamoView.class), //
+            
             new MenuItemInfo("Usuario", "la la-th-user", UsuarioView.class), //
             
             new MenuItemInfo("Estadística", "la la-chart-bar", EstadisticasView.class), //

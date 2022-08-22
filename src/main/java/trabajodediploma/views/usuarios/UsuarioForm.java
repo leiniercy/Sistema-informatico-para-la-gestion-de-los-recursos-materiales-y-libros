@@ -31,6 +31,9 @@ import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Collections;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.springframework.web.util.UriUtils;
 import trabajodediploma.data.Rol;
 
@@ -45,19 +48,20 @@ public class UsuarioForm extends FormLayout {
     Upload profilePictureUrl = new Upload();
     TextField name = new TextField();
     TextField username = new TextField();
-    ComboBox roles = new ComboBox<>();
+    ComboBox<Rol> roles = new ComboBox<>();
 
     Button save = new Button("Añadir", VaadinIcon.PLUS.create());
     Button close = new Button("Cancelar", VaadinIcon.ERASER.create());
 
-    //BeanValidationBinder<User> binder = new BeanValidationBinder<>(User.class);
+    BeanValidationBinder<User> binder = new BeanValidationBinder<>(User.class);
+
     public UsuarioForm() {
         addClassName("user-form");
 
-        //binder.bindInstanceFields(this);
-        //Config form
-        //foto de perfil
-        //int maxFileSizeInBytes = 10 * 1024 * 1024; // 10MB
+        binder.bindInstanceFields(this);
+        // Config form
+        // foto de perfil
+        // int maxFileSizeInBytes = 10 * 1024 * 1024; // 10MB
         Label imageSize = new Label("Tamaño maximo: 400kb");
         imageSize.getStyle().set("color", "var(--lumo-secondary-text-color)");
         imagePreview = new Image();
@@ -69,7 +73,7 @@ public class UsuarioForm extends FormLayout {
         uploadButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         profilePictureUrl.setUploadButton(uploadButton);
 
-        //name
+        // name
         name.setLabel("Nombre");
         name.setAutofocus(true);
         name.setRequired(true);
@@ -80,7 +84,7 @@ public class UsuarioForm extends FormLayout {
             event.getSource().setHelperText(event.getValue().length() + "/" + 255);
         });
 
-        //username
+        // username
         username.setLabel("Nombre");
         username.setAutofocus(true);
         username.setRequired(true);
@@ -91,14 +95,14 @@ public class UsuarioForm extends FormLayout {
             event.getSource().setHelperText(event.getValue().length() + "/" + 255);
         });
 
-        //Rol
+        // Rol
         roles.setItems(
-//                Collections.singleton(Rol.VD_ADIMN_ECONOMIA),
-//                Collections.singleton(Rol.ASISTENTE_CONTROL),
-//                Collections.singleton(Rol.RESP_ALMACEN),
-//                Collections.singleton(Rol.USER)
-                Rol.VD_ADIMN_ECONOMIA,Rol.ASISTENTE_CONTROL,Rol.RESP_ALMACEN,Rol.USER
-        //               "vicedecano","asistente","responsable_almacen","usuario"
+                // Collections.singleton(Rol.VD_ADIMN_ECONOMIA),
+                // Collections.singleton(Rol.ASISTENTE_CONTROL),
+                // Collections.singleton(Rol.RESP_ALMACEN),
+                // Collections.singleton(Rol.USER)
+                Rol.VD_ADIMN_ECONOMIA, Rol.ASISTENTE_CONTROL, Rol.RESP_ALMACEN, Rol.USER
+        // "vicedecano","asistente","responsable_almacen","usuario"
         );
 
         attachImageUpload(profilePictureUrl, imagePreview);
@@ -118,7 +122,7 @@ public class UsuarioForm extends FormLayout {
         close.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         close.addClickShortcut(Key.ESCAPE);
 
-        // binder.addStatusChangeListener(e -> save.setEnabled(binder.isValid()));
+        binder.addStatusChangeListener(e -> save.setEnabled(binder.isValid()));
         buttonlayout.add(save, close);
 
         return buttonlayout;
@@ -126,7 +130,7 @@ public class UsuarioForm extends FormLayout {
 
     public void setUser(User usuario) {
         this.usuario = usuario;
-        // binder.readBean(usuario);
+        binder.readBean(usuario);
         if (usuario == null) {
             this.imagePreview.setSrc("");
         } else {
@@ -135,19 +139,19 @@ public class UsuarioForm extends FormLayout {
     }
 
     private void validateAndSave() {
-        // try {
-//            binder.writeBean(usuario);
-        this.usuario.setProfilePictureUrl(imagePreview.getSrc());
-        fireEvent(new SaveEvent(this, usuario));
-        //    } catch (ValidationException e) {
-        //  e.printStackTrace();
-        Notification notification = Notification.show(
-                "Ocurrió un problema al intentar actualizar el usuario",
-                5000,
-                Notification.Position.MIDDLE
-        );
-        notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
-        // }
+        try {
+            binder.writeBean(usuario);
+            this.usuario.setProfilePictureUrl(imagePreview.getSrc());
+            this.usuario.setRoles(Stream.of(Rol.USER,roles.getValue()).collect(Collectors.toSet()));
+            fireEvent(new SaveEvent(this, usuario));
+        } catch (ValidationException e) {
+            e.printStackTrace();
+            Notification notification = Notification.show(
+                    "Ocurrió un problema al intentar actualizar el usuario",
+                    5000,
+                    Notification.Position.MIDDLE);
+            notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+        }
     }
 
     private void configuracionErroresImagen() {
@@ -158,7 +162,8 @@ public class UsuarioForm extends FormLayout {
 
         i18n.getError()
                 .setFileIsTooBig("El archivo excede el tamaño máximo permitido de 400 Kb.")
-                .setIncorrectFileType("El archivo seleccionado no es una imágen.");;
+                .setIncorrectFileType("El archivo seleccionado no es una imágen.");
+        ;
         profilePictureUrl.setI18n(i18n);
 
     }
@@ -176,8 +181,7 @@ public class UsuarioForm extends FormLayout {
             Notification notification = Notification.show(
                     errorMessage,
                     5000,
-                    Notification.Position.MIDDLE
-            );
+                    Notification.Position.MIDDLE);
 
             notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
         });

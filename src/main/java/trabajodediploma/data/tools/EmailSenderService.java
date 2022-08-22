@@ -5,12 +5,15 @@
  */
 package trabajodediploma.data.tools;
 
-import java.io.File;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+import java.io.File;
 
 
 /**
@@ -20,20 +23,20 @@ import org.springframework.stereotype.Service;
 @Service
 public class EmailSenderService {
 
-//    @Autowired
-//    private JavaMailSender mailSender;
+    @Autowired
+    private JavaMailSender mailSender;
 
     public void sendSimpleEmail(String toEmail,
             String subject,
             String body
     ) {
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("leiniercaraballo08@gmail.com");
+        message.setFrom("lcaraballo98@nauta.cu");
         message.setTo(toEmail);
         message.setText(body);
         message.setSubject(subject);
-//        mailSender.send(message);
-        System.out.println("Mail Send...");
+        mailSender.send(message);
+        System.out.println("Email enviado con éxito...");
 
     }
 }

@@ -7,7 +7,6 @@ import com.vaadin.flow.theme.Theme;
 import java.util.Collections;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.mail.MessagingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +17,6 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import org.springframework.context.event.EventListener;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import trabajodediploma.data.Rol;
-import trabajodediploma.data.entity.TarjetaPrestamoEstudiante;
 import trabajodediploma.data.entity.User;
 import trabajodediploma.data.repository.UserRepository;
 import trabajodediploma.data.tools.EmailSenderService;
@@ -32,7 +30,10 @@ import trabajodediploma.data.tools.EmailSenderService;
  */
 @SpringBootApplication
 @Theme(value = "scdrm")
-@PWA(name = "GENIUS", shortName = "GENIUS", offlineResources = {"images/logo.png"})
+@PWA(   name = "GENIUS", 
+        shortName = "GENIUS",
+        offlinePath="offline.html", 
+        offlineResources = { "images/logo.png", "images/offline.png"  })
 @NpmPackage(value = "line-awesome", version = "1.3.0")
 public class Application extends SpringBootServletInitializer implements AppShellConfigurator {
 
@@ -57,7 +58,7 @@ public class Application extends SpringBootServletInitializer implements AppShel
         logger.info("Generating demo data");
         logger.info("... generando 1 Usuario");
 
-        //Vicedecano
+        // Vicedecano
         createUser1("User", "user", "user");
         createUser2("Asistente", "asistente", "asistente");
         createUser3("Almacenero", "almacen", "almacen");
@@ -111,7 +112,8 @@ public class Application extends SpringBootServletInitializer implements AppShel
         user.setName(name);
         user.setUsername(username);
         user.setHashedPassword(passwordEncoder.encode(password));
-        user.setRoles(Stream.of(Rol.ADMIN, Rol.VD_ADIMN_ECONOMIA, Rol.RESP_ALMACEN, Rol.ASISTENTE_CONTROL, Rol.USER).collect(Collectors.toSet()));
+        user.setRoles(Stream.of(Rol.ADMIN, Rol.VD_ADIMN_ECONOMIA, Rol.RESP_ALMACEN, Rol.ASISTENTE_CONTROL, Rol.USER)
+                .collect(Collectors.toSet()));
         userRepository.saveAndFlush(user);
         return user;
     }
@@ -126,15 +128,13 @@ public class Application extends SpringBootServletInitializer implements AppShel
         return user;
     }
 
-//    @Autowired
-//    private EmailSenderService senderService;
+    @Autowired
+    private EmailSenderService senderService;
 
-//    @EventListener(ApplicationReadyEvent.class)
-//    public void triggerMail() throws MessagingException {
-//        senderService.sendSimpleEmail("leiniercaraballo08@gmail.com",
-//                "This is email body",
-//                "This is email subject");
-//
-//    }
-
+    @EventListener(ApplicationReadyEvent.class)
+    public void triggerMail() {
+    senderService.sendSimpleEmail("leiniercaraballo08@gmail.com",
+    "This is email body",
+    "This is email subject");
+    }
 }
