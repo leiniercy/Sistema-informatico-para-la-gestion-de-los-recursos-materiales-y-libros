@@ -24,8 +24,13 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.shared.Registration;
+
+import java.io.IOException;
+import java.security.InvalidParameterException;
 import java.util.List;
 import java.util.Random;
+
+import javax.mail.MessagingException;
 
 import trabajodediploma.data.entity.Estudiante;
 import trabajodediploma.data.entity.Grupo;
@@ -133,19 +138,29 @@ public class CrearEstudianteForm extends FormLayout {
         codigo.setEnabled(false);
 
         btn_codigo.addClassName("div_codigo__btn");
+
         btn_codigo.addClickListener(click -> {
-            codigo.setEnabled(true);
-            senderService.sendSimpleEmail(
-                    /* enviado a: */ email.getValue(),
-                    /* asunto: */ "Código de identificación",
-                    /* mensaje: */ "Bienvenido a Genius \n"
-                            + "Su código de identificación es: "
-                            + codigo_buffer.toString());
-            Notification notification = Notification.show(
-                    "El código de identificación ha enviado a su correo electrónico",
-                    5000,
-                    Notification.Position.BOTTOM_START);
-            notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+            try {
+                senderService.sendSimpleEmail(
+                        /* enviado a: */ email.getValue(),
+                        /* asunto: */ "Código de identificación",
+                        /* mensaje: */ "Bienvenido a Genius \n"
+                                + "Su código de identificación es: "
+                                + codigo_buffer.toString());
+                Notification notification = Notification.show(
+                        "El código de identificación ha enviado a su correo electrónico",
+                        2000,
+                        Notification.Position.BOTTOM_START);
+                notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+                codigo.setEnabled(true);
+            } catch (Exception e) {
+                // TODO: handle exception
+                Notification notification = Notification.show(
+                        "Error al enviar correo electrónico a la dirección de correo seleccionada",
+                        2000,
+                        Notification.Position.MIDDLE);
+                notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+            }
         });
         div_codigo.add(btn_codigo, codigo);
         /* Fin->Codigo */
@@ -193,7 +208,7 @@ public class CrearEstudianteForm extends FormLayout {
             } else {
                 Notification notification = Notification.show(
                         "Código de identificación incorrecto",
-                        5000,
+                        2000,
                         Notification.Position.MIDDLE);
                 notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
             }
@@ -201,7 +216,7 @@ public class CrearEstudianteForm extends FormLayout {
             e.printStackTrace();
             Notification notification = Notification.show(
                     "Ocurrió un problema al intentar guardar el estudiante",
-                    5000,
+                    2000,
                     Notification.Position.MIDDLE);
             notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
         }

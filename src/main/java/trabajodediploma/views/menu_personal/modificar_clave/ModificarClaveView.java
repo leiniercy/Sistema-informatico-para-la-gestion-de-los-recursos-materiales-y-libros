@@ -9,9 +9,6 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import trabajodediploma.data.entity.User;
 import trabajodediploma.data.service.UserService;
@@ -48,7 +45,7 @@ public class ModificarClaveView extends Div {
             userService.save(event.getUser());
             Notification notification = Notification.show(
                     "clave modificada",
-                    5000,
+                    2000,
                     Notification.Position.BOTTOM_START
             );
             notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
