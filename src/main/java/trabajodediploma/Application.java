@@ -128,13 +128,13 @@ public class Application extends SpringBootServletInitializer implements AppShel
         return user;
     }
 
-    @Autowired
-    private EmailSenderService senderService;
+    // @Autowired
+    // private EmailSenderService senderService;
 
-    @EventListener(ApplicationReadyEvent.class)
-    public void triggerMail() {
-    senderService.sendSimpleEmail("leiniercaraballo08@gmail.com",
-    "This is email body",
-    "This is email subject");
-    }
+    // @EventListener(ApplicationReadyEvent.class)
+    // public void triggerMail() {
+    // senderService.sendSimpleEmail("leiniercaraballo08@gmail.com",
+    // "This is email body",
+    // "This is email subject");
+    // }
 }

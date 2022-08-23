@@ -247,7 +247,7 @@ public class MainLayout extends AppLayout {
                     5000,
                     Notification.Position.MIDDLE
             );
-            notification.addThemeVariants(NotificationVariant.LUMO_PRIMARY);
+            notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
         } else {
             modificarPerfil.open();
         }

@@ -37,6 +37,8 @@ html {
   --lumo-success-color-50pct: rgba(20, 184, 143, 0.5);
   --lumo-success-color-10pct: rgba(20, 184, 143, 0.1);
   --lumo-primary-color: #253d6d;
+  --lumo-info-color: #0dcaf0;
+  --lumo-warning-color: #ffc107;
   --lumo-error-color: hsl(346, 100%, 61%);
   --lumo-success-color: hsl(165, 80%, 40%);
   --lumo-header-text-color: hsl(285, 35%, 15%);

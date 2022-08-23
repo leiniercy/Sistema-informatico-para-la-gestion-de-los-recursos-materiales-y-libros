@@ -13,7 +13,6 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Autowired;
 import trabajodediploma.data.entity.Estudiante;
 import trabajodediploma.data.entity.Trabajador;
 import trabajodediploma.data.entity.User;
@@ -21,6 +20,7 @@ import trabajodediploma.data.service.AreaService;
 import trabajodediploma.data.service.EstudianteService;
 import trabajodediploma.data.service.GrupoService;
 import trabajodediploma.data.service.TrabajadorService;
+import trabajodediploma.data.tools.EmailSenderService;
 
 /**
  *
@@ -33,6 +33,7 @@ public class CrearInformacionPerfilView extends VerticalLayout {
     GrupoService grupoService;
     EstudianteService estudianteService;
     TrabajadorService trabajadorService;
+    EmailSenderService senderService;
     Select<String> selection;
     CrearEstudianteForm form_estudiante;
     CrearTrabajadorForm form_trabajador;
@@ -41,10 +42,11 @@ public class CrearInformacionPerfilView extends VerticalLayout {
 
     public CrearInformacionPerfilView(
             User user,
-            @Autowired EstudianteService estudianteService,
-            @Autowired TrabajadorService trabajadorService,
-            @Autowired AreaService areaService,
-            @Autowired GrupoService grupoService,
+             EstudianteService estudianteService,
+             TrabajadorService trabajadorService,
+             AreaService areaService,
+             GrupoService grupoService,
+             EmailSenderService senderService,
             Dialog dialog
     ) {
         this.user = user;
@@ -52,6 +54,7 @@ public class CrearInformacionPerfilView extends VerticalLayout {
         this.trabajadorService = trabajadorService;
         this.areaService = areaService;
         this.grupoService = grupoService;
+        this.senderService = senderService;
         this.dialog = dialog;
 
         Configuracion();
@@ -73,10 +76,10 @@ public class CrearInformacionPerfilView extends VerticalLayout {
 
     private void Configuracion() {
 
-        form_estudiante = new CrearEstudianteForm(grupoService.findAll(), user);
+        form_estudiante = new CrearEstudianteForm(grupoService.findAll(), user, senderService);
         form_estudiante.addListener(CrearEstudianteForm.SaveEvent.class, this::saveEstudiante);
         form_estudiante.addListener(CrearEstudianteForm.CloseEvent.class, e -> closeEstudianteEditor());
-        form_trabajador = new CrearTrabajadorForm(areaService.findAll(), user);
+        form_trabajador = new CrearTrabajadorForm(areaService.findAll(), user, senderService);
         form_trabajador.addListener(CrearTrabajadorForm.SaveEvent.class, this::saveTrabajador);
         form_trabajador.addListener(CrearTrabajadorForm.CloseEvent.class, e -> closeTrabajadorEditor());
         container = new Div();
@@ -141,10 +144,10 @@ public class CrearInformacionPerfilView extends VerticalLayout {
 
     //close
     private void closeEstudianteEditor() {
-        form_estudiante.setEstudiante(null);
+        dialog.close();
+        form_estudiante.setEstudiante(new Estudiante());
         form_estudiante.setVisible(false);
         removeClassName("editing");
-        dialog.close();
     }
 
     //Trabajador
@@ -199,10 +202,10 @@ public class CrearInformacionPerfilView extends VerticalLayout {
 
     //close
     private void closeTrabajadorEditor() {
-        form_trabajador.setTrabajador(null);
+        dialog.close();
+        form_trabajador.setTrabajador(new Trabajador());
         form_trabajador.setVisible(false);
         removeClassName("editing");
-        dialog.close();
     }
 
 }

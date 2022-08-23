@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import trabajodediploma.data.entity.User;
 import trabajodediploma.data.service.UserService;
+import trabajodediploma.data.tools.EmailSenderService;
 
 /**
  *
@@ -29,7 +30,10 @@ public class CrearUsuarioView extends VerticalLayout {
     PasswordEncoder passwordEncoder;
     Dialog dialog;
 
-    public CrearUsuarioView(UserService userService, PasswordEncoder passwordEncoder, Dialog dialog) {
+    public CrearUsuarioView(
+            UserService userService,
+            PasswordEncoder passwordEncoder,
+            Dialog dialog) {
         addClassName("crear-usuario-view");
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
@@ -54,24 +58,21 @@ public class CrearUsuarioView extends VerticalLayout {
         List<User> listUsuario = userService.findAll();
 
         listUsuario = listUsuario.parallelStream()
-                .filter(user -> event.getUser().getUsername().equals(user.getUsername())
-                )
+                .filter(user -> event.getUser().getUsername().equals(user.getUsername()))
                 .collect(Collectors.toList());
 
         if (listUsuario.size() != 0) {
             Notification notification = Notification.show(
                     "El usuario ya existe",
                     5000,
-                    Notification.Position.MIDDLE
-            );
+                    Notification.Position.MIDDLE);
             notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
         } else {
             userService.save(event.getUser());
             Notification notification = Notification.show(
                     "registro exitoso",
                     5000,
-                    Notification.Position.BOTTOM_START
-            );
+                    Notification.Position.BOTTOM_START);
             notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
             closeEditor();
         }

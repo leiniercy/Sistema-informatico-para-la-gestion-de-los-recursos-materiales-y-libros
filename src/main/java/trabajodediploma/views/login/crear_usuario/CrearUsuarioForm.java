@@ -33,6 +33,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.util.UriUtils;
 import trabajodediploma.data.Rol;
 import trabajodediploma.data.entity.User;
+import trabajodediploma.data.tools.EmailSenderService;
 import trabajodediploma.data.tools.MyUploadI18n;
 
 /**
@@ -42,13 +43,15 @@ import trabajodediploma.data.tools.MyUploadI18n;
 public class CrearUsuarioForm extends FormLayout {
 
     private PasswordEncoder passwordEncoder;
+    private EmailSenderService senderService;
     private User user;
+  
     private Image imagePreview;
-    Upload profilePictureUrl;
-    TextField name;
-    TextField username;
-    PasswordField hashedPassword;
-    PasswordField confirmPassword;
+    Upload profilePictureUrl = new Upload();
+    TextField name = new TextField();
+    TextField username = new TextField();
+    PasswordField hashedPassword = new PasswordField();
+    PasswordField confirmPassword = new PasswordField();
 
     Button save = new Button("Añadir", VaadinIcon.PLUS.create());
     Button close = new Button("Cancelar", VaadinIcon.ERASER.create());
@@ -58,7 +61,7 @@ public class CrearUsuarioForm extends FormLayout {
     public CrearUsuarioForm(PasswordEncoder passwordEncoder) {
         this.passwordEncoder = passwordEncoder;
         Configuracion();
-        add(profilePictureUrl, name, username, hashedPassword, confirmPassword, createButtonsLayout());
+        add(profilePictureUrl, name, username, hashedPassword, confirmPassword,createButtonsLayout());
     }
 
     private void Configuracion() {
@@ -69,15 +72,13 @@ public class CrearUsuarioForm extends FormLayout {
         imageSize.getStyle().set("color", "var(--lumo-secondary-text-color)");
         imagePreview = new Image();
         imagePreview.setWidth("100%");
-        profilePictureUrl = new Upload();
         profilePictureUrl.getStyle().set("box-sizing", "border-box");
         profilePictureUrl.getElement().appendChild(imagePreview.getElement());
         Button uploadButton = new Button("Seleccionar imagen...");
         uploadButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         profilePictureUrl.setUploadButton(uploadButton);
         /*Fin->imagen*/
- /*nombre*/
-        name = new TextField();
+        /*nombre*/
         name.setPlaceholder("Nombre y apellidos ...");
         name.setRequired(true);
         name.setMinLength(2);
@@ -87,15 +88,13 @@ public class CrearUsuarioForm extends FormLayout {
             event.getSource().setHelperText(event.getValue().length() + "/" + 255);
         });
         /*Fin->nombre*/
- /*usuario*/
-        username = new TextField();
+        /*usuario*/
         username.setPlaceholder("Usuario...");
         username.setRequired(true);
         username.setMinLength(2);
         username.setMaxLength(255);
         /*Fin->usuario*/
- /*contrasena*/
-        hashedPassword = new PasswordField();
+         /*contrasena*/
         hashedPassword.setPlaceholder("Contraseña...");
         hashedPassword.setMinLength(8);
         hashedPassword.setMaxLength(255);
@@ -104,8 +103,7 @@ public class CrearUsuarioForm extends FormLayout {
             event.getSource().setHelperText(event.getValue().length() + "/" + 255);
         });
         /*Fin->Contrasena*/
- /*confirmacion*/
-        confirmPassword = new PasswordField();
+        /*confirmacion*/
         confirmPassword.setPlaceholder("Confirmar contraseña...");
         confirmPassword.setMinLength(8);
         confirmPassword.setMaxLength(255);
@@ -114,6 +112,7 @@ public class CrearUsuarioForm extends FormLayout {
             event.getSource().setHelperText(event.getValue().length() + "/" + 255);
         });
         /*Fin->confirmacion*/
+        
         attachImageUpload(profilePictureUrl, imagePreview);
     }
 

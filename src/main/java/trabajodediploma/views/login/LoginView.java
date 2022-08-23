@@ -16,6 +16,7 @@ import com.vaadin.flow.router.Route;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import trabajodediploma.data.service.UserService;
+import trabajodediploma.data.tools.EmailSenderService;
 
 @PageTitle("Login")
 @Route(value = "login")
@@ -35,7 +36,7 @@ public class LoginView extends Div implements BeforeEnterObserver {
         addClassName("login-view");
         this.userService = userService;
         this.passwordEncoder  = passwordEncoder;
-        Configuracion(userService);
+        Configuracion();
 
         LoginI18n i18n = LoginI18n.createDefault();
 
@@ -63,7 +64,7 @@ public class LoginView extends Div implements BeforeEnterObserver {
         add(loginOverlay);
     }
 
-    private void Configuracion(UserService userService) {
+    private void Configuracion() {
 
         dialog = new Dialog();
         crearUsuario = new CrearUsuarioView(userService, passwordEncoder,dialog);

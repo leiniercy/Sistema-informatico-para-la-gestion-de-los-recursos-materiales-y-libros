@@ -24,6 +24,30 @@
   right: 16px;
   font-size: 18px;
 }
+
+.div_codigo{
+width: 100%;
+display: flex;
+flex-direction: row;
+flex-wrap: nowrap;
+
+}
+.div_codigo__input{
+flex-grow: 2;
+}
+.div_codigo__btn{
+ flex-grow: 1;
+ background-color: var( --lumo-primary-text-color);
+ color: #fff;
+ transition: background-color 0.2s, transform 0.2s, color 0.2s 0.2s;
+}
+.div_codigo__btn:focus{
+  background-color: var(--lumo-primary-color-50pct);
+  color: #fff;
+}
+.div_codigo__btn:active{
+  transform: scale(0.95);
+}
 /*Fin -> Header crear usuario*/
 
 /* Pagina de inicio*/
