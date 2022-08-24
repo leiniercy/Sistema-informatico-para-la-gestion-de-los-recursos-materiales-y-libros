@@ -38,7 +38,7 @@ public class Estudiante extends AbstractEntity {
     @EqualsAndHashCode.Include
     @ToString.Include
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne()
     private User user;
 
     
@@ -67,7 +67,7 @@ public class Estudiante extends AbstractEntity {
     
     @NotNull(message = "debe elegir un campo")
     @JoinColumn(name = "grupo_id",nullable = false, updatable = false )
-    @ManyToOne(optional = false, cascade = CascadeType.ALL)
+    @ManyToOne(optional = false)
     private Grupo grupo;
 
     @OneToMany(mappedBy = "estudiante", cascade = CascadeType.ALL)

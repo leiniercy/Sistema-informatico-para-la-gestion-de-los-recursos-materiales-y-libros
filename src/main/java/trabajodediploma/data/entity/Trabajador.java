@@ -35,7 +35,7 @@ public class Trabajador extends AbstractEntity {
     @EqualsAndHashCode.Include
     @ToString.Include
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne()
     private User user;
 
     @Email

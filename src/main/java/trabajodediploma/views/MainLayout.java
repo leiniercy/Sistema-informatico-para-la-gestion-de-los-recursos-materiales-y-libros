@@ -36,6 +36,7 @@ import trabajodediploma.data.service.EstudianteService;
 import trabajodediploma.data.service.GrupoService;
 import trabajodediploma.data.service.TrabajadorService;
 import trabajodediploma.data.service.UserService;
+import trabajodediploma.data.tools.EmailSenderService;
 import trabajodediploma.security.AuthenticatedUser;
 import trabajodediploma.views.catalogo.CatalogoView;
 import trabajodediploma.views.inicio.InicioView;
@@ -61,6 +62,7 @@ public class MainLayout extends AppLayout {
     private TrabajadorService trabajadorService;
     private GrupoService grupoService;
     private AreaService areaService;
+    private EmailSenderService senderService;
     private PasswordEncoder passwordEncoder;
     private Div titleDiv;
     private Dialog modificarPerfil;
@@ -117,7 +119,8 @@ public class MainLayout extends AppLayout {
             @Autowired TrabajadorService trabajadorService,
             @Autowired GrupoService grupoService,
             @Autowired AreaService areaService,
-            @Autowired PasswordEncoder passwordEncoder
+            @Autowired PasswordEncoder passwordEncoder,
+            @Autowired EmailSenderService senderService
     ) {
         this.authenticatedUser = authenticatedUser;
         this.accessChecker = accessChecker;
@@ -126,6 +129,7 @@ public class MainLayout extends AppLayout {
         this.trabajadorService = trabajadorService;
         this.grupoService = grupoService;
         this.areaService = areaService;
+        this.senderService = senderService;
         this.passwordEncoder = passwordEncoder;
         setPrimarySection(Section.DRAWER);
         addToNavbar(true, createHeaderContent());
@@ -233,7 +237,7 @@ public class MainLayout extends AppLayout {
     //
     private void ModificarUsuario() {
         modificarPerfil = new Dialog();
-        ModificarPerfilView modificarPerfilView = new ModificarPerfilView(user, userService, estudianteService, trabajadorService, grupoService, areaService, modificarPerfil);
+        ModificarPerfilView modificarPerfilView = new ModificarPerfilView(user, userService, estudianteService, trabajadorService, grupoService, areaService, senderService,modificarPerfil);
         modificarPerfil.add(modificarPerfilView);
 
         List<Estudiante> estudiantes = estudianteService.findAll();

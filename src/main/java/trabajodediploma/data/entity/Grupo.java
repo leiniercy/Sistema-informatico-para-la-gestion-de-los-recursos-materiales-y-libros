@@ -1,6 +1,8 @@
 package trabajodediploma.data.entity;
 
 import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
@@ -41,7 +43,6 @@ public class Grupo extends AbstractEntity {
     @Size(message = "solo puede contener 4 numeros ", max = 4, min = 4)
     private String numero;
 
-    @OneToMany(mappedBy = "grupo")
-    @ElementCollection(fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "grupo", cascade = CascadeType.ALL)
     List<Estudiante> estudiantes;
 }

@@ -12,6 +12,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
@@ -23,9 +24,12 @@ import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.shared.Registration;
 import java.util.List;
+import java.util.Random;
+
 import trabajodediploma.data.entity.Estudiante;
 import trabajodediploma.data.entity.Grupo;
 import trabajodediploma.data.entity.User;
+import trabajodediploma.data.tools.EmailSenderService;
 
 /**
  *
@@ -36,12 +40,17 @@ public class ModificarPerfilEstudianteForm extends FormLayout {
     private User user;
     private Estudiante estudiante;
     private List<Grupo> listGrupos;
+    private EmailSenderService senderService;
+    private StringBuffer codigo_buffer;
+    private Div div_codigo;
     TextField name = new TextField();
     EmailField email = new EmailField();
     TextField solapin = new TextField();
     IntegerField anno_academico = new IntegerField();
     ComboBox<String> facultad = new ComboBox<>();
     ComboBox<Grupo> grupo = new ComboBox<>();
+    TextField codigo = new TextField();
+    Button btn_codigo = new Button("Obtener");
 
     Button save = new Button("Añadir", VaadinIcon.PLUS.create());
     Button close = new Button("Cancelar", VaadinIcon.ERASER.create());
@@ -49,12 +58,13 @@ public class ModificarPerfilEstudianteForm extends FormLayout {
     BeanValidationBinder<Estudiante> binderEstudiante = new BeanValidationBinder<>(Estudiante.class);
     BeanValidationBinder<User> binderUser = new BeanValidationBinder<>(User.class);
 
-    public ModificarPerfilEstudianteForm(List<Grupo> listGrupos, User user,Estudiante estudiante) {
+    public ModificarPerfilEstudianteForm(List<Grupo> listGrupos, User user,Estudiante estudiante,EmailSenderService senderService) {
         this.user = user;
         this.estudiante = estudiante;
         this.listGrupos = listGrupos;
+        this.senderService = senderService;
         Configuration();
-        add(name,email,solapin,anno_academico, facultad, grupo,createButtonsLayout());
+        add(name,email,solapin,anno_academico, facultad, grupo, div_codigo,createButtonsLayout());
     }
 
     //Configuration
@@ -102,6 +112,59 @@ public class ModificarPerfilEstudianteForm extends FormLayout {
         grupo.setItems(listGrupos);
         grupo.setItemLabelGenerator(Grupo::getNumero);
         grupo.setValue(estudiante.getGrupo());
+        /* Codigo */
+
+        // Los caracteres de interés en un array de char.
+        char[] chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
+        // Longitud del array de char.
+        int charsLength = chars.length;
+        // Instanciamos la clase Random
+        Random random = new Random();
+        // Un StringBuffer para componer la cadena aleatoria de forma eficiente
+        codigo_buffer = new StringBuffer();
+        // Bucle para elegir una cadena de 6 caracteres al azar
+        for (int i = 0; i < 6; i++) {
+            // Añadimos al buffer un caracter al azar del array
+            codigo_buffer.append(chars[random.nextInt(charsLength)]);
+        }
+
+        div_codigo = new Div();
+        div_codigo.addClassName("div_codigo");
+
+        codigo.addClassName("div_codigo__input");
+        codigo.setPlaceholder("Código");
+        codigo.setMinLength(6);
+        codigo.setMaxLength(6);
+        codigo.setErrorMessage("mínimo 6 caracteres");
+        codigo.setEnabled(false);
+
+        btn_codigo.addClassName("div_codigo__btn");
+
+        btn_codigo.addClickListener(click -> {
+            try {
+                senderService.sendSimpleEmail(
+                        /* enviado a: */ email.getValue(),
+                        /* asunto: */ "Código de identificación",
+                        /* mensaje: */ "Bienvenido a Genius \n"
+                                + "Su código de identificación es: "
+                                + codigo_buffer.toString());
+                Notification notification = Notification.show(
+                        "El código de identificación ha enviado a su correo electrónico",
+                        2000,
+                        Notification.Position.BOTTOM_START);
+                notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+                codigo.setEnabled(true);
+            } catch (Exception e) {
+                // TODO: handle exception
+                Notification notification = Notification.show(
+                        "Error al enviar correo electrónico a la dirección de correo seleccionada",
+                        2000,
+                        Notification.Position.MIDDLE);
+                notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+            }
+        });
+        div_codigo.add(btn_codigo, codigo);
+        /* Fin->Codigo */
     }
 
     //Buttons 
@@ -136,6 +199,7 @@ public class ModificarPerfilEstudianteForm extends FormLayout {
     //Validate and Save
     private void validateAndSave() {
         try {
+            if (codigo.getValue() != codigo_buffer.toString()) {
             binderEstudiante.writeBean(estudiante);
             binderUser.writeBean(user);
             //user
@@ -148,11 +212,18 @@ public class ModificarPerfilEstudianteForm extends FormLayout {
             this.estudiante.setSolapin(solapin.getValue());
             this.estudiante.setUser(user);
             fireEvent(new SaveEvent(this, estudiante,user));
+        } else {
+            Notification notification = Notification.show(
+                    "Código de identificación incorrecto",
+                    2000,
+                    Notification.Position.MIDDLE);
+            notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+        }
         } catch (ValidationException e) {
             e.printStackTrace();
             Notification notification = Notification.show(
                     "Ocurrió un problema al intentar guardar el estudiante",
-                    5000,
+                    2000,
                     Notification.Position.MIDDLE
             );
             notification.addThemeVariants(NotificationVariant.LUMO_ERROR);

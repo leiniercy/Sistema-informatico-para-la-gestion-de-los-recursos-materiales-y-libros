@@ -19,6 +19,7 @@ import trabajodediploma.data.service.EstudianteService;
 import trabajodediploma.data.service.GrupoService;
 import trabajodediploma.data.service.TrabajadorService;
 import trabajodediploma.data.service.UserService;
+import trabajodediploma.data.tools.EmailSenderService;
 
 /**
  *
@@ -32,6 +33,7 @@ public class ModificarPerfilView extends Div {
     private TrabajadorService trabajadorService;
     private GrupoService grupoService;
     private AreaService areaService;
+    private EmailSenderService senderService;
     private Dialog dialog;
     private List<Estudiante> estudiantes;
     private List<Trabajador> trabajadores;
@@ -47,6 +49,7 @@ public class ModificarPerfilView extends Div {
             TrabajadorService trabajadorService,
             GrupoService grupoService,
             AreaService areaService,
+            EmailSenderService senderService,
             Dialog dialog
     ) {
         this.user = user;
@@ -55,6 +58,7 @@ public class ModificarPerfilView extends Div {
         this.trabajadorService = trabajadorService;
         this.grupoService = grupoService;
         this.areaService = areaService;
+        this.senderService = senderService;
         this.dialog = dialog;
         Configuration();
         add(container);
@@ -73,7 +77,7 @@ public class ModificarPerfilView extends Div {
         if (estudiantes.size() != 0) {
             container.removeAll();
             Estudiante est = estudiantes.get(0);
-            estudianteForm = new ModificarPerfilEstudianteForm(grupoService.findAll(), user, est);
+            estudianteForm = new ModificarPerfilEstudianteForm(grupoService.findAll(), user, est, senderService);
             estudianteForm.addListener(ModificarPerfilEstudianteForm.SaveEvent.class, this::saveEstudiante);
             estudianteForm.addListener(ModificarPerfilEstudianteForm.CloseEvent.class, e -> closeEstudianteEditor());
             editEstudiante(est, user);
@@ -81,7 +85,7 @@ public class ModificarPerfilView extends Div {
         } else if (trabajadores.size() != 0) {
             container.removeAll();
             Trabajador trab = trabajadores.get(0);
-            trabajadorForm = new ModificarPerfilTrabajadorForm(areaService.findAll(), user, trab);
+            trabajadorForm = new ModificarPerfilTrabajadorForm(areaService.findAll(), user, trab,senderService);
             trabajadorForm.addListener(ModificarPerfilTrabajadorForm.SaveEvent.class, this::saveTrabajador);
             trabajadorForm.addListener(ModificarPerfilTrabajadorForm.CloseEvent.class, e -> closeTrabajadorEditor());
             editTrabajador(trab,user);
@@ -113,10 +117,10 @@ public class ModificarPerfilView extends Div {
                 )
                 .collect(Collectors.toList());
 
-        if (listEstudiante.size() != 0 || listUsuario.size() != 0) {
+        if (listEstudiante.size() != 0 && listUsuario.size() != 0) {
             Notification notification = Notification.show(
                     "Debe modificar al menos un campo",
-                    5000,
+                    2000,
                     Notification.Position.MIDDLE
             );
             notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
@@ -125,7 +129,7 @@ public class ModificarPerfilView extends Div {
             userService.update(event.getUser());
             Notification notification = Notification.show(
                     "Su información de perfil ha sido modificada",
-                    5000,
+                    2000,
                     Notification.Position.BOTTOM_START
             );
             notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
@@ -146,7 +150,7 @@ public class ModificarPerfilView extends Div {
 
     //close
     private void closeEstudianteEditor() {
-        estudianteForm.setEstudiante(null, null);
+        estudianteForm.setEstudiante(new Estudiante(), new User());
         estudianteForm.setVisible(false);
         removeClassName("editing");
         dialog.close();
@@ -175,10 +179,10 @@ public class ModificarPerfilView extends Div {
                 )
                 .collect(Collectors.toList());
 
-        if (listTrabajadores.size() != 0 || listUsuario.size() != 0) {
+        if (listTrabajadores.size() != 0 && listUsuario.size() != 0) {
             Notification notification = Notification.show(
                     "Debe modificar al menos un campo",
-                    5000,
+                    2000,
                     Notification.Position.MIDDLE
             );
             notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
@@ -187,7 +191,7 @@ public class ModificarPerfilView extends Div {
             trabajadorService.update(event.getTrabajador());
             Notification notification = Notification.show(
                     "Su información de perfil ha sido modificada",
-                    5000,
+                    2000,
                     Notification.Position.BOTTOM_START
             );
             notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
@@ -208,7 +212,7 @@ public class ModificarPerfilView extends Div {
 
     //close
     private void closeTrabajadorEditor() {
-        trabajadorForm.setTrabajador(null,null);
+        trabajadorForm.setTrabajador(new Trabajador(),new User());
         trabajadorForm.setVisible(false);
         removeClassName("editing");
         dialog.close();
