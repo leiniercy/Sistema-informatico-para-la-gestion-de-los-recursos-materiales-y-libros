@@ -48,7 +48,7 @@ import trabajodediploma.views.footer.MyFooter;
 @RolesAllowed("RESP_ALMACEN")
 public class LibroView extends Div {
 
-    private Grid<Libro> grid;
+    private Grid<Libro> grid = new Grid<>(Libro.class, false);
     LibroService libroService;
     GridListDataView<Libro> gridListDataView;
     Grid.Column<Libro> imagenColumn;
@@ -119,9 +119,7 @@ public class LibroView extends Div {
     /* Tabla */
     /* Configuracion de la tabla */
     private void configureGrid() {
-        
-        grid = new Grid<>(Libro.class, false);
-        grid.setClassName("libro-grid");
+        grid.setClassName("grid_content__table");
         LitRenderer<Libro> imagenRenderer = LitRenderer.<Libro>of("<img style='height: 64px' src=${item.imagen} />")
                 .withProperty("imagen", Libro::getImagen);
         imagenColumn = grid.addColumn(imagenRenderer).setHeader("Imagen").setAutoWidth(true);
@@ -373,9 +371,9 @@ public class LibroView extends Div {
                 .filter(lib -> event.getLibro().getImagen().equals(lib.getImagen())
                         && event.getLibro().getTitulo().equals(lib.getTitulo())
                         && event.getLibro().getAutor().equals(lib.getAutor())
-                        && event.getLibro().getVolumen().equals(lib.getVolumen())
-                        && event.getLibro().getTomo().equals(lib.getTomo())
-                        && event.getLibro().getParte().equals(lib.getParte())
+                        && (event.getLibro().getVolumen() != null && event.getLibro().getVolumen().equals(lib.getVolumen()))
+                        && ( event.getLibro().getTomo() != null && event.getLibro().getTomo().equals(lib.getTomo()))
+                        && ( event.getLibro().getParte() != null  && event.getLibro().getParte().equals(lib.getParte()) )
                         && event.getLibro().getCantidad().equals(lib.getCantidad())
                         && event.getLibro().getPrecio().equals(lib.getPrecio()))
                 .collect(Collectors.toList());

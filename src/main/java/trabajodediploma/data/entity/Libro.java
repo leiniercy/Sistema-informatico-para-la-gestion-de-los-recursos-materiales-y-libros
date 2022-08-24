@@ -64,16 +64,17 @@ public class Libro extends AbstractEntity {
     @Column(nullable = true)
     private Integer parte;
 
+    @NotNull(message = "Debe elegir una cantidad")
     @Min(message = "Mínimo 1", value = 1)
-    @Column()
+    @Column(nullable = false)
     private Integer cantidad;
 
+    @NotNull(message = "Debe elegir un precio")
     @Min(message = "Mínimo 0", value = 0)
-    @Column()
+    @Column(nullable = false)
     private Double precio;
     
     @OneToMany(mappedBy = "libro",cascade = CascadeType.ALL)
-    @ElementCollection(fetch = FetchType.EAGER)
     private List<TarjetaPrestamo> tarjetas;
 
 }

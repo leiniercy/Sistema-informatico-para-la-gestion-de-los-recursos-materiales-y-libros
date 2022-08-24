@@ -1,6 +1,8 @@
 package trabajodediploma.data.entity;
 
 import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -36,7 +38,7 @@ public class Estudiante extends AbstractEntity {
     @EqualsAndHashCode.Include
     @ToString.Include
 
-    @OneToOne()
+    @OneToOne(cascade = CascadeType.ALL)
     private User user;
 
     
@@ -65,13 +67,13 @@ public class Estudiante extends AbstractEntity {
     
     @NotNull(message = "debe elegir un campo")
     @JoinColumn(name = "grupo_id",nullable = false, updatable = false )
-    @ManyToOne(optional = false,fetch = FetchType.EAGER)
+    @ManyToOne(optional = false, cascade = CascadeType.ALL)
     private Grupo grupo;
 
-    @OneToMany(mappedBy = "estudiante")
+    @OneToMany(mappedBy = "estudiante", cascade = CascadeType.ALL)
     List<DestinoFinalEstudiante> destinoFinal;
 
-    @OneToMany(mappedBy = "estudiante")
+    @OneToMany(mappedBy = "estudiante", cascade = CascadeType.ALL)
     List<TarjetaPrestamoEstudiante> tarjetaPrestamo;
     
     public String getNombreApellidos() {

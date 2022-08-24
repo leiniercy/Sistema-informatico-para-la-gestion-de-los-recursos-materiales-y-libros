@@ -1,6 +1,8 @@
 package trabajodediploma.data.entity;
 
 import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
@@ -33,7 +35,7 @@ public class Trabajador extends AbstractEntity {
     @EqualsAndHashCode.Include
     @ToString.Include
 
-    @OneToOne()
+    @OneToOne(cascade = CascadeType.ALL)
     private User user;
 
     @Email
@@ -60,10 +62,10 @@ public class Trabajador extends AbstractEntity {
     @ManyToOne()
     private Area area;
     
-    @OneToMany(mappedBy = "trabajador")
+    @OneToMany(mappedBy = "trabajador", cascade = CascadeType.ALL)
     List<DestinoFinalTrabajador> destinoFinal;
 
-    @OneToMany(mappedBy = "trabajador")
+    @OneToMany(mappedBy = "trabajador", cascade = CascadeType.ALL)
     List<TarjetaPrestamoTrabajador> tarjetaPrestamo;
 
     public String getNombreApellidos() {

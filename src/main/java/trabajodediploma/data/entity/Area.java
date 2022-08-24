@@ -34,7 +34,6 @@ public class Area extends AbstractEntity {
     private String nombre;
 
     @OneToMany(mappedBy = "area", cascade = CascadeType.ALL)
-    @ElementCollection(fetch = FetchType.EAGER)
     private List<Trabajador> trabajadores;
 
 }

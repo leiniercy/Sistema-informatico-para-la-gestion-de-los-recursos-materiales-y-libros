@@ -3,6 +3,7 @@ package trabajodediploma.data.entity;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToMany;
@@ -43,7 +44,7 @@ public class RecursoMaterial extends AbstractEntity {
     @Min(message = "Mínimo 1", value = 1)
     private Integer cantidad;
     
-    @ManyToMany(mappedBy = "recursosMateriales")
+    @ManyToMany(mappedBy = "recursosMateriales", cascade = CascadeType.ALL)
     Set<Modulo> modulos;
 
 }

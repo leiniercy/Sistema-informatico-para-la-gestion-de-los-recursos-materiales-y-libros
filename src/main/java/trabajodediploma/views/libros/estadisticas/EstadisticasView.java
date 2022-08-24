@@ -10,7 +10,10 @@ import com.vaadin.flow.component.HasStyle;
 import com.vaadin.flow.component.board.Board;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.charts.Chart;
+import com.vaadin.flow.component.charts.export.ExportOptions;
+import com.vaadin.flow.component.charts.export.SVGGenerator;
 import com.vaadin.flow.component.charts.model.ChartType;
+import com.vaadin.flow.component.charts.model.Configuration;
 import com.vaadin.flow.component.charts.model.DataSeries;
 import com.vaadin.flow.component.charts.model.DataSeriesItem;
 import com.vaadin.flow.component.datepicker.DatePicker;
@@ -18,11 +21,15 @@ import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -49,23 +56,24 @@ public class EstadisticasView extends Div {
     private TarjetaPrestamoService prestamoService;
     private Div container;
     private MyFooter footer;
-    private DatePicker endDate;
-    private DatePicker initDate;
+    private DatePicker endDate = new DatePicker("Fecha de fin:");;
+    private DatePicker initDate = new DatePicker("Fecha de inicio:");
     private List<TarjetaPrestamo> tarjetas;
     private List<Libro> listLibros;
-    
+    private Configuration configuration;
+    private Chart chart;
+
     public EstadisticasView(
             @Autowired LibroService libroService,
-            @Autowired TarjetaPrestamoService prestamoService
-    ) {
+            @Autowired TarjetaPrestamoService prestamoService) {
         addClassName("estadistica_view");
         this.libroService = libroService;
         this.prestamoService = prestamoService;
-        
+
         container = new Div();
         container.addClassName("estadistica_view__container");
-        
         footer = new MyFooter();
+
         add(getBarraDeMenu());
         if (initDate.getValue() == null || endDate.getValue() == null) {
             container.removeAll();
@@ -79,9 +87,10 @@ public class EstadisticasView extends Div {
             add(container);
         }
         add(footer);
+
     }
 
-    //actualizar listas
+    // actualizar listas
     private void updateList() {
         if (initDate.getValue() == null || endDate.getValue() == null) {
             listLibros = libroService.findAll();
@@ -90,26 +99,41 @@ public class EstadisticasView extends Div {
             listLibros = libroService.findAll();
             tarjetas = prestamoService.findAll();
             tarjetas = tarjetas.stream().filter(
-                    //fecha_inicio <= x <= fecha_fin            
+                    // fecha_inicio <= x <= fecha_fin
                     event -> event.getFechaPrestamo() != null
-                    &&   (event.getFechaPrestamo().isEqual(initDate.getValue())
-                    || event.getFechaPrestamo().isAfter(initDate.getValue()))
-                    &&   event.getFechaDevolucion() != null      
-                    && (event.getFechaDevolucion().isEqual(endDate.getValue())
-                    || event.getFechaDevolucion().isBefore(endDate.getValue()))
-            ).collect(Collectors.toList());
+                            && (event.getFechaPrestamo().isEqual(initDate.getValue())
+                                    || event.getFechaPrestamo().isAfter(initDate.getValue()))
+                            && event.getFechaDevolucion() != null
+                            && (event.getFechaDevolucion().isEqual(endDate.getValue())
+                                    || event.getFechaDevolucion().isBefore(endDate.getValue())))
+                    .collect(Collectors.toList());
         }
     }
 
+    // Barra de menu
+    private Component getBarraDeMenu() {
+
+        Div buttons = new Div();
+        buttons.addClassNames("estadistica_view___barra_menu__export");
+        Button exportButton = new Button(VaadinIcon.FILE.create());
+        exportButton.addClickListener(click -> exportChart());
+        buttons.add(exportButton);
+
+        Div toolbar = new Div(DatePickerDateRange(), buttons);
+        toolbar.addClassName("estadistica_view___barra_menu");
+        return toolbar;
+    }
+
     private Component getBoard() {
-        
+
         Board board = new Board();
         board.addClassName("estadistica_view__container__basic_board");
         board.addRow(
                 createHighlight("Cantidad real de libros", new Span(String.format("%d", cantRealLibros()))),
-                createHighlight("Cantidad de libros en el álmacen", new Span(String.format("%d", cantRealLibrosAlmacen()))),
-                createHighlight("Cantidad de libros prestados", new Span(String.format("%d", cantRealLibrosPrestados())))
-        );
+                createHighlight("Cantidad de libros en el álmacen",
+                        new Span(String.format("%d", cantRealLibrosAlmacen()))),
+                createHighlight("Cantidad de libros prestados",
+                        new Span(String.format("%d", cantRealLibrosPrestados()))));
         return board;
     }
 
@@ -129,7 +153,7 @@ public class EstadisticasView extends Div {
         return layout;
     }
 
-    //Cantidad real de libros
+    // Cantidad real de libros
     public int cantRealLibros() {
         int cantReal = 0;
         for (int i = 0; i < listLibros.size(); i++) {
@@ -138,7 +162,7 @@ public class EstadisticasView extends Div {
         return cantReal;
     }
 
-    //Cantidad real de libros en el almacen
+    // Cantidad real de libros en el almacen
     public int cantRealLibrosAlmacen() {
         int librosPrestados = 0;
         for (int i = 0; i < tarjetas.size(); i++) {
@@ -150,25 +174,25 @@ public class EstadisticasView extends Div {
         return cantRealLibros() - librosPrestados;
     }
 
-    //Cantidad de libros en manos de los estudiantes
+    // Cantidad de libros en manos de los estudiantes
     public int cantRealLibrosPrestados() {
         return cantRealLibros() - cantRealLibrosAlmacen();
     }
 
-    //Graficos de pasteles
+    // Graficos de pasteles
     private Component getGraficosPasteles() {
         Board board = new Board();
         board.addClassName("estadistica_view__container__grafics_key_board");
         board.addRow(
-                getEstadisticasProrcientoLibros()
-        );
+                getEstadisticasProrcientoLibros());
 
         return board;
     }
 
     private Component getEstadisticasProrcientoLibros() {
+        configuration = new Configuration();
+        chart = new Chart(ChartType.PIE);
 
-        Chart chart = new Chart(ChartType.PIE);
         float promedioP = 0;
         float promedioA = 0;
         if (cantRealLibros() != 0) {
@@ -178,13 +202,15 @@ public class EstadisticasView extends Div {
 
         DataSeries dataSeries = new DataSeries();
         dataSeries.add(new DataSeriesItem(String.format("Libros prestados: %d", cantRealLibrosPrestados()), promedioP));
-        dataSeries.add(new DataSeriesItem(String.format("Libros en el álmacen: %d", cantRealLibrosAlmacen()), promedioA));
+        dataSeries
+                .add(new DataSeriesItem(String.format("Libros en el álmacen: %d", cantRealLibrosAlmacen()), promedioA));
 
         chart.getConfiguration().setSeries(dataSeries);
         chart.getConfiguration().setTitle("Distribución de libros");
         chart.getConfiguration().setSubTitle(String.format("Cantidad real de libros: %d", cantRealLibros()));
+        configuration = chart.getConfiguration();
         chart.addClassNames("text-xl", "mt-m");
-
+        
         VerticalLayout serviceHealth = new VerticalLayout(chart);
         serviceHealth.addClassName("p-l");
         serviceHealth.setPadding(false);
@@ -194,26 +220,12 @@ public class EstadisticasView extends Div {
         return serviceHealth;
     }
 
-    //Barra de menu
-    private Component getBarraDeMenu() {
-
-        Div buttons = new Div();
-        buttons.addClassNames("estadistica_view___barra_menu__export");
-        Button exportButton = new Button(VaadinIcon.FILE.create());
-        buttons.add(exportButton);
-
-        Div toolbar = new Div(DatePickerDateRange(), buttons);
-        toolbar.addClassName("estadistica_view___barra_menu");
-        return toolbar;
-    }
-
-    //Rango de las fechas
+    // Rango de las fechas
     private Component DatePickerDateRange() {
 
         DatePicker.DatePickerI18n singleFormatI18n = new DatePicker.DatePickerI18n();
         singleFormatI18n.setDateFormat("dd.MM.yyyy");
 
-        initDate = new DatePicker("Fecha de inicio:");
         initDate.setI18n(singleFormatI18n);
         initDate.setClearButtonVisible(true);
         initDate.addValueChangeListener(event -> {
@@ -221,7 +233,7 @@ public class EstadisticasView extends Div {
             updateList();
             container.add(getBoard(), getGraficosPasteles());
         });
-        endDate = new DatePicker("Fecha de fin:");
+
         endDate.setI18n(singleFormatI18n);
         endDate.setClearButtonVisible(true);
         endDate.setValue(LocalDate.now());
@@ -234,11 +246,32 @@ public class EstadisticasView extends Div {
         initDate.addValueChangeListener(e -> endDate.setMin(e.getValue()));
         endDate.addValueChangeListener(e -> initDate.setMax(e.getValue()));
 
-        Span  s = new Span("-");
+        Span s = new Span("-");
 
-        Div layout = new Div(initDate, s ,endDate);
+        Div layout = new Div(initDate, s, endDate);
         layout.addClassNames("barra-menu-date");
         return layout;
+    }
+
+    private void exportChart() {
+        Div div = new Div();
+        // configuracion
+        ExportOptions options = new ExportOptions();
+        options.setWidth(800);
+        options.setHeight(600);
+        try (SVGGenerator generator = new SVGGenerator()) {
+            String svg = generator.generate(configuration, options);
+            // previsualizar el svg a exportar
+            div.getElement().setProperty("innerHTML", svg);
+        } catch (IOException | InterruptedException ex) {
+            // handle exceptions accordingly
+            Notification notification = Notification.show(
+                    "Error al exportar el svg",
+                    2000,
+                    Notification.Position.MIDDLE);
+            notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+        }
+
     }
 
 }
