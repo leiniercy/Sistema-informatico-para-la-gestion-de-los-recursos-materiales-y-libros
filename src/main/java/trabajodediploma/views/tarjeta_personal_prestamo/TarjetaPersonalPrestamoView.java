@@ -100,22 +100,24 @@ public class TarjetaPersonalPrestamoView extends Div {
                 Optional<Estudiante> e = estudianteService.findAll().stream()
                         .filter(event -> event.getUser().equals(user))
                         .findFirst();
-                estudiante = e.get();
                 Optional<Trabajador> t = trabajadorService.findAll().stream()
                         .filter(event -> event.getUser().equals(user))
                         .findFirst();
-                trabajador = t.get();
-                if (estudiante == null || trabajador == null) {
-                    Image imageError = new Image("", "Error 202");
+                if (e.isEmpty() && t.isEmpty()) {
+                    Image imageError = new Image("images/autorize-required-401.png", "Error 401");
                     imageError.addClassName("container__img");
                     H1 info = new H1("Información personal no disponible");
                     info.addClassName("container__h1");
+                    container = new Div();
+                    container.addClassName("container");
                     container.add(imageError, info);
-                } else if (estudiante == null) {
+                } else if (!e.isEmpty()) {
+                    estudiante = e.get();
                     updateListEstudiante();
                     configureGrid();
                     getContent();
-                } else if (trabajador == null) {
+                } else if (!t.isEmpty()) {
+                    trabajador = t.get();
                     updateListTrabajador();
                     configureGrid();
                     getContent();

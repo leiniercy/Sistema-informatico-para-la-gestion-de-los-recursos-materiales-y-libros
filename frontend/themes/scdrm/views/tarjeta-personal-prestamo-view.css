@@ -16,10 +16,13 @@
 }
 .container__img{
     flex-grow: 1;
+    border-radius: 50%;
+    width: 500px;
+    max-height: 500px;
+    filter: contrast(1.3) brightness(1) drop-shadow(2px 4px 6px black);
 }
 .container__h1{
-    flex-grow: 1;
-    font-size: var( --lumo-font-size-l );
+    font-size: var( --lumo-font-size-xxl );
     font-family: var(--lumo-font-family);
     color: var(--lumo-primary-text-color);
 }
@@ -33,8 +36,11 @@
 }
 .container__div_info{
     flex-grow: 1;
+    position: relative;
+    text-align: right;
+    margin-right: 15px;
     width: 100%;
-    font-size: var( --lumo-font-size-l );
+    font-size: var( --lumo-font-size-m );
     font-family: var(--lumo-font-family);
     color: var(--lumo-primary-text-color);
 }
