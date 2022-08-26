@@ -38,8 +38,8 @@ public class Estudiante extends AbstractEntity {
     @EqualsAndHashCode.Include
     @ToString.Include
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @OneToOne(optional = false)
+    @JoinColumn(name = "user_id", nullable = false, updatable = false)
     private User user;
 
     

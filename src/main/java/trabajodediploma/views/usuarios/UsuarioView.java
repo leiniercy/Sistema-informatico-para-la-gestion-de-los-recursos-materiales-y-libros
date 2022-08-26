@@ -6,6 +6,7 @@
 package trabajodediploma.views.usuarios;
 
 import com.vaadin.flow.component.Html;
+import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -21,13 +22,16 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.shared.Registration;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -35,6 +39,8 @@ import java.util.stream.Collectors;
 import javax.annotation.security.RolesAllowed;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import trabajodediploma.data.Rol;
 import trabajodediploma.data.entity.User;
 import trabajodediploma.data.service.UserService;
 import trabajodediploma.views.MainLayout;
@@ -70,7 +76,7 @@ public class UsuarioView extends Div {
     private Div header;
 
     public UsuarioView(@Autowired UserService userService) {
-        addClassNames("usuario-view");
+        addClassNames("usuario_view");
         this.userService = userService;
         configureGrid();
         configureForm();
@@ -83,34 +89,33 @@ public class UsuarioView extends Div {
     private Div getContent() {
 
         Div formContent = new Div(form);
-        formContent.addClassName("form-content");
+        formContent.addClassName("form_content");
         Div gridContent = new Div(grid);
-        gridContent.addClassName("grid-content");
-        Div content = new Div(gridContent);
-        content.addClassName("content");
-        content.setSizeFull();
+        gridContent.addClassName("usuario_view__container__div_grid");
+        Div container = new Div(gridContent);
+        container.addClassName("usuario_view__container");
+        container.setSizeFull();
         /* Dialog Header */
         Button closeButton = new Button(new Icon("lumo", "cross"), (e) -> dialog.close());
         closeButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         Span title = new Span("Usuario");
         Div titleDiv = new Div(title);
-        titleDiv.addClassName("div-dialog-title");
+        titleDiv.addClassName("div_dialog_title");
         Div buttonDiv = new Div(closeButton);
-        buttonDiv.addClassName("div-dialog-button");
+        buttonDiv.addClassName("div_dialog_button");
         header = new Div(titleDiv, buttonDiv);
-        header.addClassName("div-dialog-header");
+        header.addClassName("div_dialog_header");
         /* Dialog Header */
 
         dialog = new Dialog(header, formContent);
-        return content;
+        return container;
     }
 
     /* Tabla */
     /* Configuracion de la tabla */
     private void configureGrid() {
 
-        grid.setClassName("user-grid");
-
+        grid.setClassName("usuario_view__container__div_grid");
         LitRenderer<User> imagenRenderer = LitRenderer.<User>of(
                 "<vaadin-horizontal-layout style=\"align-items: center;\" theme=\"spacing\">"
                         + "<vaadin-avatar img=\"${item.profilePictureUrl}\" name=\"${item.name}\" alt=\"User avatar\"></vaadin-avatar>"
@@ -125,11 +130,24 @@ public class UsuarioView extends Div {
 
         userNameColumn = grid.addColumn(User::getUsername).setHeader("Usuario").setAutoWidth(true);
 
-        rolColumn = grid.addColumn(User::getRoles).setHeader("Rol").setAutoWidth(true).setSortable(true);
+        rolColumn = grid.addColumn(new ComponentRenderer<>(Span::new, (span, rol) -> {
+            span.setWidth("100%");
+            List<Rol> rols = new LinkedList<>(rol.getRoles());
+            String listRoles = new String();
+            if (rols.size() != 0) {
+                listRoles += "" + rols.get(0);
+                for (int i = 1; i < rols.size(); i++) {
+                    listRoles += ", " + rols.get(i);
+                }
+            }
+            span.setText(listRoles);
+            ;
+        })).setHeader("Rol").setAutoWidth(true);
 
         editColumn = grid.addComponentColumn(user -> {
             Button editButton = new Button(VaadinIcon.EDIT.create());
             editButton.addClickListener(e -> this.editUser(user));
+            editButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
             return editButton;
         }).setFlexGrow(0);
 
@@ -191,8 +209,10 @@ public class UsuarioView extends Div {
         buttons = new HorizontalLayout();
         Button refreshButton = new Button(VaadinIcon.REFRESH.create());
         refreshButton.addClickListener(click -> refreshGrid());
+        refreshButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         Button deleteButton = new Button(VaadinIcon.TRASH.create());
         deleteButton.addClickListener(click -> deleteLibro());
+        deleteButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
         buttons.add(refreshButton, deleteButton);
 
@@ -261,25 +281,22 @@ public class UsuarioView extends Div {
     }
 
     private void saveUsuario(UsuarioForm.SaveEvent event) {
-        List<User>listUsuarios = userService.findAll();
-        listUsuarios = listUsuarios.parallelStream().filter(u-> event.getUsuario().getRoles().equals(u.getRoles())
-        && event.getUsuario().getName().equals(u.getName())
-        && event.getUsuario().getUsername().equals(u.getUsername())
-        ).collect(Collectors.toList());
+        List<User> listUsuarios = userService.findAll();
+        listUsuarios = listUsuarios.parallelStream().filter(u -> event.getUsuario().getRoles().equals(u.getRoles())
+                && event.getUsuario().getName().equals(u.getName())
+                && event.getUsuario().getUsername().equals(u.getUsername())).collect(Collectors.toList());
         if (listUsuarios.size() != 0) {
             Notification notification = Notification.show(
                     "El usuario ya existe",
                     5000,
-                    Notification.Position.MIDDLE
-            );
+                    Notification.Position.MIDDLE);
             notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
         } else {
             userService.update(event.getUsuario());
             Notification notification = Notification.show(
                     "Usuario modificado",
                     5000,
-                    Notification.Position.BOTTOM_START
-            );
+                    Notification.Position.BOTTOM_START);
             notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
         }
         toolbar.remove(total);

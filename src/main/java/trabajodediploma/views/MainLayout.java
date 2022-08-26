@@ -218,7 +218,7 @@ public class MainLayout extends AppLayout {
 
             new MenuItemInfo("Tarjeta Personal", "la la-columns", TarjetaPersonalPrestamoView.class), //
             
-            new MenuItemInfo("Usuario", "la la-th-user", UsuarioView.class), //
+            new MenuItemInfo("Usuario", "la la-user", UsuarioView.class), //
             
             new MenuItemInfo("Estadística", "la la-chart-bar", EstadisticasView.class), //
 

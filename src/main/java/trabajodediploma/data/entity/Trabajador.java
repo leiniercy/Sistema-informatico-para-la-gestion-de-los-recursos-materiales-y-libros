@@ -35,8 +35,8 @@ public class Trabajador extends AbstractEntity {
     @EqualsAndHashCode.Include
     @ToString.Include
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @JoinColumn(name = "user_id", nullable = false, updatable = false)
+    @OneToOne(optional = false)
     private User user;
 
     @Email

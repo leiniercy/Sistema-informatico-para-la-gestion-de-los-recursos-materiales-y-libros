@@ -53,9 +53,9 @@ public class User extends AbstractEntity {
     @Lob
     private String profilePictureUrl;
 
-    @OneToOne(mappedBy = "user")
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Estudiante estudiante;
 
-    @OneToOne(mappedBy = "user")
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Trabajador trabajador;
 }
