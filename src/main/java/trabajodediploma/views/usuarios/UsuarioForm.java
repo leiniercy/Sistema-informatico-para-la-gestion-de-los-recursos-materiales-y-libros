@@ -21,6 +21,7 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
@@ -33,7 +34,6 @@ import java.util.Base64;
 import java.util.Collections;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import org.springframework.web.util.UriUtils;
 import trabajodediploma.data.Rol;
 
@@ -48,7 +48,9 @@ public class UsuarioForm extends FormLayout {
     Upload profilePictureUrl = new Upload();
     TextField name = new TextField();
     TextField username = new TextField();
-    ComboBox<Rol> roles = new ComboBox<>();
+    PasswordField hashedPassword = new PasswordField();
+    PasswordField confirmPassword = new PasswordField();
+    ComboBox<Rol> rols = new ComboBox<>();
 
     Button save = new Button("Añadir", VaadinIcon.PLUS.create());
     Button close = new Button("Cancelar", VaadinIcon.ERASER.create());
@@ -66,13 +68,11 @@ public class UsuarioForm extends FormLayout {
         imageSize.getStyle().set("color", "var(--lumo-secondary-text-color)");
         imagePreview = new Image();
         imagePreview.setWidth("100%");
-        profilePictureUrl = new Upload();
         profilePictureUrl.getStyle().set("box-sizing", "border-box");
         profilePictureUrl.getElement().appendChild(imagePreview.getElement());
         Button uploadButton = new Button("Seleccionar imagen...");
         uploadButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         profilePictureUrl.setUploadButton(uploadButton);
-
         // name
         name.setLabel("Nombre");
         name.setAutofocus(true);
@@ -83,7 +83,6 @@ public class UsuarioForm extends FormLayout {
         name.addValueChangeListener(event -> {
             event.getSource().setHelperText(event.getValue().length() + "/" + 255);
         });
-
         // username
         username.setLabel("Nombre");
         username.setAutofocus(true);
@@ -94,20 +93,32 @@ public class UsuarioForm extends FormLayout {
         username.addValueChangeListener(event -> {
             event.getSource().setHelperText(event.getValue().length() + "/" + 255);
         });
-
+        /* contrasena */
+        hashedPassword.setPlaceholder("Contraseña...");
+        hashedPassword.setMinLength(8);
+        hashedPassword.setMaxLength(255);
+        hashedPassword.setErrorMessage("mínimo 8 caracteres y máximo 255");
+        hashedPassword.addValueChangeListener(event -> {
+            event.getSource().setHelperText(event.getValue().length() + "/" + 255);
+        });
+        /* Fin->Contrasena */
+        /* confirmacion */
+        confirmPassword.setPlaceholder("Confirmar contraseña...");
+        confirmPassword.setMinLength(8);
+        confirmPassword.setMaxLength(255);
+        confirmPassword.setErrorMessage("mínimo 8 caracteres y máximo 255");
+        confirmPassword.addValueChangeListener(event -> {
+            event.getSource().setHelperText(event.getValue().length() + "/" + 255);
+        });
+        /* Fin->confirmacion */
         // Rol
-        roles.setItems(
-                // Collections.singleton(Rol.VD_ADIMN_ECONOMIA),
-                // Collections.singleton(Rol.ASISTENTE_CONTROL),
-                // Collections.singleton(Rol.RESP_ALMACEN),
-                // Collections.singleton(Rol.USER)
-                Rol.VD_ADIMN_ECONOMIA, Rol.ASISTENTE_CONTROL, Rol.RESP_ALMACEN, Rol.USER
-        // "vicedecano","asistente","responsable_almacen","usuario"
-        );
+        rols.setItems(Rol.VD_ADIMN_ECONOMIA,
+                Rol.ASISTENTE_CONTROL,
+                Rol.RESP_ALMACEN);
 
         attachImageUpload(profilePictureUrl, imagePreview);
 
-        add(roles, createButtonsLayout());
+        add(rols, createButtonsLayout());
     }
 
     private HorizontalLayout createButtonsLayout() {
@@ -131,18 +142,12 @@ public class UsuarioForm extends FormLayout {
     public void setUser(User usuario) {
         this.usuario = usuario;
         binder.readBean(usuario);
-        if (usuario == null) {
-            this.imagePreview.setSrc("");
-        } else {
-            this.imagePreview.setSrc(usuario.getProfilePictureUrl());
-        }
     }
 
     private void validateAndSave() {
         try {
             binder.writeBean(usuario);
-            this.usuario.setProfilePictureUrl(imagePreview.getSrc());
-            this.usuario.setRoles(Stream.of(Rol.USER,roles.getValue()).collect(Collectors.toSet()));
+            this.usuario.setRoles(Stream.of(Rol.USER, rols.getValue()).collect(Collectors.toSet()));
             fireEvent(new SaveEvent(this, usuario));
         } catch (ValidationException e) {
             e.printStackTrace();

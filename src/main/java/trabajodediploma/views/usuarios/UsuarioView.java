@@ -294,7 +294,6 @@ public class UsuarioView extends Div {
         if (user == null) {
             closeEditor();
         } else {
-            user.setProfilePictureUrl("");
             form.setUser(user);
             form.setVisible(true);
             addClassName("editing");

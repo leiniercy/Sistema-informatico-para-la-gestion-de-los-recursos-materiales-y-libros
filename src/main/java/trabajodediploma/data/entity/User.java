@@ -2,13 +2,17 @@ package trabajodediploma.data.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Set;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -49,4 +53,9 @@ public class User extends AbstractEntity {
     @Lob
     private String profilePictureUrl;
 
+    @OneToOne(mappedBy = "user")
+    private Estudiante estudiante;
+
+    @OneToOne(mappedBy = "user")
+    private Trabajador trabajador;
 }

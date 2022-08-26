@@ -185,12 +185,6 @@ public class CrearEstudianteForm extends FormLayout {
     public void setEstudiante(Estudiante estudiante) {
         this.estudiante = estudiante;
         binder.readBean(estudiante);
-        if (user == null) {
-            this.estudiante.setUser(null);
-        } else {
-            this.estudiante.setUser(user);
-            ;
-        }
     }
 
     // Validate and Save
