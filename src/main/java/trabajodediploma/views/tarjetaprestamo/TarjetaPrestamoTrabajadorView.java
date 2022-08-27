@@ -39,6 +39,7 @@ import trabajodediploma.data.entity.Libro;
 import trabajodediploma.data.entity.TarjetaPrestamo;
 import trabajodediploma.data.entity.TarjetaPrestamoTrabajador;
 import trabajodediploma.data.service.TrabajadorService;
+import trabajodediploma.data.tools.EmailSenderService;
 import trabajodediploma.data.service.LibroService;
 import trabajodediploma.data.service.TarjetaPrestamoService;
 
@@ -55,12 +56,13 @@ public class TarjetaPrestamoTrabajadorView extends Div {
     Grid.Column<TarjetaPrestamo> fechaDevolucionColumn;
     Grid.Column<TarjetaPrestamo> editColumn;
     TrabajadorGrid trabajadorGrid;
-    Trabajador trabajador;
-    List<Libro> libros;
-    List<TarjetaPrestamo> prestamos;
-    TarjetaPrestamoService prestamoService;
-    TrabajadorService trabajadorService;
-    LibroService libroService;
+    private Trabajador trabajador;
+    private List<Libro> libros;
+    private List<TarjetaPrestamo> prestamos;
+    private TarjetaPrestamoService prestamoService;
+    private TrabajadorService trabajadorService;
+    private LibroService libroService;
+    private EmailSenderService senderService;
     TarjetaPrestamoTrabajadorForm form;
     private ComboBox<Libro> libroFilter;
     private DatePicker entregaFilter;
@@ -74,15 +76,17 @@ public class TarjetaPrestamoTrabajadorView extends Div {
 
     public TarjetaPrestamoTrabajadorView(
             Trabajador trabajador,
-            @Autowired TarjetaPrestamoService prestamoService,
-            @Autowired TrabajadorService trabajadorService,
-            @Autowired LibroService libroService) {
+            TarjetaPrestamoService prestamoService,
+            TrabajadorService trabajadorService,
+            LibroService libroService,
+            EmailSenderService senderService) {
 
         addClassName("container__tarjeta");
         this.trabajador = trabajador;
         this.prestamoService = prestamoService;
         this.trabajadorService = trabajadorService;
         this.libroService = libroService;
+        this.senderService = senderService;
         this.libros = libroService.findAll();
         prestamos = new LinkedList<>();
         updateList();
@@ -303,7 +307,7 @@ public class TarjetaPrestamoTrabajadorView extends Div {
     }
 
     public void volverAtras() {
-        trabajadorGrid = new TrabajadorGrid(prestamoService, trabajadorService, libroService);
+        trabajadorGrid = new TrabajadorGrid(prestamoService, trabajadorService, libroService,senderService);
         content.removeAll();
         content.add(trabajadorGrid);
     }
@@ -364,7 +368,7 @@ public class TarjetaPrestamoTrabajadorView extends Div {
                 .filter(target -> target instanceof TarjetaPrestamoTrabajador
                         && event.getTarjetaPrestamo().getLibro().equals(target.getLibro())
                         && event.getTarjetaPrestamo().getFechaPrestamo().equals(target.getFechaPrestamo())
-                        && event.getTarjetaPrestamo().getFechaDevolucion().equals(target.getFechaDevolucion()))
+                        && (event.getTarjetaPrestamo().getFechaDevolucion() != null && event.getTarjetaPrestamo().getFechaDevolucion().equals(target.getFechaDevolucion())))
                 .forEach((tarjeta) -> {
                     if (tarjeta instanceof TarjetaPrestamoTrabajador) {
                         tarjetaTrabajador = (TarjetaPrestamoTrabajador) tarjeta;
@@ -381,20 +385,70 @@ public class TarjetaPrestamoTrabajadorView extends Div {
                     Notification.Position.MIDDLE);
             notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
         } else {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/YYYY");
             if (event.getTarjetaPrestamo().getId() == null) {
-                prestamoService.save(event.getTarjetaPrestamo());
-                Notification notification = Notification.show(
-                        "Libro añadido",
-                        5000,
-                        Notification.Position.BOTTOM_START);
-                notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+
+                try {
+                    prestamoService.save(event.getTarjetaPrestamo());
+                    senderService.sendSimpleEmail(
+                            /* enviado a: */ trabajador.getEmail(),
+                            /* asunto: */ "Entrega de libros",
+                            /* mensaje: */ "Sistema de Gestión Académica Genius \n"
+                                    + "Usted ha recibido el libro: "
+                                    + event.getTarjetaPrestamo().getLibro().getTitulo()
+                                    + " el día: "
+                                    + formatter.format(event.getTarjetaPrestamo().getFechaPrestamo()).toString());
+                    if (event.getTarjetaPrestamo().getFechaDevolucion() != null) {
+                        senderService.sendSimpleEmail(
+                                /* enviado a: */ trabajador.getEmail(),
+                                /* asunto: */ "Devolución de libros",
+                                /* mensaje: */ "Sistema de Gestión Académica Genius \n"
+                                        + "Usted ha entregado el libro: "
+                                        + event.getTarjetaPrestamo().getLibro().getTitulo()
+                                        + " el día: "
+                                        + formatter.format(event.getTarjetaPrestamo().getFechaDevolucion()).toString());
+                    }
+                    Notification notification = Notification.show(
+                            "Libro añadido",
+                            2000,
+                            Notification.Position.BOTTOM_START);
+                    notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+                } catch (Exception e) {
+                    // TODO: handle exception
+                    Notification notification = Notification.show(
+                            "Error al enviar correo electrónico a la dirección de correo seleccionada",
+                            2000,
+                            Notification.Position.MIDDLE);
+                    notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+                }
+
             } else {
-                prestamoService.update(event.getTarjetaPrestamo());
-                Notification notification = Notification.show(
-                        "Libro modificado",
-                        5000,
-                        Notification.Position.BOTTOM_START);
-                notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+
+                try {
+                    prestamoService.update(event.getTarjetaPrestamo());
+                    if (event.getTarjetaPrestamo().getFechaDevolucion() != null) {
+                        senderService.sendSimpleEmail(
+                                /* enviado a: */ trabajador.getEmail(),
+                                /* asunto: */ "Devolución de libros",
+                                /* mensaje: */ "Sistema de Gestión Académica Genius \n"
+                                        + "Usted ha entregado el libro: "
+                                        + event.getTarjetaPrestamo().getLibro().getTitulo()
+                                        + " el día: "
+                                        + formatter.format(event.getTarjetaPrestamo().getFechaDevolucion()).toString());
+                    }
+                    Notification notification = Notification.show(
+                            "Libro modificado",
+                            2000,
+                            Notification.Position.BOTTOM_START);
+                    notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+                } catch (Exception e) {
+                    // TODO: handle exception
+                    Notification notification = Notification.show(
+                            "Error al enviar correo electrónico a la dirección de correo seleccionada",
+                            2000,
+                            Notification.Position.MIDDLE);
+                    notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+                }
             }
             updateList();
             info.remove(total);

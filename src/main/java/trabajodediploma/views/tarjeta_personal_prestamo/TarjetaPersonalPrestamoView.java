@@ -104,7 +104,7 @@ public class TarjetaPersonalPrestamoView extends Div {
                         .filter(event -> event.getUser().equals(user))
                         .findFirst();
                 if (e.isEmpty() && t.isEmpty()) {
-                    Image imageError = new Image("images/autorize-required-401.png", "Error 401");
+                    Image imageError = new Image("images/error.png", "Error 401");
                     imageError.addClassName("container__img");
                     H1 info = new H1("Información personal no disponible");
                     info.addClassName("container__h1");

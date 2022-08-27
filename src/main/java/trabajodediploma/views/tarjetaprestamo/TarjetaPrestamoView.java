@@ -14,6 +14,7 @@ import trabajodediploma.data.service.EstudianteService;
 import trabajodediploma.data.service.LibroService;
 import trabajodediploma.data.service.TarjetaPrestamoService;
 import trabajodediploma.data.service.TrabajadorService;
+import trabajodediploma.data.tools.EmailSenderService;
 import trabajodediploma.views.MainLayout;
 import trabajodediploma.views.footer.MyFooter;
 
@@ -35,12 +36,13 @@ public class TarjetaPrestamoView extends Div {
             @Autowired TarjetaPrestamoService prestamoService,
             @Autowired EstudianteService estudianteService,
             @Autowired LibroService libroService,
-            @Autowired TrabajadorService trabajadorService
+            @Autowired TrabajadorService trabajadorService,
+            @Autowired  EmailSenderService senderService
     ) {
         addClassNames("tarjeta-prestamo-view");
         myFooter = new MyFooter();
-        estudianteGrid = new EstudianteGrid(prestamoService, estudianteService, libroService);
-        trabajadorGrid = new TrabajadorGrid(prestamoService, trabajadorService, libroService);
+        estudianteGrid = new EstudianteGrid(prestamoService, estudianteService, libroService,senderService);
+        trabajadorGrid = new TrabajadorGrid(prestamoService, trabajadorService, libroService,senderService);
         container = new Div();
         container.addClassName("container");
         container.add(estudianteGrid);

@@ -41,6 +41,7 @@ import trabajodediploma.data.entity.TarjetaPrestamoEstudiante;
 import trabajodediploma.data.service.EstudianteService;
 import trabajodediploma.data.service.LibroService;
 import trabajodediploma.data.service.TarjetaPrestamoService;
+import trabajodediploma.data.tools.EmailSenderService;
 
 /**
  *
@@ -55,12 +56,13 @@ public class TarjetaPrestamoEstudianteView extends Div {
     Grid.Column<TarjetaPrestamo> fechaDevolucionColumn;
     Grid.Column<TarjetaPrestamo> editColumn;
     EstudianteGrid estudianteGrid;
-    Estudiante estudiante;
-    List<Libro> libros;
-    List<TarjetaPrestamo> prestamos;
-    TarjetaPrestamoService prestamoService;
-    EstudianteService estudiantService;
-    LibroService libroService;
+    private Estudiante estudiante;
+    private List<Libro> libros;
+    private List<TarjetaPrestamo> prestamos;
+    private TarjetaPrestamoService prestamoService;
+    private EstudianteService estudiantService;
+    private LibroService libroService;
+    private EmailSenderService senderService;
     TarjetaPrestamoEstudianteForm form;
     private ComboBox<Libro> libroFilter;
     private DatePicker entregaFilter;
@@ -74,9 +76,10 @@ public class TarjetaPrestamoEstudianteView extends Div {
 
     public TarjetaPrestamoEstudianteView(
             Estudiante estudiante,
-            @Autowired TarjetaPrestamoService prestamoService,
-            @Autowired EstudianteService estudianteService,
-            @Autowired LibroService libroService) {
+            TarjetaPrestamoService prestamoService,
+            EstudianteService estudianteService,
+            LibroService libroService,
+            EmailSenderService senderService) {
 
         addClassName("container__tarjeta");
         this.estudiante = estudiante;
@@ -84,6 +87,7 @@ public class TarjetaPrestamoEstudianteView extends Div {
         this.estudiantService = estudianteService;
         this.libroService = libroService;
         this.libros = libroService.findAll();
+        this.senderService = senderService;
         prestamos = new LinkedList<>();
         updateList();
         configureForm();
@@ -187,8 +191,8 @@ public class TarjetaPrestamoEstudianteView extends Div {
         prestamoService.findAll().parallelStream().forEach((tarjeta) -> {
             if (tarjeta instanceof TarjetaPrestamoEstudiante) {
                 tarjetaEstudiante = (TarjetaPrestamoEstudiante) tarjeta;
-                if (tarjetaEstudiante.getEstudiante().equals(estudiante)){
-                prestamos.add(tarjetaEstudiante);
+                if (tarjetaEstudiante.getEstudiante().equals(estudiante)) {
+                    prestamos.add(tarjetaEstudiante);
                 }
             }
         });
@@ -301,7 +305,7 @@ public class TarjetaPrestamoEstudianteView extends Div {
     }
 
     public void volverAtras() {
-        estudianteGrid = new EstudianteGrid(prestamoService, estudiantService, libroService);
+        estudianteGrid = new EstudianteGrid(prestamoService, estudiantService, libroService, senderService);
         content.removeAll();
         content.add(estudianteGrid);
     }
@@ -362,12 +366,12 @@ public class TarjetaPrestamoEstudianteView extends Div {
                 .filter(target -> target instanceof TarjetaPrestamoEstudiante
                         && event.getTarjetaPrestamo().getLibro().equals(target.getLibro())
                         && event.getTarjetaPrestamo().getFechaPrestamo().equals(target.getFechaPrestamo())
-                        && event.getTarjetaPrestamo().getFechaDevolucion().equals(target.getFechaDevolucion()))
+                        && (event.getTarjetaPrestamo().getFechaDevolucion() != null && event.getTarjetaPrestamo().getFechaDevolucion().equals(target.getFechaDevolucion())) )
                 .forEach((tarjeta) -> {
                     if (tarjeta instanceof TarjetaPrestamoEstudiante) {
                         tarjetaEstudiante = (TarjetaPrestamoEstudiante) tarjeta;
-                        if (tarjetaEstudiante.getEstudiante().equals(estudiante)){
-                        prestamos.add(tarjetaEstudiante);
+                        if (tarjetaEstudiante.getEstudiante().equals(estudiante)) {
+                            prestamos.add(tarjetaEstudiante);
                         }
                     }
                 });
@@ -379,20 +383,70 @@ public class TarjetaPrestamoEstudianteView extends Div {
                     Notification.Position.MIDDLE);
             notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
         } else {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/YYYY");
             if (event.getTarjetaPrestamo().getId() == null) {
-                prestamoService.save(event.getTarjetaPrestamo());
-                Notification notification = Notification.show(
-                        "Libro añadido",
-                        5000,
-                        Notification.Position.BOTTOM_START);
-                notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+
+                try {
+                    prestamoService.save(event.getTarjetaPrestamo());
+                    senderService.sendSimpleEmail(
+                            /* enviado a: */ estudiante.getEmail(),
+                            /* asunto: */ "Entrega de libros",
+                            /* mensaje: */ "Sistema de Gestión Académica Genius \n"
+                                    + "Usted ha recibido el libro: "
+                                    + event.getTarjetaPrestamo().getLibro().getTitulo()
+                                    + " el día: "
+                                    + formatter.format(event.getTarjetaPrestamo().getFechaPrestamo()).toString());
+                    if (event.getTarjetaPrestamo().getFechaDevolucion() != null) {
+                        senderService.sendSimpleEmail(
+                                /* enviado a: */ estudiante.getEmail(),
+                                /* asunto: */ "Devolución de libros",
+                                /* mensaje: */ "Sistema de Gestión Académica Genius \n"
+                                        + "Usted ha entregado el libro: "
+                                        + event.getTarjetaPrestamo().getLibro().getTitulo()
+                                        + " el día: "
+                                        + formatter.format(event.getTarjetaPrestamo().getFechaDevolucion()).toString());
+                    }
+                    Notification notification = Notification.show(
+                            "Libro añadido",
+                            2000,
+                            Notification.Position.BOTTOM_START);
+                    notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+                } catch (Exception e) {
+                    // TODO: handle exception
+                    Notification notification = Notification.show(
+                            "Error al enviar correo electrónico a la dirección de correo seleccionada",
+                            2000,
+                            Notification.Position.MIDDLE);
+                    notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+                }
+
             } else {
-                prestamoService.update(event.getTarjetaPrestamo());
-                Notification notification = Notification.show(
-                        "Libro modificado",
-                        5000,
-                        Notification.Position.BOTTOM_START);
-                notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+
+                try {
+                    prestamoService.update(event.getTarjetaPrestamo());
+                    if (event.getTarjetaPrestamo().getFechaDevolucion() != null) {
+                        senderService.sendSimpleEmail(
+                                /* enviado a: */ estudiante.getEmail(),
+                                /* asunto: */ "Devolución de libros",
+                                /* mensaje: */ "Sistema de Gestión Académica Genius \n"
+                                        + "Usted ha entregado el libro: "
+                                        + event.getTarjetaPrestamo().getLibro().getTitulo()
+                                        + " el día: "
+                                        + formatter.format(event.getTarjetaPrestamo().getFechaDevolucion()).toString());
+                    }
+                    Notification notification = Notification.show(
+                            "Libro modificado",
+                            2000,
+                            Notification.Position.BOTTOM_START);
+                    notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+                } catch (Exception e) {
+                    // TODO: handle exception
+                    Notification notification = Notification.show(
+                            "Error al enviar correo electrónico a la dirección de correo seleccionada",
+                            2000,
+                            Notification.Position.MIDDLE);
+                    notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+                }
             }
             updateList();
             info.remove(total);
@@ -435,8 +489,8 @@ public class TarjetaPrestamoEstudianteView extends Div {
         prestamoService.findAll().parallelStream().forEach((tarjeta) -> {
             if (tarjeta instanceof TarjetaPrestamoEstudiante) {
                 tarjetaEstudiante = (TarjetaPrestamoEstudiante) tarjeta;
-                if (tarjetaEstudiante.getEstudiante().equals(estudiante)){
-                prestamos.add(tarjetaEstudiante);
+                if (tarjetaEstudiante.getEstudiante().equals(estudiante)) {
+                    prestamos.add(tarjetaEstudiante);
                 }
             }
         });

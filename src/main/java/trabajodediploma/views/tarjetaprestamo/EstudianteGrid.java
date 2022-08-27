@@ -21,6 +21,7 @@ import trabajodediploma.data.entity.Estudiante;
 import trabajodediploma.data.service.EstudianteService;
 import trabajodediploma.data.service.LibroService;
 import trabajodediploma.data.service.TarjetaPrestamoService;
+import trabajodediploma.data.tools.EmailSenderService;
 
 /**
  *
@@ -41,13 +42,18 @@ public class EstudianteGrid extends Div {
 
     private TextField nombreFilter;
     private Div content;
+    private EmailSenderService senderService;
 
-    public EstudianteGrid(@Autowired TarjetaPrestamoService prestamoService, @Autowired EstudianteService estudianteService,
-            @Autowired LibroService libroService) {
+    public EstudianteGrid( 
+        TarjetaPrestamoService prestamoService, 
+        EstudianteService estudianteService,
+        LibroService libroService, 
+        EmailSenderService senderService) {
         addClassName("container___estudiante_grid");           
         this.prestamoService = prestamoService;
         this.estudianteService = estudianteService;
         this.libroService = libroService;
+        this.senderService = senderService;
         configureGrid();
         content = new Div();
         content.addClassName("container___estudiante_grid__div");
@@ -97,7 +103,7 @@ public class EstudianteGrid extends Div {
 
     public void editCard(Estudiante e) {
         content.removeAll();
-        tarjetaEstudiante = new TarjetaPrestamoEstudianteView(e,prestamoService, estudianteService,libroService);
+        tarjetaEstudiante = new TarjetaPrestamoEstudianteView(e,prestamoService, estudianteService,libroService,senderService);
         tarjetaEstudiante.setWidthFull();
         content.add(tarjetaEstudiante);
     }

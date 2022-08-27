@@ -26,8 +26,8 @@ import java.util.List;
 import trabajodediploma.data.entity.Libro;
 import trabajodediploma.data.entity.TarjetaPrestamo;
 import trabajodediploma.data.entity.TarjetaPrestamoEstudiante;
+import trabajodediploma.data.tools.EmailSenderService;
 import trabajodediploma.data.entity.Estudiante;
-
 
 /**
  *
@@ -49,15 +49,15 @@ public class TarjetaPrestamoEstudianteForm extends FormLayout {
     public TarjetaPrestamoEstudianteForm(Estudiante estudiante, List<Libro> listLibros) {
         addClassNames("tarjeta-estudiante-form");
         this.estudiante = estudiante;
-        binder.bindInstanceFields(this);  
-        /*Config form*/
-        /*Estudiante*/
-        /*Libros*/
+        binder.bindInstanceFields(this);
+        /* Config form */
+        /* Estudiante */
+        /* Libros */
         libro.setItems(listLibros);
         libro.setItemLabelGenerator(Libro::getTitulo);
-        /*fecha de prestamo*/
+        /* fecha de prestamo */
         fechaPrestamo.setMin(LocalDate.now(ZoneId.systemDefault()));
-        /*fecha de devolucion*/
+        /* fecha de devolucion */
         fechaDevolucion.setMin(LocalDate.now(ZoneId.systemDefault()));
 
         add(libro, fechaPrestamo, fechaDevolucion, createButtonsLayout());
@@ -97,21 +97,23 @@ public class TarjetaPrestamoEstudianteForm extends FormLayout {
             Notification notification = Notification.show(
                     "Ocurrió un problema al intentar almacenar La tarjeta",
                     5000,
-                    Notification.Position.MIDDLE
-            );
+                    Notification.Position.MIDDLE);
             notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
         }
     }
 
     // Events
-    public static abstract class TarjetaPrestamoEstudianteFormEvent extends ComponentEvent<TarjetaPrestamoEstudianteForm> {
+    public static abstract class TarjetaPrestamoEstudianteFormEvent
+            extends ComponentEvent<TarjetaPrestamoEstudianteForm> {
 
         private TarjetaPrestamoEstudiante tarjetaPrestamo;
 
-        protected TarjetaPrestamoEstudianteFormEvent(TarjetaPrestamoEstudianteForm source, TarjetaPrestamoEstudiante tarjetaPrestamo) {
+        protected TarjetaPrestamoEstudianteFormEvent(TarjetaPrestamoEstudianteForm source,
+                TarjetaPrestamoEstudiante tarjetaPrestamo) {
             super(source, false);
             this.tarjetaPrestamo = tarjetaPrestamo;
         }
+
         public TarjetaPrestamoEstudiante getTarjetaPrestamo() {
             return tarjetaPrestamo;
         }

@@ -13,6 +13,8 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Image;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
@@ -20,16 +22,23 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.shared.Registration;
 import java.util.List;
 import java.util.Random;
-
+import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import org.springframework.web.util.UriUtils;
+import elemental.json.Json;
 import trabajodediploma.data.entity.Estudiante;
 import trabajodediploma.data.entity.Grupo;
 import trabajodediploma.data.entity.User;
 import trabajodediploma.data.tools.EmailSenderService;
+import trabajodediploma.data.tools.MyUploadI18n;
+
 
 /**
  *
@@ -43,6 +52,9 @@ public class ModificarPerfilEstudianteForm extends FormLayout {
     private EmailSenderService senderService;
     private StringBuffer codigo_buffer;
     private Div div_codigo;
+    private  Label imageSize;
+    private Image imagePreview;
+    Upload profilePictureUrl = new Upload();
     TextField name = new TextField();
     EmailField email = new EmailField();
     TextField solapin = new TextField();
@@ -64,13 +76,25 @@ public class ModificarPerfilEstudianteForm extends FormLayout {
         this.listGrupos = listGrupos;
         this.senderService = senderService;
         Configuration();
-        add(name,email,solapin,anno_academico, facultad, grupo, div_codigo,createButtonsLayout());
+        add( /*imageSize, profilePictureUrl,*/ name,email,solapin,anno_academico, facultad, grupo, div_codigo,createButtonsLayout());
     }
 
     //Configuration
     private void Configuration() {
         binderEstudiante.bindInstanceFields(this);
         binderUser.bindInstanceFields(this);
+        // foto de perfil
+        // int maxFileSizeInBytes = 10 * 1024 * 1024; // 10MB
+        imageSize = new Label("Tamaño maximo: 1mb");
+        imageSize.getStyle().set("color", "var(--lumo-secondary-text-color)");
+        imagePreview = new Image();
+        imagePreview.setWidth("100%");
+        profilePictureUrl.getStyle().set("box-sizing", "border-box");
+        profilePictureUrl.getElement().appendChild(imagePreview.getElement());
+        Button uploadButton = new Button("Seleccionar imagen...");
+        uploadButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        profilePictureUrl.setUploadButton(uploadButton);
+        attachImageUpload(profilePictureUrl, imagePreview);
         //nombre
         name.setLabel("Nombre");
         name.setPlaceholder("Nombre y  apellidos...");
@@ -139,7 +163,6 @@ public class ModificarPerfilEstudianteForm extends FormLayout {
         codigo.setEnabled(false);
 
         btn_codigo.addClassName("div_codigo__btn");
-
         btn_codigo.addClickListener(click -> {
             try {
                 senderService.sendSimpleEmail(
@@ -187,13 +210,9 @@ public class ModificarPerfilEstudianteForm extends FormLayout {
     public void setEstudiante(Estudiante estudiante,User user) {
         this.estudiante = estudiante;
         this.user = user;
+        this.imagePreview.setVisible(user != null);
         binderEstudiante.readBean(estudiante);
         binderUser.readBean(user);
-        if (user == null) {
-            this.estudiante.setUser(null);
-        } else {
-            this.estudiante.setUser(user);;
-        }
     }
 
     //Validate and Save
@@ -204,6 +223,7 @@ public class ModificarPerfilEstudianteForm extends FormLayout {
             binderUser.writeBean(user);
             //user
             this.user.setName(name.getValue());
+            // this.user.setProfilePictureUrl(imagePreview.getSrc());
             //estudiante
             this.estudiante.setAnno_academico(anno_academico.getValue());
             this.estudiante.setEmail(email.getValue());
@@ -230,6 +250,49 @@ public class ModificarPerfilEstudianteForm extends FormLayout {
         }
     }
 
+    private void configuracionErroresImagen() {
+
+        MyUploadI18n i18n = new MyUploadI18n();
+        i18n.getAddFiles().setOne("Cargar Imágen...");
+        i18n.getDropFiles().setOne("Arrastra la imágen aquí");
+
+        i18n.getError()
+                .setFileIsTooBig("El archivo excede el tamaño máximo permitido de 1 MB.")
+                .setIncorrectFileType("El archivo seleccionado no es una imágen.");
+        ;
+        profilePictureUrl.setI18n(i18n);
+
+    }
+
+    private void attachImageUpload(Upload upload, Image preview) {
+        ByteArrayOutputStream uploadBuffer = new ByteArrayOutputStream();
+        upload.setAcceptedFileTypes("image/tiff", ".png", ".jpg");
+        upload.setReceiver((fileName, mimeType) -> {
+            return uploadBuffer;
+        });
+        upload.setMaxFileSize(1 * 1024 * 1024);
+        upload.addFileRejectedListener(event -> {
+            String errorMessage = event.getErrorMessage();
+
+            Notification notification = Notification.show(
+                    errorMessage,
+                    2000,
+                    Notification.Position.MIDDLE);
+
+            notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+        });
+        configuracionErroresImagen();
+        upload.addSucceededListener(e -> {
+            String mimeType = e.getMIMEType();
+            String base64ImageData = Base64.getEncoder().encodeToString(uploadBuffer.toByteArray());
+            String dataUrl = "data:" + mimeType + ";base64,"
+                    + UriUtils.encodeQuery(base64ImageData, StandardCharsets.UTF_8);
+            upload.getElement().setPropertyJson("files", Json.createArray());
+            preview.setSrc(dataUrl);
+            uploadBuffer.reset();
+        });
+        preview.setVisible(false);
+    }
     // Events
     public static abstract class EstudianteFormEvent extends ComponentEvent<ModificarPerfilEstudianteForm> {
 

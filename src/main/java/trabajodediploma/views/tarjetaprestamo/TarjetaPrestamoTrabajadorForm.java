@@ -27,7 +27,7 @@ import trabajodediploma.data.entity.Libro;
 import trabajodediploma.data.entity.TarjetaPrestamo;
 import trabajodediploma.data.entity.TarjetaPrestamoTrabajador;
 import trabajodediploma.data.entity.Trabajador;
-
+import trabajodediploma.data.tools.EmailSenderService;
 
 /**
  *
@@ -49,15 +49,15 @@ public class TarjetaPrestamoTrabajadorForm extends FormLayout {
     public TarjetaPrestamoTrabajadorForm(Trabajador trabajador, List<Libro> listLibros) {
         addClassNames("tarjeta-trabajador-form");
         this.trabajador = trabajador;
-        binder.bindInstanceFields(this);  
-        /*Config form*/
-        /*Trabajador*/
-        /*Libros*/
+        binder.bindInstanceFields(this);
+        /* Config form */
+        /* Trabajador */
+        /* Libros */
         libro.setItems(listLibros);
         libro.setItemLabelGenerator(Libro::getTitulo);
-        /*fecha de prestamo*/
+        /* fecha de prestamo */
         fechaPrestamo.setMin(LocalDate.now(ZoneId.systemDefault()));
-        /*fecha de devolucion*/
+        /* fecha de devolucion */
         fechaDevolucion.setMin(LocalDate.now(ZoneId.systemDefault()));
 
         add(libro, fechaPrestamo, fechaDevolucion, createButtonsLayout());
@@ -97,21 +97,23 @@ public class TarjetaPrestamoTrabajadorForm extends FormLayout {
             Notification notification = Notification.show(
                     "Ocurrió un problema al intentar almacenar La tarjeta",
                     5000,
-                    Notification.Position.MIDDLE
-            );
+                    Notification.Position.MIDDLE);
             notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
         }
     }
 
     // Events
-    public static abstract class TarjetaPrestamoTrabajadorFormEvent extends ComponentEvent<TarjetaPrestamoTrabajadorForm> {
+    public static abstract class TarjetaPrestamoTrabajadorFormEvent
+            extends ComponentEvent<TarjetaPrestamoTrabajadorForm> {
 
         private TarjetaPrestamoTrabajador tarjetaPrestamo;
 
-        protected TarjetaPrestamoTrabajadorFormEvent(TarjetaPrestamoTrabajadorForm source, TarjetaPrestamoTrabajador tarjetaPrestamo) {
+        protected TarjetaPrestamoTrabajadorFormEvent(TarjetaPrestamoTrabajadorForm source,
+                TarjetaPrestamoTrabajador tarjetaPrestamo) {
             super(source, false);
             this.tarjetaPrestamo = tarjetaPrestamo;
         }
+
         public TarjetaPrestamoTrabajador getTarjetaPrestamo() {
             return tarjetaPrestamo;
         }

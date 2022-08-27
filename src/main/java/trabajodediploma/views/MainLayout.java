@@ -22,6 +22,7 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.RouterLink;
+import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.auth.AccessAnnotationChecker;
 import java.util.List;
 import java.util.Optional;
@@ -120,8 +121,7 @@ public class MainLayout extends AppLayout {
             @Autowired GrupoService grupoService,
             @Autowired AreaService areaService,
             @Autowired PasswordEncoder passwordEncoder,
-            @Autowired EmailSenderService senderService
-    ) {
+            @Autowired EmailSenderService senderService) {
         this.authenticatedUser = authenticatedUser;
         this.accessChecker = accessChecker;
         this.userService = userService;
@@ -133,17 +133,18 @@ public class MainLayout extends AppLayout {
         this.passwordEncoder = passwordEncoder;
         setPrimarySection(Section.DRAWER);
         addToNavbar(true, createHeaderContent());
-        addToDrawer(createDrawerContent());        
+        addToDrawer(createDrawerContent());
     }
-    //barra de menu
+
+    // barra de menu
     private Component createHeaderContent() {
 
         DrawerToggle toggle = new DrawerToggle();
         toggle.addClassNames("toggle", "text-secondary");
         toggle.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
         toggle.getElement().setAttribute("aria-label", "Menu toggle");
-        Image iconPage = new Image("images/pageLogo.png", "Logo");                
-        titleDiv = new Div(toggle, iconPage); 
+        Image iconPage = new Image("images/pageLogo.png", "Logo");
+        titleDiv = new Div(toggle, iconPage);
         titleDiv.addClassName("div-toggle-title");
 
         Div layout = new Div();
@@ -154,6 +155,10 @@ public class MainLayout extends AppLayout {
 
             Avatar avatar = new Avatar(user.getUsername(), user.getProfilePictureUrl());
             avatar.addClassNames("avatar", "me-xs");
+            // StreamResource imageResource = new StreamResource(
+            //         user.getProfilePictureUrl(),
+            //         () -> getClass().getResourceAsStream(user.getProfilePictureUrl()));
+            // avatar.setImageResource(imageResource);
 
             ContextMenu userMenu = new ContextMenu(avatar);
             userMenu.setOpenOnClick(true);
@@ -173,16 +178,17 @@ public class MainLayout extends AppLayout {
             header = new Div(titleDiv, layout);
         } else {
 
-            Anchor loginLink = new Anchor(/*"login", "Sign in"*/);
+            Anchor loginLink = new Anchor(/* "login", "Sign in" */);
             loginLink.addClassName("login__link");
             loginLink.setHref("login");
             loginLink.add("Acceder");
-            header = new Div(titleDiv,loginLink);    
+            header = new Div(titleDiv, loginLink);
         }
         header.addClassNames("div-header");
         return header;
     }
-    //barra de menu desplegable lateral izquierda
+
+    // barra de menu desplegable lateral izquierda
     private Component createDrawerContent() {
         H2 appName = new H2("Menú");
         appName.addClassNames("app-name");
@@ -192,6 +198,7 @@ public class MainLayout extends AppLayout {
         section.addClassNames("drawer-section");
         return section;
     }
+
     //
     private Nav createNavigation() {
         Nav nav = new Nav();
@@ -209,35 +216,37 @@ public class MainLayout extends AppLayout {
         }
         return nav;
     }
+
     //
     private MenuItemInfo[] createMenuItems() {
-        return new MenuItemInfo[]{ //
-            new MenuItemInfo("Inicio", "la la-home", InicioView.class), //
+        return new MenuItemInfo[] { //
+                new MenuItemInfo("Inicio", "la la-home", InicioView.class), //
 
-            new MenuItemInfo("Catálogo", "la la-th-list", CatalogoView.class), //
+                new MenuItemInfo("Catálogo", "la la-th-list", CatalogoView.class), //
 
-            new MenuItemInfo("Tarjeta Personal", "la la-columns", TarjetaPersonalPrestamoView.class), //
-            
-            new MenuItemInfo("Usuario", "la la-user", UsuarioView.class), //
-            
-            new MenuItemInfo("Estadística", "la la-chart-bar", EstadisticasView.class), //
+                new MenuItemInfo("Tarjeta Personal", "la la-columns", TarjetaPersonalPrestamoView.class), //
 
-            new MenuItemInfo("Libros", "la la-book", LibroView.class), //
+                new MenuItemInfo("Usuario", "la la-user", UsuarioView.class), //
 
-            new MenuItemInfo("Recursos Materiales ", "la la-tools", RecursosMaterialesView.class), //
+                new MenuItemInfo("Estadística", "la la-chart-bar", EstadisticasView.class), //
 
-            new MenuItemInfo("Tarjeta Prestamo", "la la-columns", TarjetaPrestamoView.class), //
+                new MenuItemInfo("Libros", "la la-book", LibroView.class), //
 
-            new MenuItemInfo("Modulo", "la la-gift", ModuloView.class), //
+                new MenuItemInfo("Recursos Materiales ", "la la-tools", RecursosMaterialesView.class), //
 
-            new MenuItemInfo("Destino Final", "la la-user-check", TarjetaDestinoFinalView.class), //
+                new MenuItemInfo("Tarjeta Prestamo", "la la-columns", TarjetaPrestamoView.class), //
+
+                new MenuItemInfo("Modulo", "la la-gift", ModuloView.class), //
+
+                new MenuItemInfo("Destino Final", "la la-user-check", TarjetaDestinoFinalView.class), //
         };
     }
 
     //
     private void ModificarUsuario() {
         modificarPerfil = new Dialog();
-        ModificarPerfilView modificarPerfilView = new ModificarPerfilView(user, userService, estudianteService, trabajadorService, grupoService, areaService, senderService,modificarPerfil);
+        ModificarPerfilView modificarPerfilView = new ModificarPerfilView(user, userService, estudianteService,
+                trabajadorService, grupoService, areaService, senderService, modificarPerfil);
         modificarPerfil.add(modificarPerfilView);
 
         List<Estudiante> estudiantes = estudianteService.findAll();
@@ -249,8 +258,7 @@ public class MainLayout extends AppLayout {
             Notification notification = Notification.show(
                     "Información de perfil no disponible",
                     2000,
-                    Notification.Position.MIDDLE
-            );
+                    Notification.Position.MIDDLE);
             notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
         } else {
             modificarPerfil.open();

@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import trabajodediploma.data.entity.Trabajador;
 import trabajodediploma.data.service.TrabajadorService;
+import trabajodediploma.data.tools.EmailSenderService;
 import trabajodediploma.data.service.LibroService;
 import trabajodediploma.data.service.TarjetaPrestamoService;
 
@@ -31,9 +32,10 @@ public class TrabajadorGrid extends Div {
     private Grid<Trabajador> gridTrabajadors = new Grid<>(Trabajador.class, false);
 
     TarjetaPrestamoTrabajadorView tarjetaTrabajador;
-    TarjetaPrestamoService prestamoService;
-    TrabajadorService trabajadorService;
-    LibroService libroService;
+    private TarjetaPrestamoService prestamoService;
+    private TrabajadorService trabajadorService;
+    private LibroService libroService;
+    private EmailSenderService senderService;
 
     GridListDataView<Trabajador> gridListDataView;
     Grid.Column<Trabajador> nombreColumn;
@@ -42,12 +44,16 @@ public class TrabajadorGrid extends Div {
     private TextField nombreFilter;
     private Div content;
 
-    public TrabajadorGrid(@Autowired TarjetaPrestamoService prestamoService, @Autowired TrabajadorService trabajadorService,
-            @Autowired LibroService libroService) {
+    public TrabajadorGrid(
+            TarjetaPrestamoService prestamoService,
+            TrabajadorService trabajadorService,
+            LibroService libroService, 
+            EmailSenderService senderService) {
         addClassName("container___trabajador_grid");           
         this.prestamoService = prestamoService;
         this.trabajadorService = trabajadorService;
         this.libroService = libroService;
+        this.senderService = senderService;
         configureGrid();
         content = new Div();
         content.addClassName("container___trabajador_grid__div");
@@ -97,7 +103,7 @@ public class TrabajadorGrid extends Div {
 
     public void editCard(Trabajador e) {
         content.removeAll();
-        tarjetaTrabajador = new TarjetaPrestamoTrabajadorView(e,prestamoService, trabajadorService,libroService);
+        tarjetaTrabajador = new TarjetaPrestamoTrabajadorView(e,prestamoService, trabajadorService,libroService,senderService);
         tarjetaTrabajador.setWidthFull();
         content.add(tarjetaTrabajador);
     }
