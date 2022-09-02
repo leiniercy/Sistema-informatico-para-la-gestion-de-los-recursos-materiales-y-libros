@@ -5,12 +5,15 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
+// import org.vaadin.gatanaso.MultiselectComboBox;
+
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.listbox.MultiSelectListBox;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
@@ -32,6 +35,8 @@ public class ModuloForm extends FormLayout {
     private List<RecursoMaterial> materiales;
     TextField nombre = new TextField();
     MultiSelectListBox<RecursoMaterial> recursosMateriales = new MultiSelectListBox<>();
+    // MultiselectComboBox<String> multiselectComboBox = new MultiselectComboBox();
+
     Button save = new Button("Añadir", VaadinIcon.PLUS.create());
     Button close = new Button("Cancelar", VaadinIcon.ERASER.create());
     BeanValidationBinder<Modulo> binder = new BeanValidationBinder<>(Modulo.class);
@@ -52,12 +57,15 @@ public class ModuloForm extends FormLayout {
             event.getSource().setHelperText(event.getValue().length() + "/" + 100);
         });
         // Recursos Materiales
+        Label mat = new Label("Materiales:");
         recursosMateriales.setItems(materiales);
         recursosMateriales.setItemLabelGenerator(RecursoMaterial::getDescripcion);
-       // recursosMateriales.setRenderer(new ComponentRenderer<>(material -> new Text(material.getDescripcion())));
         recursosMateriales.setHeight("80px");
 
-        add(nombre, recursosMateriales,createButtonsLayout());
+        // multiselectComboBox.setLabel("Select items");
+        // multiselectComboBox.setItems("Item 1", "Item 2", "Item 3", "Item 4");
+
+        add(nombre, /*multiselectComboBox,*/ mat, recursosMateriales, createButtonsLayout());
     }
 
     private HorizontalLayout createButtonsLayout() {
@@ -87,7 +95,7 @@ public class ModuloForm extends FormLayout {
     private void validateAndSave() {
         try {
             binder.writeBean(modulo);
-            this.modulo.setRecursosMateriales(recursosMateriales.getValue());    
+            this.modulo.setRecursosMateriales(recursosMateriales.getValue());
             fireEvent(new SaveEvent(this, modulo));
         } catch (ValidationException e) {
             e.printStackTrace();

@@ -18,12 +18,14 @@ import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Image;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.LocalDateRenderer;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
@@ -32,6 +34,7 @@ import trabajodediploma.data.entity.DestinoFinal;
 import trabajodediploma.data.entity.DestinoFinalEstudiante;
 import trabajodediploma.data.entity.Estudiante;
 import trabajodediploma.data.entity.Modulo;
+import trabajodediploma.data.entity.RecursoMaterial;
 import trabajodediploma.data.service.DestinoFinalService;
 import trabajodediploma.data.service.EstudianteService;
 import trabajodediploma.data.service.ModuloService;
@@ -115,9 +118,24 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
             return hl;
         })).setHeader("Estudiante").setAutoWidth(true).setSortable(true);
 
-        moduloColumn = grid.addColumn(tarjeta -> tarjeta.getModulo().getRecursosMateriales())
-                .setHeader("Modulo")
-                .setAutoWidth(true);
+        moduloColumn = grid.addColumn(new ComponentRenderer<>(tarjeta -> {
+            VerticalLayout layout = new VerticalLayout(); 
+            Label nombreModulo = new Label(tarjeta.getModulo().getNombre());
+            Span span_materiales = new Span();
+            span_materiales.setWidth("100%");
+            List<RecursoMaterial> materiales = new LinkedList<>(tarjeta.getModulo().getRecursosMateriales());
+            String listMateriales = new String();
+            if (materiales.size() != 0) {
+                listMateriales += "" + materiales.get(0);
+                for (int i = 1; i < materiales.size(); i++) {
+                    listMateriales += ", " + materiales.get(i);
+                }
+            }
+            span_materiales.setText(listMateriales);
+            layout.add(nombreModulo, span_materiales);
+            layout.setWidth("100%");
+            return layout;
+        })).setHeader("Modulo").setAutoWidth(true);
 
         fechaEntregaColumn = grid
                 .addColumn(new LocalDateRenderer<>(tarjeta -> tarjeta.getFecha(),
@@ -153,10 +171,10 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
     private void refreshGrid() {
         grid.setVisible(true);
         tarjetas.clear();
-        destinoService.findAll().parallelStream().forEach( (target)->{
-            if(target instanceof DestinoFinalEstudiante){
+        destinoService.findAll().parallelStream().forEach((target) -> {
+            if (target instanceof DestinoFinalEstudiante) {
                 tarjetaEstudiante = (DestinoFinalEstudiante) target;
-                if(tarjetaEstudiante.getEstudiante() != null){
+                if (tarjetaEstudiante.getEstudiante() != null) {
                     tarjetas.add(target);
                 }
             }
@@ -264,7 +282,7 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
                 deleteItems(grid.getSelectedItems().size(), grid.getSelectedItems());
                 refreshGrid();
                 toolbar.remove(total);
-                total = new Html("<span>Total: <b>"+ tarjetas.size() + "</b></span>");
+                total = new Html("<span>Total: <b>" + tarjetas.size() + "</b></span>");
                 toolbar.addComponentAtIndex(1, total);
                 toolbar.setFlexGrow(1, buttons);
             }
@@ -302,7 +320,7 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
 
     private void saveTarjeta(TarjetaDestinoFinal_EstudianteForm.SaveEvent event) {
 
-         updateList();
+        updateList();
 
         if (tarjetas.size() != 0) {
             Notification notification = Notification.show(
@@ -327,7 +345,7 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
                 notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
             }
             toolbar.remove(total);
-            total = new Html("<span>Total: <b>"+ tarjetas.size()+"</b></span>");
+            total = new Html("<span>Total: <b>" + tarjetas.size() + "</b></span>");
             toolbar.addComponentAtIndex(1, total);
             toolbar.setFlexGrow(1, buttons);
             updateList();
@@ -361,10 +379,10 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
 
     private void updateList() {
         tarjetas.clear();
-        destinoService.findAll().parallelStream().forEach( (target)->{
-            if(target instanceof DestinoFinalEstudiante){
+        destinoService.findAll().parallelStream().forEach((target) -> {
+            if (target instanceof DestinoFinalEstudiante) {
                 tarjetaEstudiante = (DestinoFinalEstudiante) target;
-                if(tarjetaEstudiante.getEstudiante() != null){
+                if (tarjetaEstudiante.getEstudiante() != null) {
                     tarjetas.add(target);
                 }
             }

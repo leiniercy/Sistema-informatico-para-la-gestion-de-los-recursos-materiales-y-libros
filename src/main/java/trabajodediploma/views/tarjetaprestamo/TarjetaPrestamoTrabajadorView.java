@@ -191,8 +191,8 @@ public class TarjetaPrestamoTrabajadorView extends Div {
         prestamoService.findAll().parallelStream().forEach((tarjeta) -> {
             if (tarjeta instanceof TarjetaPrestamoTrabajador) {
                 tarjetaTrabajador = (TarjetaPrestamoTrabajador) tarjeta;
-                if (tarjetaTrabajador.getTrabajador().equals(trabajador)){
-                prestamos.add(tarjetaTrabajador);
+                if (tarjetaTrabajador.getTrabajador().equals(trabajador)) {
+                    prestamos.add(tarjetaTrabajador);
                 }
             }
         });
@@ -307,7 +307,7 @@ public class TarjetaPrestamoTrabajadorView extends Div {
     }
 
     public void volverAtras() {
-        trabajadorGrid = new TrabajadorGrid(prestamoService, trabajadorService, libroService,senderService);
+        trabajadorGrid = new TrabajadorGrid(prestamoService, trabajadorService, libroService, senderService);
         content.removeAll();
         content.add(trabajadorGrid);
     }
@@ -367,13 +367,12 @@ public class TarjetaPrestamoTrabajadorView extends Div {
         prestamoService.findAll().parallelStream()
                 .filter(target -> target instanceof TarjetaPrestamoTrabajador
                         && event.getTarjetaPrestamo().getLibro().equals(target.getLibro())
-                        && event.getTarjetaPrestamo().getFechaPrestamo().equals(target.getFechaPrestamo())
-                        && (event.getTarjetaPrestamo().getFechaDevolucion() != null && event.getTarjetaPrestamo().getFechaDevolucion().equals(target.getFechaDevolucion())))
+                        && event.getTarjetaPrestamo().getFechaPrestamo().equals(target.getFechaPrestamo()))
                 .forEach((tarjeta) -> {
                     if (tarjeta instanceof TarjetaPrestamoTrabajador) {
                         tarjetaTrabajador = (TarjetaPrestamoTrabajador) tarjeta;
-                        if (tarjetaTrabajador.getTrabajador().equals(trabajador)){
-                        prestamos.add(tarjetaTrabajador);
+                        if (tarjetaTrabajador.getTrabajador().equals(trabajador)) {
+                            prestamos.add(tarjetaTrabajador);
                         }
                     }
                 });
@@ -491,8 +490,8 @@ public class TarjetaPrestamoTrabajadorView extends Div {
         prestamoService.findAll().parallelStream().forEach((tarjeta) -> {
             if (tarjeta instanceof TarjetaPrestamoTrabajador) {
                 tarjetaTrabajador = (TarjetaPrestamoTrabajador) tarjeta;
-                if (tarjetaTrabajador.getTrabajador().equals(trabajador)){
-                prestamos.add(tarjetaTrabajador);
+                if (tarjetaTrabajador.getTrabajador().equals(trabajador)) {
+                    prestamos.add(tarjetaTrabajador);
                 }
             }
         });

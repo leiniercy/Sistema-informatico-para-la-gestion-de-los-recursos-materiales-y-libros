@@ -163,13 +163,20 @@
             <groupId>org.vaadin.reportui</groupId>
             <artifactId>report-ui</artifactId>
             <version>4.0.2</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.lowagie</groupId>
+                    <artifactId>itext</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
-        <dependency>
+        <!--        <dependency>
             <groupId>com.lowagie</groupId>
             <artifactId>itext</artifactId>
             <version>2.1.7.js6</version>
-        </dependency>
-        <dependency>
+        </dependency>-->
+        
+         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <type>jar</type>
@@ -187,11 +194,11 @@
             <artifactId>itextpdf</artifactId>
             <version>5.5.13</version>
         </dependency>
-        <dependency>
+        <!--        <dependency>
             <groupId>com.lowagie</groupId>
             <artifactId>itext</artifactId>
             <version>2.1.7.js8</version>
-        </dependency>
+        </dependency>-->
         <!--Generar Archivos PDF-->
         <!--Email-->
         <dependency>
@@ -212,11 +219,17 @@
         </dependency>
         <!-- Chart -->
         <!--Multiselect-Combobox-->
-        <!--        <dependency>
+<!--        <dependency>
             <groupId>org.vaadin.gatanaso</groupId>
             <artifactId>multiselect-combo-box-flow</artifactId>
             <version>3.0.2</version>
         </dependency>-->
+<!--        <dependency>
+            <groupId>org.vaadin.gatanaso</groupId>
+            <artifactId>multiselect-combo-box-flow</artifactId>
+            <version>4.0.0-rc2</version>
+        </dependency>-->
+
         <!--Multiselect-Combobox-->
     </dependencies>
 

@@ -19,6 +19,7 @@ import com.vaadin.flow.component.charts.model.DataSeriesItem;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
@@ -74,6 +75,7 @@ public class EstadisticasView extends Div {
         container.addClassName("estadistica_view__container");
         footer = new MyFooter();
 
+        updateList();
         add(getBarraDeMenu());
         if (initDate.getValue() == null || endDate.getValue() == null) {
             container.removeAll();
@@ -92,21 +94,24 @@ public class EstadisticasView extends Div {
 
     // actualizar listas
     private void updateList() {
-        if (initDate.getValue() == null || endDate.getValue() == null) {
+        if (initDate.isEmpty() || endDate.isEmpty()) {
             listLibros = libroService.findAll();
             tarjetas = prestamoService.findAll();
-        } else if (initDate.getValue() != null && endDate.getValue() != null) {
+        } else if (!initDate.isEmpty() && !endDate.isEmpty()) {
             listLibros = libroService.findAll();
             tarjetas = prestamoService.findAll();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
             tarjetas = tarjetas.stream().filter(
                     // fecha_inicio <= x <= fecha_fin
                     event -> event.getFechaPrestamo() != null
-                            && (event.getFechaPrestamo().isEqual(initDate.getValue())
-                                    || event.getFechaPrestamo().isAfter(initDate.getValue()))
-                            && event.getFechaDevolucion() != null
-                            && (event.getFechaDevolucion().isEqual(endDate.getValue())
-                                    || event.getFechaDevolucion().isBefore(endDate.getValue())))
-                    .collect(Collectors.toList());
+                            /* x <=  fecha_fin*/
+                           // && ( event.getFechaPrestamo().isBefore(endDate.getValue()) || event.getFechaPrestamo().isEqual(endDate.getValue()) )
+                           && ( formatter.format(event.getFechaPrestamo()).compareTo(formatter.format(endDate.getValue())) < 0 || (formatter.format(event.getFechaPrestamo()).equals(formatter.format(endDate.getValue()))) ) 
+                           && event.getFechaDevolucion() != null
+                             /*fecha_inicio <= x */
+                        //&& ( event.getFechaDevolucion().isAfter(initDate.getValue()) || event.getFechaDevolucion().isEqual(initDate.getValue()) ))
+                         && ( formatter.format(event.getFechaDevolucion()).compareTo(formatter.format(initDate.getValue())) > 0 || (formatter.format(event.getFechaPrestamo()).equals(formatter.format(initDate.getValue()))) )) 
+                        .collect(Collectors.toList());
         }
     }
 
@@ -118,7 +123,6 @@ public class EstadisticasView extends Div {
         Button exportButton = new Button(VaadinIcon.FILE.create());
         exportButton.addClickListener(click -> exportChart());
         buttons.add(exportButton);
-
         Div toolbar = new Div(DatePickerDateRange(), buttons);
         toolbar.addClassName("estadistica_view___barra_menu");
         return toolbar;
@@ -210,7 +214,7 @@ public class EstadisticasView extends Div {
         chart.getConfiguration().setSubTitle(String.format("Cantidad real de libros: %d", cantRealLibros()));
         configuration = chart.getConfiguration();
         chart.addClassNames("text-xl", "mt-m");
-        
+
         VerticalLayout serviceHealth = new VerticalLayout(chart);
         serviceHealth.addClassName("p-l");
         serviceHealth.setPadding(false);

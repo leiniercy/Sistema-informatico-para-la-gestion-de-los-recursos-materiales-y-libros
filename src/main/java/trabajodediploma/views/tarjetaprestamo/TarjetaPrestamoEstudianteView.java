@@ -365,8 +365,7 @@ public class TarjetaPrestamoEstudianteView extends Div {
         prestamoService.findAll().parallelStream()
                 .filter(target -> target instanceof TarjetaPrestamoEstudiante
                         && event.getTarjetaPrestamo().getLibro().equals(target.getLibro())
-                        && event.getTarjetaPrestamo().getFechaPrestamo().equals(target.getFechaPrestamo())
-                        && (event.getTarjetaPrestamo().getFechaDevolucion() != null && event.getTarjetaPrestamo().getFechaDevolucion().equals(target.getFechaDevolucion())) )
+                        && event.getTarjetaPrestamo().getFechaPrestamo().equals(target.getFechaPrestamo()))
                 .forEach((tarjeta) -> {
                     if (tarjeta instanceof TarjetaPrestamoEstudiante) {
                         tarjetaEstudiante = (TarjetaPrestamoEstudiante) tarjeta;

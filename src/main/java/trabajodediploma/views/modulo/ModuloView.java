@@ -28,6 +28,7 @@ import com.vaadin.flow.router.Route;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -113,11 +114,20 @@ public class ModuloView extends Div {
         nombreColumn = grid.addColumn(Modulo::getNombre).setHeader("Nombre").setAutoWidth(true)
                 .setSortable(true);
 
-        materialesColumn = grid.addColumn(new ComponentRenderer<>(TextArea::new, (textArea, modulo) -> {   
-            textArea.setReadOnly(true);            
-            textArea.setWidth("100%");
+        // materialesColumn = grid.addColumn(new ComponentRenderer<>(Span::new, (span, modulo) -> {          
+        //     span.setWidth("100%");
+        //     List<RecursoMaterial> materiales = new LinkedList<>(modulo.getRecursosMateriales());
+        //     String listMateriales = new String();
+        //     if (materiales.size() != 0) {
+        //         listMateriales += "" + materiales.get(0);
+        //         for (int i = 1; i < materiales.size(); i++) {
+        //             listMateriales += ", " + materiales.get(i);
+        //         }
+        //     }
+        //     span.setText(listMateriales);
             
-        })).setHeader("Materiales").setAutoWidth(true);
+        // })).setHeader("Materiales").setAutoWidth(true);
+        //materialesColumn = grid.addColumn(Modulo::getRecursosMateriales).setHeader("Materiales").setAutoWidth(true);
 
         editColumn = grid.addComponentColumn(modulo -> {
             Button editButton = new Button(VaadinIcon.EDIT.create());

@@ -141,7 +141,6 @@ public class UsuarioView extends Div {
                 }
             }
             span.setText(listRoles);
-            ;
         })).setHeader("Rol").setAutoWidth(true);
 
         editColumn = grid.addComponentColumn(user -> {

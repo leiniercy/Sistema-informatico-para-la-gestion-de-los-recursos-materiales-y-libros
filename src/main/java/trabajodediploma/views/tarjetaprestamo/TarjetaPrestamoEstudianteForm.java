@@ -60,6 +60,9 @@ public class TarjetaPrestamoEstudianteForm extends FormLayout {
         /* fecha de devolucion */
         fechaDevolucion.setMin(LocalDate.now(ZoneId.systemDefault()));
 
+        fechaPrestamo.addValueChangeListener(e -> fechaDevolucion.setMin(e.getValue()));
+        fechaDevolucion.addValueChangeListener(e -> fechaPrestamo.setMax(e.getValue()));
+
         add(libro, fechaPrestamo, fechaDevolucion, createButtonsLayout());
 
     }
