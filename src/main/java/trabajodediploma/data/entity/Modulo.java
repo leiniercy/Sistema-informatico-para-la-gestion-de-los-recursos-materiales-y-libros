@@ -47,7 +47,7 @@ public class Modulo extends AbstractEntity {
     @Column(name = "nombre", nullable = false)
     private String nombre;
 
-    @ManyToMany()
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "modulo_recurosMateriales", 
     joinColumns = @JoinColumn(name = "modulo_id", nullable = false), 
     inverseJoinColumns = @JoinColumn(name = "material_id", unique = false, nullable = false, updatable = true))
@@ -61,7 +61,7 @@ public class Modulo extends AbstractEntity {
         this.recursosMateriales.add(material);
     }
 
-    @OneToMany(mappedBy = "modulo")
+    @OneToMany(mappedBy = "modulo", cascade = CascadeType.ALL)
     List<DestinoFinal> destinosFinales;
 
 }

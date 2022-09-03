@@ -70,7 +70,7 @@ public class ModuloView extends Div {
             @Autowired ModuloService moduloService,
             @Autowired RecursoMaterialService materialService) {
 
-        addClassNames("modulo-view");
+        addClassNames("modulo_view");
         this.moduloService = moduloService;
         this.materialService = materialService;
         Filtros();
@@ -85,52 +85,52 @@ public class ModuloView extends Div {
     /* Contenido de la vista */
     private Div getContent() {
         Div formContent = new Div(form);
-        formContent.addClassName("form-content");
+        formContent.addClassName("form_content");
         Div gridContent = new Div(grid);
-        gridContent.addClassName("grid-content");
-        Div content = new Div(gridContent);
-        content.addClassName("content");
-        content.setSizeFull();
+        gridContent.addClassName("container__grid_content");
+        Div container = new Div(gridContent);
+        container.addClassName("container");
+        container.setSizeFull();
         /* Dialog Header */
         Button closeButton = new Button(new Icon("lumo", "cross"), (e) -> dialog.close());
         closeButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         Span title = new Span("Modulo");
         Div titleDiv = new Div(title);
-        titleDiv.addClassName("div-dialog-title");
+        titleDiv.addClassName("div_dialog_title");
         Div buttonDiv = new Div(closeButton);
-        buttonDiv.addClassName("div-dialog-button");
+        buttonDiv.addClassName("div_dialog_button");
         header = new Div(titleDiv, buttonDiv);
-        header.addClassName("div-dialog-header");
+        header.addClassName("div_dialog_header");
         /* Dialog Header */
         dialog = new Dialog(header, formContent);
-        return content;
+        return container;
     }
 
     /* Tabla */
     /* Configuracion de la tabla */
     private void configureGrid() {
-        grid.setClassName("modulo-grid");
+        grid.setClassName("container__grid_content__table");
 
         nombreColumn = grid.addColumn(Modulo::getNombre).setHeader("Nombre").setAutoWidth(true)
                 .setSortable(true);
 
-        // materialesColumn = grid.addColumn(new ComponentRenderer<>(Span::new, (span, modulo) -> {          
-        //     span.setWidth("100%");
-        //     List<RecursoMaterial> materiales = new LinkedList<>(modulo.getRecursosMateriales());
-        //     String listMateriales = new String();
-        //     if (materiales.size() != 0) {
-        //         listMateriales += "" + materiales.get(0);
-        //         for (int i = 1; i < materiales.size(); i++) {
-        //             listMateriales += ", " + materiales.get(i);
-        //         }
-        //     }
-        //     span.setText(listMateriales);
+        materialesColumn = grid.addColumn(new ComponentRenderer<>(Span::new, (span, modulo) -> {          
+            span.setWidth("100%");
+            List<RecursoMaterial> materiales = new LinkedList<>(modulo.getRecursosMateriales());
+            String listMateriales = new String();
+            if (materiales.size() != 0) {
+                listMateriales += "" + materiales.get(0).getDescripcion();
+                for (int i = 1; i < materiales.size(); i++) {
+                    listMateriales += ", " + materiales.get(i).getDescripcion();
+                }
+            }
+            span.setText(listMateriales);
             
-        // })).setHeader("Materiales").setAutoWidth(true);
-        //materialesColumn = grid.addColumn(Modulo::getRecursosMateriales).setHeader("Materiales").setAutoWidth(true);
-
+        })).setHeader("Materiales").setAutoWidth(true);
+       
         editColumn = grid.addComponentColumn(modulo -> {
             Button editButton = new Button(VaadinIcon.EDIT.create());
+            editButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
             editButton.addClickListener(e -> this.editModulo(modulo));
             return editButton;
         }).setFlexGrow(0);
@@ -174,10 +174,13 @@ public class ModuloView extends Div {
         buttons = new HorizontalLayout();
         Button refreshButton = new Button(VaadinIcon.REFRESH.create());
         refreshButton.addClickListener(click -> refreshGrid());
+        refreshButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         Button deleteButton = new Button(VaadinIcon.TRASH.create());
         deleteButton.addClickListener(click -> deleteModulo());
+        deleteButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         Button addButton = new Button(VaadinIcon.PLUS.create());
         addButton.addClickListener(click -> addModulo());
+        addButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         buttons.add(refreshButton, watchColumns(), deleteButton, addButton);
         if (moduloService.count() == 1) {
             total = new Html("<span>Total: <b>" + moduloService.count() + "</b> modulo</span>");
@@ -242,10 +245,11 @@ public class ModuloView extends Div {
     /* Menu de Columnas */
     private Button watchColumns() {
         Button menuButton = new Button(/* "Mostar/Ocultar Columnas" */VaadinIcon.EYE.create());
+        menuButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         ColumnToggleContextMenu columnToggleContextMenu = new ColumnToggleContextMenu(
                 menuButton);
-        columnToggleContextMenu.addColumnToggleItem("Código", nombreColumn);
-        // columnToggleContextMenu.addColumnToggleItem("Descripción", materialesColumn);
+        columnToggleContextMenu.addColumnToggleItem("Nombre", nombreColumn);
+        columnToggleContextMenu.addColumnToggleItem("Materiales", materialesColumn);
         return menuButton;
     }
 
@@ -278,7 +282,9 @@ public class ModuloView extends Div {
         List<Modulo> modulos = moduloService.findAll();
 
         modulos = modulos.parallelStream().filter(
-                mat -> event.getModulo().getNombre().equals(mat.getNombre()))
+                mat -> event.getModulo().getNombre().equals(mat.getNombre())
+                && event.getModulo().getRecursosMateriales().equals(mat.getRecursosMateriales())
+                )
                 .collect(Collectors.toList());
 
         if (modulos.size() != 0) {

@@ -126,9 +126,9 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
             List<RecursoMaterial> materiales = new LinkedList<>(tarjeta.getModulo().getRecursosMateriales());
             String listMateriales = new String();
             if (materiales.size() != 0) {
-                listMateriales += "" + materiales.get(0);
+                listMateriales += "" + materiales.get(0).getDescripcion();
                 for (int i = 1; i < materiales.size(); i++) {
-                    listMateriales += ", " + materiales.get(i);
+                    listMateriales += ", " + materiales.get(i).getDescripcion();
                 }
             }
             span_materiales.setText(listMateriales);

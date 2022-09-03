@@ -3,9 +3,10 @@ package trabajodediploma.views.modulo;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Set;
 
-// import org.vaadin.gatanaso.MultiselectComboBox;
+import org.vaadin.gatanaso.MultiselectComboBox;
 
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
@@ -34,8 +35,8 @@ public class ModuloForm extends FormLayout {
     private Modulo modulo;
     private List<RecursoMaterial> materiales;
     TextField nombre = new TextField();
-    MultiSelectListBox<RecursoMaterial> recursosMateriales = new MultiSelectListBox<>();
-    // MultiselectComboBox<String> multiselectComboBox = new MultiselectComboBox();
+   
+    MultiselectComboBox<RecursoMaterial> recursosMateriales = new MultiselectComboBox();
 
     Button save = new Button("Añadir", VaadinIcon.PLUS.create());
     Button close = new Button("Cancelar", VaadinIcon.ERASER.create());
@@ -57,15 +58,17 @@ public class ModuloForm extends FormLayout {
             event.getSource().setHelperText(event.getValue().length() + "/" + 100);
         });
         // Recursos Materiales
-        Label mat = new Label("Materiales:");
+        recursosMateriales.setLabel("Materiales:");
         recursosMateriales.setItems(materiales);
         recursosMateriales.setItemLabelGenerator(RecursoMaterial::getDescripcion);
-        recursosMateriales.setHeight("80px");
+        // recursosMateriales.setCompactMode(true);
+        recursosMateriales.setOrdered(true);
+        recursosMateriales.setRequired(true); 
+        recursosMateriales.setErrorMessage("Campo obligatorio");
+        recursosMateriales.setClearButtonVisible(true); 
+        
 
-        // multiselectComboBox.setLabel("Select items");
-        // multiselectComboBox.setItems("Item 1", "Item 2", "Item 3", "Item 4");
-
-        add(nombre, /*multiselectComboBox,*/ mat, recursosMateriales, createButtonsLayout());
+        add(nombre, recursosMateriales, createButtonsLayout());
     }
 
     private HorizontalLayout createButtonsLayout() {
@@ -95,13 +98,12 @@ public class ModuloForm extends FormLayout {
     private void validateAndSave() {
         try {
             binder.writeBean(modulo);
-            this.modulo.setRecursosMateriales(recursosMateriales.getValue());
             fireEvent(new SaveEvent(this, modulo));
         } catch (ValidationException e) {
             e.printStackTrace();
             Notification notification = Notification.show(
                     "Ocurrió un problema al intentar almacenar el recurso",
-                    5000,
+                    2000,
                     Notification.Position.MIDDLE);
             notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
         }

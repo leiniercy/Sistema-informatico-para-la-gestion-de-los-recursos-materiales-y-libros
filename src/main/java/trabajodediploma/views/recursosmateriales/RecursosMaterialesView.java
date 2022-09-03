@@ -164,6 +164,7 @@ public class RecursosMaterialesView extends Div {
                 editColumn = grid.addComponentColumn(material -> {
                         Button editButton = new Button(VaadinIcon.EDIT.create());
                         editButton.addClickListener(e -> this.editMaterial(material));
+                        editButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
                         return editButton;
                 }).setFlexGrow(0);
 
@@ -251,11 +252,15 @@ public class RecursosMaterialesView extends Div {
                 buttons = new HorizontalLayout();
                 Button refreshButton = new Button(VaadinIcon.REFRESH.create());
                 refreshButton.addClickListener(click -> refreshGrid());
+                refreshButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
                 Button deleteButton = new Button(VaadinIcon.TRASH.create());
                 deleteButton.addClickListener(click -> deleteMaterial());
+                deleteButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
                 Button addButton = new Button(VaadinIcon.PLUS.create());
                 addButton.addClickListener(click -> addMaterial());
+                addButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
                 Button modelButton = new Button(VaadinIcon.FILE.create());
+                modelButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
                 modelButton.addClickListener(click -> formReporte());
                 buttons.add(refreshButton, watchColumns(), deleteButton, addButton, modelButton);
                 if (materialService.count() == 1) {
@@ -326,7 +331,7 @@ public class RecursosMaterialesView extends Div {
         /* Menu de Columnas */
         private Button watchColumns() {
                 Button menuButton = new Button(/* "Mostar/Ocultar Columnas" */VaadinIcon.EYE.create());
-
+                menuButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
                 ColumnToggleContextMenu columnToggleContextMenu = new ColumnToggleContextMenu(
                                 menuButton);
                 columnToggleContextMenu.addColumnToggleItem("Código", codigoColumn);
