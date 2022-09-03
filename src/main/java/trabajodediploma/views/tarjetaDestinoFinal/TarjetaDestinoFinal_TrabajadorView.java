@@ -7,11 +7,13 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import com.vaadin.flow.component.Html;
+import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.HeaderRow;
@@ -66,6 +68,7 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
             ModuloService moduloService,
             TrabajadorService trabajadorService,
             DestinoFinalService destinoService) {
+        addClassName("tarjeta_trabajador");       
         this.moduloService = moduloService;
         this.trabajadorService = trabajadorService;
         this.destinoService = destinoService;
@@ -81,20 +84,20 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
         Div formContent = new Div(form);
         formContent.addClassName("form-content");
         Div gridContent = new Div(grid);
-        gridContent.addClassName("grid-content");
+        gridContent.addClassName("tarjeta_trabajador__content__grid-content");
         Div content = new Div(gridContent);
-        content.addClassName("content");
+        content.addClassName("tarjeta_trabajador__content");
         content.setSizeFull();
         /* Dialog Header */
         Button closeButton = new Button(new Icon("lumo", "cross"), (e) -> dialog.close());
         closeButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         Span title = new Span("Libro");
         Div titleDiv = new Div(title);
-        titleDiv.addClassName("div-dialog-title");
+        titleDiv.addClassName("div_dialog_title");
         Div buttonDiv = new Div(closeButton);
-        buttonDiv.addClassName("div-dialog-button");
+        buttonDiv.addClassName("div_dialog_button");
         header = new Div(titleDiv, buttonDiv);
-        header.addClassName("div-dialog-header");
+        header.addClassName("div_dialog_header");
         /* Dialog Header */
         dialog = new Dialog(header, formContent);
         return content;
@@ -103,20 +106,19 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
     /* Tabla */
     /* Configuracion de la tabla */
     private void configureGrid() {
-        grid.setClassName("tarjetaDestinoFinal-trabajador-grid");
+        grid.setClassName("tarjeta_trabajador__content__grid-content__table");
 
         trabajadorColumn = grid.addColumn(new ComponentRenderer<>(tarjeta -> {
             tarjetaTrabajador = (DestinoFinalTrabajador) tarjeta;
             HorizontalLayout hl = new HorizontalLayout();
             hl.setAlignItems(Alignment.CENTER);
-            Image img = new Image(tarjetaTrabajador.getTrabajador().getUser().getProfilePictureUrl(), "");
-            img.setHeight("3.5rem");
+            Avatar avatar = new Avatar(tarjetaTrabajador.getTrabajador().getUser().getName(), tarjetaTrabajador.getTrabajador().getUser().getProfilePictureUrl());
             Span span = new Span();
             span.setClassName("name");
             span.setText(tarjetaTrabajador.getTrabajador().getUser().getName());
-            hl.add(img, span);
+            hl.add(avatar, span);
             return hl;
-        })).setHeader("Trabajador").setAutoWidth(true).setSortable(true);
+        })).setHeader("Trabajador").setFrozen(true).setAutoWidth(true).setSortable(true);
 
         moduloColumn = grid.addColumn(new ComponentRenderer<>(tarjeta -> {
             VerticalLayout layout = new VerticalLayout();
@@ -141,13 +143,15 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
                 .addColumn(new LocalDateRenderer<>(tarjeta -> tarjeta.getFecha(),
                         DateTimeFormatter.ofPattern("dd/MM/yyyy")))
                 .setComparator(tarjeta -> tarjeta.getFecha()).setHeader("Fecha de Entrega").setAutoWidth(true)
+                .setTextAlign(ColumnTextAlign.CENTER)
                 .setSortable(true);
         editColumn = grid.addComponentColumn(tarjeta -> {
             tarjetaTrabajador = (DestinoFinalTrabajador) tarjeta;
             Button editButton = new Button(VaadinIcon.EDIT.create());
             editButton.addClickListener(e -> this.editTarjeta(tarjetaTrabajador));
+            editButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
             return editButton;
-        }).setFlexGrow(0);
+        }).setTextAlign(ColumnTextAlign.CENTER).setFrozen(true).setFlexGrow(0);
 
         Filtros();
 
@@ -251,11 +255,11 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
     private HorizontalLayout menuBar() {
         buttons = new HorizontalLayout();
         Button refreshButton = new Button(VaadinIcon.REFRESH.create(), click -> refreshGrid());
-        refreshButton.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
+        refreshButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         Button deleteButton = new Button(VaadinIcon.TRASH.create(), click -> deleteTarjeta());
-        deleteButton.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
+        deleteButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         Button addButton = new Button(VaadinIcon.PLUS.create(), click -> addTarjeta());
-        addButton.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
+        addButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         buttons.add(refreshButton, deleteButton, addButton);
 
         total = new Html("<span>Total: <b>" + tarjetas.size() + "</b></span>");

@@ -187,7 +187,7 @@ public class ModificarPerfilTrabajadorForm extends FormLayout {
     // Validate and Save
     private void validateAndSave() {
         try {
-            if (codigo.getValue() != codigo_buffer.toString()) {
+            if (codigo.isEnabled() && codigo.getValue() == codigo_buffer.toString()) {
                 binderTrabajador.writeBean(trabajador);
                 binderUser.writeBean(user);
                 // user
@@ -199,7 +199,7 @@ public class ModificarPerfilTrabajadorForm extends FormLayout {
                 this.trabajador.setSolapin(solapin.getValue());
                 this.trabajador.setUser(user);
                 fireEvent(new SaveEvent(this, trabajador, user));
-            } else {
+            }  else if( !codigo.isEnabled() || codigo.getValue() == codigo_buffer.toString() ){
                 Notification notification = Notification.show(
                         "Código de identificación incorrecto",
                         2000,

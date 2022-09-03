@@ -42,7 +42,7 @@ public class TarjetaDestinoFinalView extends Div {
             @Autowired EstudianteService estudianteService,
             @Autowired TrabajadorService trabajadorService,
             @Autowired ModuloService moduloService) {
-        addClassNames("tarjeta-destino-view");
+        addClassNames("tarjeta_destino_final_view");
         this.destinoService = destinoService;
         this.estudianteService = estudianteService;
         this.trabajadorService = trabajadorService;
@@ -51,7 +51,7 @@ public class TarjetaDestinoFinalView extends Div {
         trabajadorView = new TarjetaDestinoFinal_TrabajadorView(moduloService, trabajadorService, destinoService);
         estudianteView = new TarjetaDestinoFinal_EstudianteView(moduloService, estudianteService, destinoService);
         content = new Div();
-        content.addClassName("content");
+        content.addClassName("tarjeta_destino_final_view__container");
         content.add(estudianteView);
         add(MenuBar(), content, myFooter);
     }
