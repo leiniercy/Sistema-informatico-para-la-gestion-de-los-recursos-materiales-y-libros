@@ -1,38 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>GENIUS</title>
     <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-family: sans-serif;
-            color: #555;
-        }
-
-        .content {
-            width: 80%;
-        }
-
-        .offline-image {
-            width: 100%;
-            margin: 4em 0px;
-        }
+      body,
+      .content {
+        font-family: sans-serif;
+        color: #555;
+        height: 100vh;
+        width: 100%;
+        margin: 0;
+      }
+      .content {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+      .div_img {
+        height: 300px;
+        width: 400px;
+      }
+      .div_img img {
+        height: inherit;
+        width: inherit;
+        object-fit: contain;
+      }
+      .div_sms {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        line-height: 0.1;
+      }
     </style>
-</head>
-<body>
-
-<div class="content">
-    <img src="./images/offline.png" alt="GENIUS is offline" class="offline-image"/>
-    <h1>Página sin conexión</h1>
-    <p>A perdido su conexión a Internet, compruebe la misma y vuelva a intentarlo</p>
-</div>
-<script>
-    window.addEventListener('online', () => window.location.reload()); 
-</script>
-</body>
+  </head>
+  <body>
+    <div class="content">
+      <div class="div_img">
+        <img src="./images/offline.png" alt="GENIUS is offline" class="offline-image" />
+      </div>
+      <div class="div_sms">
+        <h1>Página sin conexión</h1>
+        <p>A perdido su conexión a Internet, compruebe la misma y vuelva a intentarlo</p>
+      </div>
+    </div>
+    <script>
+      window.addEventListener('online', () => window.location.reload());
+    </script>
+  </body>
 </html>
