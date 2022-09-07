@@ -17,6 +17,7 @@
 @import url('./views/modulo-view.css'); 
 @import url('./views/page-not-found-view.css'); 
 @import url('./views/forbbiden-view.css'); 
+@import url('./views/internal-sever-error-view.css'); 
 @import url('line-awesome/dist/line-awesome/css/line-awesome.min.css');    
 html {
   --lumo-font-family: Cambria, "Hoefler Text", Utopia, "Liberation Serif", "Nimbus Roman No9 L Regular", Times, "Times New Roman", serif;

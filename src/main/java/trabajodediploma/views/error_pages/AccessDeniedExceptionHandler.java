@@ -5,7 +5,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.access.AccessDeniedException;
 
 import com.vaadin.flow.component.Composite;
-import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Image;
@@ -18,14 +17,13 @@ import com.vaadin.flow.router.ParentLayout;
 
 import trabajodediploma.views.MainLayout;
 
-@Tag(Tag.DIV)
 @ParentLayout(MainLayout.class)
 public class AccessDeniedExceptionHandler extends Composite<Div>
                 implements HasErrorParameter<AccessDeniedException> {
 
         private Label label_error;
         private Label label_sms;
-        private Image page_not_found;
+        private Image access_denied;
         private Anchor link_home;
 
         @Override
@@ -54,9 +52,9 @@ public class AccessDeniedExceptionHandler extends Composite<Div>
         private Div Imagen() {
                 Div div_img = new Div();
                 div_img.addClassName("div_img");
-                page_not_found = new Image("images/website-error-403-forbidden.png.PNG", "Forbidden");
-                page_not_found.addClassName("div_img__page_not_found");
-                div_img.add(page_not_found);
+                access_denied = new Image("images/website-error-403-forbidden.png.PNG", "Forbidden");
+                access_denied.addClassName("div_img__page_not_found");
+                div_img.add(access_denied);
                 return div_img;
         }
 

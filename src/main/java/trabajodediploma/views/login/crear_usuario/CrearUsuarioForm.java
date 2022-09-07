@@ -61,7 +61,7 @@ public class CrearUsuarioForm extends FormLayout {
     public CrearUsuarioForm(PasswordEncoder passwordEncoder) {
         this.passwordEncoder = passwordEncoder;
         Configuracion();
-        add(profilePictureUrl, name, username, hashedPassword, confirmPassword,createButtonsLayout());
+        add(/*profilePictureUrl,*/ name, username, hashedPassword, confirmPassword,createButtonsLayout());
     }
 
     private void Configuracion() {
