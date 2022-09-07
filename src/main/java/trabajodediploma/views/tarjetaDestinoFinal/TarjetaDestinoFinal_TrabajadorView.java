@@ -113,15 +113,22 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
             HorizontalLayout hl = new HorizontalLayout();
             hl.setAlignItems(Alignment.CENTER);
             Avatar avatar = new Avatar(tarjetaTrabajador.getTrabajador().getUser().getName(), tarjetaTrabajador.getTrabajador().getUser().getProfilePictureUrl());
-            Span span = new Span();
-            span.setClassName("name");
-            span.setText(tarjetaTrabajador.getTrabajador().getUser().getName());
-            hl.add(avatar, span);
+            VerticalLayout vl = new VerticalLayout();
+            vl.getStyle().set("line-height","0");
+            Span name = new Span();
+            name.addClassNames("name");
+            name.setText(tarjetaTrabajador.getTrabajador().getUser().getName());
+            Span email = new Span();
+            email.addClassNames("text-s","text-secondary");
+            email.setText(tarjetaTrabajador.getTrabajador().getEmail());
+            vl.add(name,email);
+            hl.add(avatar,vl);
             return hl;
         })).setHeader("Trabajador").setFrozen(true).setAutoWidth(true).setSortable(true);
 
         moduloColumn = grid.addColumn(new ComponentRenderer<>(tarjeta -> {
             VerticalLayout layout = new VerticalLayout();
+            layout.getStyle().set("line-height","0.5"); 
             Label nombreModulo = new Label(tarjeta.getModulo().getNombre());
             Span span_materiales = new Span();
             span_materiales.setWidth("100%");

@@ -20,6 +20,7 @@ import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.html.UnorderedList;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.RouterLink;
@@ -156,11 +157,7 @@ public class MainLayout extends AppLayout {
             
             Avatar avatar = new Avatar(user.getUsername(), user.getProfilePictureUrl());
             avatar.addClassNames("avatar", "me-xs");
-            // StreamResource imageResource = new StreamResource(
-            //         user.getProfilePictureUrl(),
-            //         () -> getClass().getResourceAsStream(user.getProfilePictureUrl()));
-            // avatar.setImageResource(imageResource);
-
+                        
             ContextMenu userMenu = new ContextMenu(avatar);
             userMenu.setOpenOnClick(true);
             userMenu.addItem("Perfil", e -> {

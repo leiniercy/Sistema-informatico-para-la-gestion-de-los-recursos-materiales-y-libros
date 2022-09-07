@@ -113,15 +113,22 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
             HorizontalLayout hl = new HorizontalLayout();
             hl.setAlignItems(Alignment.CENTER);
             Avatar avatar = new Avatar(tarjetaEstudiante.getEstudiante().getUser().getName(), tarjetaEstudiante.getEstudiante().getUser().getProfilePictureUrl());
-            Span span = new Span();
-            span.setClassName("name");
-            span.setText(tarjetaEstudiante.getEstudiante().getUser().getName());
-            hl.add(avatar,span);
+            VerticalLayout vl = new VerticalLayout();
+            vl.getStyle().set("line-height","0");
+            Span name = new Span();
+            name.addClassNames("name");
+            name.setText(tarjetaEstudiante.getEstudiante().getUser().getName());
+            Span email = new Span();
+            email.addClassNames("text-s","text-secondary");
+            email.setText(tarjetaEstudiante.getEstudiante().getEmail());
+            vl.add(name,email);
+            hl.add(avatar,vl);
             return hl;
         })).setHeader("Estudiante").setFrozen(true).setAutoWidth(true).setSortable(true);
 
         moduloColumn = grid.addColumn(new ComponentRenderer<>(tarjeta -> {
-            VerticalLayout layout = new VerticalLayout(); 
+            VerticalLayout layout = new VerticalLayout();
+            layout.getStyle().set("line-height","0.5"); 
             Label nombreModulo = new Label(tarjeta.getModulo().getNombre());
             Span span_materiales = new Span();
             span_materiales.setWidth("100%");
@@ -145,6 +152,7 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
                 .setComparator(tarjeta -> tarjeta.getFecha()).setHeader("Fecha de Entrega").setAutoWidth(true)
                 .setTextAlign(ColumnTextAlign.CENTER)
                 .setSortable(true);
+        
         editColumn = grid.addComponentColumn(tarjeta -> {
             tarjetaEstudiante = (DestinoFinalEstudiante) tarjeta;
             Button editButton = new Button(VaadinIcon.EDIT.create());

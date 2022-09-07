@@ -25,6 +25,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.ValidationException;
+import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.shared.Registration;
 import java.util.List;
 import java.util.Random;
@@ -36,6 +37,7 @@ import elemental.json.Json;
 import trabajodediploma.data.entity.Estudiante;
 import trabajodediploma.data.entity.Grupo;
 import trabajodediploma.data.entity.User;
+import trabajodediploma.data.tools.CustomErrorHandler;
 import trabajodediploma.data.tools.EmailSenderService;
 import trabajodediploma.data.tools.MyUploadI18n;
 
@@ -218,7 +220,7 @@ public class ModificarPerfilEstudianteForm extends FormLayout {
     //Validate and Save
     private void validateAndSave() {
         try {
-            if (codigo.isEnabled() && codigo.getValue() == codigo_buffer.toString()) {
+             if (codigo.isEnabled() && codigo.getValue() == codigo_buffer.toString()) {
             binderEstudiante.writeBean(estudiante);
             binderUser.writeBean(user);
             //user

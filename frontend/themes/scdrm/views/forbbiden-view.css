@@ -1,0 +1,53 @@
+.forbidden-view {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+.div_img {
+}
+.div_img__page_not_found {
+  border-radius: 50%;
+}
+.div_sms {
+  display: flex;
+  flex-direction: column;
+  align-items: baseline;
+  text-align: center;
+}
+.div_sms label {
+  width: 100%;
+  font-size: var(--lumo-font-size-l);
+}
+.div_sms__link_home {
+  color: rgb(238 164 51);
+  font-size: var(--lumo-font-size-m);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s, transform 0.2s;
+  width: 100%;
+}
+.div_sms__link_home:active {
+  text-decoration: none;
+  color: var(--lumo-primary-color-50pct);
+  transform: scale(0.95);
+}
+.div_sms__link_home:active vaadin-icon {
+  color: var(--lumo-primary-color-50pct);
+}
+a:not(:any-link) {
+  /* color: rgb(240, 179, 87); */
+}
+.div_sms__link_home label {
+  width: auto;
+  font-size: var(--lumo-font-size-l);
+}
+.div_sms__link_home vaadin-icon {
+  color: rgb(238 164 51);
+  margin-right: 2px;
+  height: var(--lumo-font-size-m);
+}

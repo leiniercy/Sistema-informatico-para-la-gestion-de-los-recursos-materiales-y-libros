@@ -5,6 +5,7 @@
  */
 package trabajodediploma.views.tarjetaprestamo;
 
+import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
@@ -12,8 +13,13 @@ import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,7 +72,23 @@ public class EstudianteGrid extends Div {
     private void configureGrid() {
 
         gridEstudiantes.setClassName("container___estudiante_grid__div__table");
-        nombreColumn = gridEstudiantes.addColumn(Estudiante::getNombreApellidos).setHeader("Nombre").setAutoWidth(true).setSortable(true);
+        nombreColumn = gridEstudiantes.addColumn(new ComponentRenderer<>(est-> {
+            HorizontalLayout hl = new HorizontalLayout();
+            hl.getStyle().set("align-items","center");
+            hl.setAlignItems(Alignment.CENTER);
+            Avatar avatar = new Avatar(est.getUser().getName(), est.getUser().getProfilePictureUrl());
+            VerticalLayout vl = new VerticalLayout();
+            vl.getStyle().set("line-height","0");
+            Span name = new Span();
+            name.addClassNames("name");
+            name.setText(est.getUser().getName());
+            Span email = new Span();
+            email.addClassNames("text-s","text-secondary");
+            email.setText(est.getEmail());
+            vl.add(name,email);
+            hl.add(avatar,vl);
+            return hl;
+        })).setHeader("Nombre").setAutoWidth(true).setSortable(true);
         tarjetaColumn = gridEstudiantes.addComponentColumn(event -> {
             Button cardButton = new Button("Tarjeta");
             cardButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
