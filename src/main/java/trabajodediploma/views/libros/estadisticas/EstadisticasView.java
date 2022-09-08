@@ -5,6 +5,24 @@
  */
 package trabajodediploma.views.libros.estadisticas;
 
+import com.itextpdf.kernel.color.Color;
+import com.itextpdf.kernel.color.DeviceRgb;
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.layout.Document;
+import com.itextpdf.layout.border.Border;
+import com.itextpdf.layout.element.Cell;
+import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.layout.element.Table;
+import com.itextpdf.layout.property.HorizontalAlignment;
+import com.itextpdf.layout.property.TextAlignment;
+import com.itextpdf.layout.property.VerticalAlignment;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasStyle;
 import com.vaadin.flow.component.board.Board;
@@ -17,8 +35,10 @@ import com.vaadin.flow.component.charts.model.Configuration;
 import com.vaadin.flow.component.charts.model.DataSeries;
 import com.vaadin.flow.component.charts.model.DataSeriesItem;
 import com.vaadin.flow.component.datepicker.DatePicker;
+import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -29,18 +49,24 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.StreamResource;
 
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import javax.annotation.security.RolesAllowed;
+
 import org.springframework.beans.factory.annotation.Autowired;
+
 import trabajodediploma.data.entity.Libro;
 import trabajodediploma.data.entity.TarjetaPrestamo;
 import trabajodediploma.data.service.LibroService;
 import trabajodediploma.data.service.TarjetaPrestamoService;
+
 import trabajodediploma.views.MainLayout;
 import trabajodediploma.views.footer.MyFooter;
 
@@ -57,8 +83,6 @@ public class EstadisticasView extends Div {
     private TarjetaPrestamoService prestamoService;
     private Div container;
     private MyFooter footer;
-    private DatePicker endDate = new DatePicker("Fecha de fin:");;
-    private DatePicker initDate = new DatePicker("Fecha de inicio:");
     private List<TarjetaPrestamo> tarjetas;
     private List<Libro> listLibros;
     private Configuration configuration;
@@ -76,43 +100,14 @@ public class EstadisticasView extends Div {
         footer = new MyFooter();
 
         updateList();
-        add(getBarraDeMenu());
-        if (initDate.getValue() == null || endDate.getValue() == null) {
-            container.removeAll();
-            updateList();
-            container.add(getBoard(), getGraficosPasteles());
-            add(container);
-        } else {
-            container.removeAll();
-            updateList();
-            container.add(getBoard(), getGraficosPasteles());
-            add(container);
-        }
-        add(footer);
-
+        container.add(getBoard(), getGraficosPasteles());
+        add(getBarraDeMenu(), container, footer);
     }
 
     // actualizar listas
     private void updateList() {
-        if (initDate.isEmpty() || endDate.isEmpty()) {
-            listLibros = libroService.findAll();
-            tarjetas = prestamoService.findAll();
-        } else if (!initDate.isEmpty() && !endDate.isEmpty()) {
-            listLibros = libroService.findAll();
-            tarjetas = prestamoService.findAll();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-            tarjetas = tarjetas.stream().filter(
-                    // fecha_inicio <= x <= fecha_fin
-                    event -> event.getFechaPrestamo() != null
-                            /* x <=  fecha_fin*/
-                           // && ( event.getFechaPrestamo().isBefore(endDate.getValue()) || event.getFechaPrestamo().isEqual(endDate.getValue()) )
-                           && ( formatter.format(event.getFechaPrestamo()).compareTo(formatter.format(endDate.getValue())) < 0 || (formatter.format(event.getFechaPrestamo()).equals(formatter.format(endDate.getValue()))) ) 
-                           && event.getFechaDevolucion() != null
-                             /*fecha_inicio <= x */
-                        //&& ( event.getFechaDevolucion().isAfter(initDate.getValue()) || event.getFechaDevolucion().isEqual(initDate.getValue()) ))
-                         && ( formatter.format(event.getFechaDevolucion()).compareTo(formatter.format(initDate.getValue())) > 0 || (formatter.format(event.getFechaPrestamo()).equals(formatter.format(initDate.getValue()))) )) 
-                        .collect(Collectors.toList());
-        }
+        listLibros = libroService.findAll();
+        tarjetas = prestamoService.findAll();
     }
 
     // Barra de menu
@@ -120,10 +115,16 @@ public class EstadisticasView extends Div {
 
         Div buttons = new Div();
         buttons.addClassNames("estadistica_view___barra_menu__export");
-        Button exportButton = new Button(VaadinIcon.FILE.create());
-        exportButton.addClickListener(click -> exportChart());
-        buttons.add(exportButton);
-        Div toolbar = new Div(DatePickerDateRange(), buttons);
+
+        Anchor linkExport = new Anchor();
+        linkExport.addClassName("estadistica_view___barra_menu__export__link");
+        linkExport.add(VaadinIcon.FILE.create());
+        linkExport.add(new Label("Exportar"));
+        linkExport.setHref(exportChart());
+        linkExport.setTarget("_BLANK");
+
+        buttons.add(linkExport);
+        Div toolbar = new Div(buttons);
         toolbar.addClassName("estadistica_view___barra_menu");
         return toolbar;
     }
@@ -205,9 +206,9 @@ public class EstadisticasView extends Div {
         }
 
         DataSeries dataSeries = new DataSeries();
-        dataSeries.add(new DataSeriesItem(String.format("Libros prestados: %d", cantRealLibrosPrestados()), promedioP));
+        dataSeries.add(new DataSeriesItem(String.format("Libros prestados: %.0f", promedioP ) + "%", promedioP));
         dataSeries
-                .add(new DataSeriesItem(String.format("Libros en el álmacen: %d", cantRealLibrosAlmacen()), promedioA));
+                .add(new DataSeriesItem(String.format("Libros en el álmacen: %.0f", promedioA ) + "%", promedioA));
 
         chart.getConfiguration().setSeries(dataSeries);
         chart.getConfiguration().setTitle("Distribución de libros");
@@ -224,58 +225,101 @@ public class EstadisticasView extends Div {
         return serviceHealth;
     }
 
-    // Rango de las fechas
-    private Component DatePickerDateRange() {
+    private StreamResource exportChart() {
 
-        DatePicker.DatePickerI18n singleFormatI18n = new DatePicker.DatePickerI18n();
-        singleFormatI18n.setDateFormat("dd.MM.yyyy");
+        /*
+         * ExportOptions options = new ExportOptions();
+         * options.setWidth(800);
+         * options.setHeight(600);
+         * 
+         * try (SVGGenerator generator = new SVGGenerator()) {
+         * String svg = generator.generate(configuration);
+         * SvgWrapper styleSvg = new SvgWrapper(svg);
+         * 
+         * // container.add(styleSvg);
+         * } catch (IOException | InterruptedException ex) {
+         * // handle exceptions accordingly
+         * System.out.print("Error al exportar csv");
+         * }
+         */
 
-        initDate.setI18n(singleFormatI18n);
-        initDate.setClearButtonVisible(true);
-        initDate.addValueChangeListener(event -> {
-            container.removeAll();
-            updateList();
-            container.add(getBoard(), getGraficosPasteles());
+        StreamResource source = new StreamResource("ReporteEvaluaciones.pdf", () -> {
+            String path = "src/main/resources/META-INF/resources/archivos/RecurosMateriales.pdf";
+
+            try {
+                PdfWriter pdfWriter = new PdfWriter(path);
+                PdfDocument pdfDocument = new PdfDocument(pdfWriter);
+                Document document = new Document(pdfDocument);
+
+                document.add(infoPdf());
+                document.close();
+
+                File initialFile = new File(path);
+                InputStream targetStream = new FileInputStream(initialFile);
+                return targetStream;
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                Notification notification = Notification.show("Ocurrió al exportar el documento", 5000,
+                        Notification.Position.MIDDLE);
+                ;
+                notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+                return null;
+            }
+
         });
+        return source;
 
-        endDate.setI18n(singleFormatI18n);
-        endDate.setClearButtonVisible(true);
-        endDate.setValue(LocalDate.now());
-        endDate.addValueChangeListener(event -> {
-            container.removeAll();
-            updateList();
-            container.add(getBoard(), getGraficosPasteles());
-        });
-
-        initDate.addValueChangeListener(e -> endDate.setMin(e.getValue()));
-        endDate.addValueChangeListener(e -> initDate.setMax(e.getValue()));
-
-        Span s = new Span("-");
-
-        Div layout = new Div(initDate, s, endDate);
-        layout.addClassNames("barra-menu-date");
-        return layout;
     }
+    
+    private Table infoPdf() {
+        float firstGrow_columnWidth[] = { 600 };
 
-    private void exportChart() {
-        Div div = new Div();
-        // configuracion
-        ExportOptions options = new ExportOptions();
-        options.setWidth(800);
-        options.setHeight(600);
-        try (SVGGenerator generator = new SVGGenerator()) {
-            String svg = generator.generate(configuration, options);
-            // previsualizar el svg a exportar
-            div.getElement().setProperty("innerHTML", svg);
-        } catch (IOException | InterruptedException ex) {
-            // handle exceptions accordingly
-            Notification notification = Notification.show(
-                    "Error al exportar el svg",
-                    2000,
-                    Notification.Position.MIDDLE);
-            notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
-        }
+        Table firstGrow = new Table(firstGrow_columnWidth);
 
+        firstGrow.addCell(new Cell().add("UNIVERSIDAD DE LAS CIENCIAS INFORMÁTICAS")
+                .setTextAlignment(TextAlignment.CENTER)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setMarginTop(30f)
+                .setMarginBottom(30f)
+                .setFontSize(14f)
+                .setBold()
+                .setBorder(Border.NO_BORDER));
+
+        firstGrow.addCell(new Cell().add("Estadísticas: Álmacen Facultad 4")
+                .setTextAlignment(TextAlignment.LEFT)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setMarginTop(20f)
+                .setMarginBottom(20f)
+                .setFontSize(14f)
+                .setBold()
+                .setBorder(Border.NO_BORDER));
+
+        firstGrow.addCell(new Cell().add("CANTIDAD REAL DE LIBROS: " + Integer.toString(cantRealLibros()))
+                .setTextAlignment(TextAlignment.LEFT)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setMarginTop(10f)
+                .setMarginBottom(10f)
+                .setFontSize(10f)
+                .setBorder(Border.NO_BORDER));
+
+        firstGrow.addCell(
+                new Cell().add("CANTIDAD DE LIBROS EN EL ÁLMACEN: " + Integer.toString(cantRealLibrosAlmacen()))
+                        .setTextAlignment(TextAlignment.LEFT)
+                        .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                        .setMarginTop(10f)
+                        .setMarginBottom(10f)
+                        .setFontSize(10f)
+                        .setBorder(Border.NO_BORDER));
+
+        firstGrow.addCell(new Cell().add("CANTIDAD DE LIBROS PRESTADOS: " + cantRealLibrosPrestados())
+                .setTextAlignment(TextAlignment.LEFT)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setMarginTop(10f)
+                .setMarginBottom(10f)
+                .setFontSize(10f)
+                .setBorder(Border.NO_BORDER));
+
+        return firstGrow;
     }
 
 }

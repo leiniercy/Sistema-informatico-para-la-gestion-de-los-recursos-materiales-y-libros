@@ -48,8 +48,37 @@
 .estadistica_view___barra_menu__export {
   margin: 10px;
   height: 44px;
-  min-width: 45px;
+  width: 120px;
 }
-
+.estadistica_view___barra_menu__export__link{
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+  height: 100%;
+  min-height: inherit;
+  text-shadow: inherit;
+  padding: 0;
+  border: none;
+  box-shadow: none;
+  background-color: var(--lumo-primary-color);
+  color: #fff;
+  border-radius: var(--lumo-border-radius-m);
+  margin-top: 10px;
+  font-size: var(--lumo-font-size-m);
+}
+.estadistica_view___barra_menu__export__link vaadin-icon{
+  height: var(--lumo-font-size-m);
+}
+.estadistica_view___barra_menu__export__link:hover{
+  text-decoration: none;
+}
+.estadistica_view___barra_menu__export__link:active{
+  color: #ffffff;
+  background-color: rgb(154, 196, 221);
+  text-decoration: none;
+}
 .estadisticas {
 }

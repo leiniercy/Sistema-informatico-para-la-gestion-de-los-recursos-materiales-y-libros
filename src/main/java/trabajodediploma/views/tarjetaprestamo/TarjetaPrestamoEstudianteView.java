@@ -364,8 +364,11 @@ public class TarjetaPrestamoEstudianteView extends Div {
         prestamos.clear();
         prestamoService.findAll().parallelStream()
                 .filter(target -> target instanceof TarjetaPrestamoEstudiante
+                        && (event.getTarjetaPrestamo().getFechaDevolucion() != null && event.getTarjetaPrestamo().getFechaDevolucion().equals(target.getFechaDevolucion()))
                         && event.getTarjetaPrestamo().getLibro().equals(target.getLibro())
-                        && event.getTarjetaPrestamo().getFechaPrestamo().equals(target.getFechaPrestamo()))
+                        && event.getTarjetaPrestamo().getFechaPrestamo().equals(target.getFechaPrestamo())
+                        )
+                        
                 .forEach((tarjeta) -> {
                     if (tarjeta instanceof TarjetaPrestamoEstudiante) {
                         tarjetaEstudiante = (TarjetaPrestamoEstudiante) tarjeta;
@@ -388,22 +391,24 @@ public class TarjetaPrestamoEstudianteView extends Div {
                 try {
                     prestamoService.save(event.getTarjetaPrestamo());
                     senderService.sendSimpleEmail(
-                            /* enviado a: */ estudiante.getEmail(),
-                            /* asunto: */ "Entrega de libros",
-                            /* mensaje: */ "Sistema de Gestión Académica Genius \n"
-                                    + "Usted ha recibido el libro: "
-                                    + event.getTarjetaPrestamo().getLibro().getTitulo()
-                                    + " el día: "
-                                    + formatter.format(event.getTarjetaPrestamo().getFechaPrestamo()).toString());
+                    /* enviado a: */ estudiante.getEmail(),
+                    /* asunto: */ "Entrega de libros",
+                    /* mensaje: */ "Sistema de Gestión Académica Genius \n"
+                    + "Usted ha recibido el libro: "
+                    + event.getTarjetaPrestamo().getLibro().getTitulo()
+                    + " el día: "
+                    +
+                    formatter.format(event.getTarjetaPrestamo().getFechaPrestamo()).toString());
                     if (event.getTarjetaPrestamo().getFechaDevolucion() != null) {
-                        senderService.sendSimpleEmail(
-                                /* enviado a: */ estudiante.getEmail(),
-                                /* asunto: */ "Devolución de libros",
-                                /* mensaje: */ "Sistema de Gestión Académica Genius \n"
-                                        + "Usted ha entregado el libro: "
-                                        + event.getTarjetaPrestamo().getLibro().getTitulo()
-                                        + " el día: "
-                                        + formatter.format(event.getTarjetaPrestamo().getFechaDevolucion()).toString());
+                    senderService.sendSimpleEmail(
+                    /* enviado a: */ estudiante.getEmail(),
+                    /* asunto: */ "Devolución de libros",
+                    /* mensaje: */ "Sistema de Gestión Académica Genius \n"
+                    + "Usted ha entregado el libro: "
+                    + event.getTarjetaPrestamo().getLibro().getTitulo()
+                    + " el día: "
+                    +
+                    formatter.format(event.getTarjetaPrestamo().getFechaDevolucion()).toString());
                     }
                     Notification notification = Notification.show(
                             "Libro añadido",
@@ -411,7 +416,6 @@ public class TarjetaPrestamoEstudianteView extends Div {
                             Notification.Position.BOTTOM_START);
                     notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
                 } catch (Exception e) {
-                    // TODO: handle exception
                     Notification notification = Notification.show(
                             "Error al enviar correo electrónico a la dirección de correo seleccionada",
                             2000,
@@ -425,13 +429,13 @@ public class TarjetaPrestamoEstudianteView extends Div {
                     prestamoService.update(event.getTarjetaPrestamo());
                     if (event.getTarjetaPrestamo().getFechaDevolucion() != null) {
                         senderService.sendSimpleEmail(
-                                /* enviado a: */ estudiante.getEmail(),
-                                /* asunto: */ "Devolución de libros",
-                                /* mensaje: */ "Sistema de Gestión Académica Genius \n"
-                                        + "Usted ha entregado el libro: "
-                                        + event.getTarjetaPrestamo().getLibro().getTitulo()
-                                        + " el día: "
-                                        + formatter.format(event.getTarjetaPrestamo().getFechaDevolucion()).toString());
+                               /* enviado a: */ estudiante.getEmail(),
+                               /* asunto: */ "Devolución de libros",
+                               /* mensaje: */ "Sistema de Gestión Académica Genius \n"
+                                       + "Usted ha entregado el libro: "
+                                       + event.getTarjetaPrestamo().getLibro().getTitulo()
+                                       + " el día: "
+                                       + formatter.format(event.getTarjetaPrestamo().getFechaDevolucion()).toString());
                     }
                     Notification notification = Notification.show(
                             "Libro modificado",
@@ -439,7 +443,6 @@ public class TarjetaPrestamoEstudianteView extends Div {
                             Notification.Position.BOTTOM_START);
                     notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
                 } catch (Exception e) {
-                    // TODO: handle exception
                     Notification notification = Notification.show(
                             "Error al enviar correo electrónico a la dirección de correo seleccionada",
                             2000,
