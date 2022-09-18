@@ -76,7 +76,10 @@ public class Estudiante extends AbstractEntity {
 
     @OneToMany(mappedBy = "estudiante", cascade = CascadeType.ALL)
     List<TarjetaPrestamoEstudiante> tarjetaPrestamo;
-    
+
+    @OneToMany(mappedBy = "estudiante",cascade = CascadeType.ALL)
+    List<ModeloPagoEstudiante> modeloPagos;
+
     public String getNombreApellidos() {
         return user.getName();
     }

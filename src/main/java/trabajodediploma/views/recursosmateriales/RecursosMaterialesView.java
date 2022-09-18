@@ -795,31 +795,31 @@ public class RecursosMaterialesView extends Div {
 
         /* Octava Fila->solicitado,autorizado,recibido, No */
         private Table octavaFila() {
-                float oactavaFila_columnWidth[] = { 170, 170, 170, 100 };
-                Table oactavaFila = new Table(oactavaFila_columnWidth);
+                float octavaFila_columnWidth[] = { 170, 170, 170, 100 };
+                Table octavaFila = new Table(octavaFila_columnWidth);
 
-                oactavaFila.addCell(new Cell().add("SOLICITADO")
+                octavaFila.addCell(new Cell().add("SOLICITADO")
                                 .setTextAlignment(TextAlignment.CENTER)
                                 .setVerticalAlignment(VerticalAlignment.MIDDLE)
                                 .setFontSize(10f));
 
-                oactavaFila.addCell(new Cell().add("AUTORIZADO")
+                octavaFila.addCell(new Cell().add("AUTORIZADO")
                                 .setTextAlignment(TextAlignment.CENTER)
                                 .setVerticalAlignment(VerticalAlignment.MIDDLE)
                                 .setFontSize(10f));
 
-                oactavaFila.addCell(new Cell().add("RECIBIDO")
+                octavaFila.addCell(new Cell().add("RECIBIDO")
                                 .setTextAlignment(TextAlignment.CENTER)
                                 .setVerticalAlignment(VerticalAlignment.MIDDLE)
                                 .setFontSize(10f));
 
-                oactavaFila.addCell(new Cell().add("No")
+                octavaFila.addCell(new Cell().add("No")
                                 .setTextAlignment(TextAlignment.LEFT)
                                 .setVerticalAlignment(VerticalAlignment.MIDDLE)
                                 .setBorderBottom(Border.NO_BORDER)
                                 .setFontSize(10f));
 
-                return oactavaFila;
+                return octavaFila;
         }
 
         /* Novena Fila-> Nombre */

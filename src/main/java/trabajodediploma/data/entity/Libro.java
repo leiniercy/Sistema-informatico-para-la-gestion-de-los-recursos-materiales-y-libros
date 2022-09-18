@@ -1,6 +1,8 @@
 package trabajodediploma.data.entity;
 
 import java.util.List;
+import java.util.Set;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -8,6 +10,7 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.*;
@@ -76,5 +79,8 @@ public class Libro extends AbstractEntity {
     
     @OneToMany(mappedBy = "libro",cascade = CascadeType.ALL)
     private List<TarjetaPrestamo> tarjetas;
+
+    @ManyToMany(mappedBy = "libros", cascade = CascadeType.ALL)
+    Set<ModeloPago> modelos;
 
 }

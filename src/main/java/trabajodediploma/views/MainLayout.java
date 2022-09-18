@@ -46,6 +46,7 @@ import trabajodediploma.views.inicio.InicioView;
 import trabajodediploma.views.libros.LibroView;
 import trabajodediploma.views.libros.estadisticas.EstadisticasView;
 import trabajodediploma.views.menu_personal.modificar_perfil.ModificarPerfilView;
+import trabajodediploma.views.modeoPago.ModeloPagoView;
 import trabajodediploma.views.modulo.ModuloView;
 import trabajodediploma.views.usuarios.UsuarioView;
 import trabajodediploma.views.recursosmateriales.RecursosMaterialesView;
@@ -234,6 +235,8 @@ public class MainLayout extends AppLayout {
 
                 new MenuItemInfo("Tarjeta Prestamo", "la la-columns", TarjetaPrestamoView.class), //
 
+                new MenuItemInfo("Modelo de Pago", "la la-columns", ModeloPagoView.class), //
+                
                 new MenuItemInfo("Modulo", "la la-gift", ModuloView.class), //
 
                 new MenuItemInfo("Destino Final", "la la-user-check", TarjetaDestinoFinalView.class), //
