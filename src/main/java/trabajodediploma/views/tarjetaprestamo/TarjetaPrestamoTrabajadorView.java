@@ -81,7 +81,7 @@ public class TarjetaPrestamoTrabajadorView extends Div {
             LibroService libroService,
             EmailSenderService senderService) {
 
-        addClassName("container__tarjeta");
+        addClassName("container__modelo");
         this.trabajador = trabajador;
         this.prestamoService = prestamoService;
         this.trabajadorService = trabajadorService;
@@ -136,7 +136,7 @@ public class TarjetaPrestamoTrabajadorView extends Div {
     /* Tabla */
     /* Configuracion de la tabla */
     private void configureGrid() {
-        grid.setClassName("container__tarjeta_trabajador__grid");
+        grid.setClassName("container__modelo__grid");
         libroColumn = grid.addColumn(new ComponentRenderer<>(tarjeta -> {
             HorizontalLayout hl = new HorizontalLayout();
             hl.setAlignItems(Alignment.CENTER);
@@ -185,24 +185,8 @@ public class TarjetaPrestamoTrabajadorView extends Div {
 
     }
 
-    private void refreshGrid() {
-        grid.setVisible(true);
-        prestamos.clear();
-        prestamoService.findAll().parallelStream().forEach((tarjeta) -> {
-            if (tarjeta instanceof TarjetaPrestamoTrabajador) {
-                tarjetaTrabajador = (TarjetaPrestamoTrabajador) tarjeta;
-                if (tarjetaTrabajador.getTrabajador().equals(trabajador)) {
-                    prestamos.add(tarjetaTrabajador);
-                }
-            }
-        });
-        grid.setItems(prestamos);
-    }
-
     /* Filtros */
     private void Filtros() {
-
-        updateList();
 
         libroFilter = new ComboBox<>();
         libroFilter.setItems(libros);
@@ -277,7 +261,7 @@ public class TarjetaPrestamoTrabajadorView extends Div {
     /* Barra de menu */
     private HorizontalLayout menuBar() {
         HorizontalLayout buttons = new HorizontalLayout();
-        Button refreshButton = new Button(VaadinIcon.REFRESH.create(), click -> refreshGrid());
+        Button refreshButton = new Button(VaadinIcon.REFRESH.create(), click -> updateList());
         refreshButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         Button deleteButton = new Button(VaadinIcon.TRASH.create(), click -> deleteLibro());
         deleteButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
@@ -322,7 +306,6 @@ public class TarjetaPrestamoTrabajadorView extends Div {
                 notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
             } else {
                 deleteItems(grid.getSelectedItems().size(), grid.getSelectedItems());
-                refreshGrid();
                 updateList();
                 info.remove(total);
                 if (prestamos.size() == 1) {

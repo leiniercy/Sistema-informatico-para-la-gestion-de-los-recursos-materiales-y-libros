@@ -1,8 +1,4 @@
-package trabajodediploma.views.modeoPago;
-
-import java.util.List;
-
-import org.vaadin.gatanaso.MultiselectComboBox;
+package trabajodediploma.views.modeloPago;
 
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
@@ -25,33 +21,38 @@ import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.shared.Registration;
 
-import trabajodediploma.data.entity.Estudiante;
+import trabajodediploma.data.entity.Trabajador;
 import trabajodediploma.data.entity.Libro;
 import trabajodediploma.data.entity.ModeloPago;
-import trabajodediploma.data.entity.ModeloPagoEstudiante;
+import trabajodediploma.data.entity.ModeloPagoTrabajador;
 import elemental.json.Json;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.List;
+
 import org.springframework.web.util.UriUtils;
+import org.vaadin.gatanaso.MultiselectComboBox;
+
 import trabajodediploma.data.tools.MyUploadI18n;
 
-public class ModeloPagoForm extends FormLayout {
-
-    ModeloPagoEstudiante modelo;
+public class ModeloPagoTrabajadorForm  extends FormLayout {
+    
+    ModeloPagoTrabajador modelo;
+    
     private Dialog reportDialog;
     private Image imagePreview;
     private Label imageSize;
     Upload imagen = new Upload();
-    ComboBox<Estudiante> estudiante = new ComboBox<>();
+    ComboBox<Trabajador> trabajador = new ComboBox<>();
     MultiselectComboBox<Libro> libros = new MultiselectComboBox<>();
 
     Button save = new Button("Añadir", VaadinIcon.PLUS.create());
     Button close = new Button("Cancelar", VaadinIcon.ERASER.create());
 
-    BeanValidationBinder<ModeloPagoEstudiante> binder = new BeanValidationBinder<>(ModeloPagoEstudiante.class);
+    BeanValidationBinder<ModeloPagoTrabajador> binder = new BeanValidationBinder<>(ModeloPagoTrabajador.class);
 
-    public ModeloPagoForm(List<Estudiante> listEstudiantes, List<Libro> listLibros) {
+    public ModeloPagoTrabajadorForm(List<Trabajador> listTrabajadors, List<Libro> listLibros){
         addClassName("modelo-pago-form");
         this.reportDialog = reportDialog;
 
@@ -68,11 +69,11 @@ public class ModeloPagoForm extends FormLayout {
         uploadButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         imagen.setUploadButton(uploadButton);
 
-        estudiante.setPlaceholder("Estudiante");
-        estudiante.setRequired(true);
-        estudiante.setErrorMessage("Campo obligatorio");
-        estudiante.setItems(listEstudiantes);
-        estudiante.setItemLabelGenerator(e -> e.getUser().getName());
+        trabajador.setPlaceholder("Trabajador");
+        trabajador.setRequired(true);
+        trabajador.setErrorMessage("Campo obligatorio");
+        trabajador.setItems(listTrabajadors);
+        trabajador.setItemLabelGenerator(e -> e.getUser().getName());
 
         libros.setPlaceholder("Libros");
         libros.setRequired(true);
@@ -82,7 +83,7 @@ public class ModeloPagoForm extends FormLayout {
         
         attachImageUpload(imagen, imagePreview);
 
-        add(imageSize, imagen, estudiante, libros, createButtonsLayout());
+        add(imageSize, imagen, trabajador, libros, createButtonsLayout());
 
     }
 
@@ -107,7 +108,7 @@ public class ModeloPagoForm extends FormLayout {
     }
 
     // Set Book
-    public void setModeloPago(ModeloPagoEstudiante modelo) {
+    public void setModeloPago(ModeloPagoTrabajador modelo) {
         this.modelo = modelo;
         binder.readBean(modelo);
         this.imagePreview.setVisible(modelo != null);
@@ -184,41 +185,41 @@ public class ModeloPagoForm extends FormLayout {
         preview.setVisible(false);
     }
 
-    public static abstract class ModeloPagoFormEvent extends ComponentEvent<ModeloPagoForm> {
+    public static abstract class ModeloPagoTrabajadorFormEvent extends ComponentEvent<ModeloPagoTrabajadorForm> {
 
-        private ModeloPagoEstudiante modeloPago;
+        private ModeloPagoTrabajador modeloPago;
 
-        protected ModeloPagoFormEvent(ModeloPagoForm source, ModeloPagoEstudiante modeloPago) {
+        protected ModeloPagoTrabajadorFormEvent(ModeloPagoTrabajadorForm source, ModeloPagoTrabajador modeloPago) {
             super(source, false);
             this.modeloPago = modeloPago;
         }
 
-        public ModeloPagoEstudiante getModeloPago() {
+        public ModeloPagoTrabajador getModeloPago() {
             return modeloPago;
         }
     }
 
     // Save Event
-    public static class SaveEvent extends ModeloPagoFormEvent {
+    public static class SaveEvent extends ModeloPagoTrabajadorFormEvent {
 
-        SaveEvent(ModeloPagoForm source, ModeloPagoEstudiante modeloPago) {
+        SaveEvent(ModeloPagoTrabajadorForm source, ModeloPagoTrabajador modeloPago) {
             super(source, modeloPago);
         }
     }
 
     // Delete Event
-    public static class DeleteEvent extends ModeloPagoFormEvent {
+    public static class DeleteEvent extends ModeloPagoTrabajadorFormEvent {
 
-        DeleteEvent(ModeloPagoForm source, ModeloPagoEstudiante modeloPago) {
+        DeleteEvent(ModeloPagoTrabajadorForm source, ModeloPagoTrabajador modeloPago) {
             super(source, modeloPago);
         }
 
     }
 
     // Close Event
-    public static class CloseEvent extends ModeloPagoFormEvent {
+    public static class CloseEvent extends ModeloPagoTrabajadorFormEvent {
 
-        CloseEvent(ModeloPagoForm source) {
+        CloseEvent(ModeloPagoTrabajadorForm source) {
             super(source, null);
         }
     }

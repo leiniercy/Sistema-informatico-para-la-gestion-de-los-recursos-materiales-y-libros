@@ -87,7 +87,7 @@ public class CrearTrabajadorForm extends FormLayout {
         });
         // categoria
         categoria.setPlaceholder("Categoría");
-        categoria.setItems("Tabajador", "otras");
+        categoria.setItems("Instructor", "Asistente","Profesor Auxiliar","Profesor Titular");
         // area
         area.setPlaceholder("Área");
         area.setItems(listArea);

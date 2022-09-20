@@ -15,6 +15,7 @@
 @import url('./views/usuario.css');
 @import url('./views/estadisticas-view.css'); 
 @import url('./views/modulo-view.css'); 
+@import url('./views/modelo-pago-view.css'); 
 @import url('./views/page-not-found-view.css'); 
 @import url('./views/forbbiden-view.css'); 
 @import url('./views/internal-sever-error-view.css'); 

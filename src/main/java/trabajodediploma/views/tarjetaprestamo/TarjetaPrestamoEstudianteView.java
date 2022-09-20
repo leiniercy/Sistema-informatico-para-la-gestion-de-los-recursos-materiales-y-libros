@@ -190,36 +190,7 @@ public class TarjetaPrestamoEstudianteView extends Div {
 
     }
 
-    private void refreshGrid() {
-        grid.setVisible(true);
-        prestamos.clear();
-        List<TarjetaPrestamo> aux = prestamoService.findAll();
-        for (int i = 0; i < aux.size(); i++) {
-
-            if (aux.get(i) instanceof TarjetaPrestamoEstudiante) {
-
-                tarjetaEstudiante = (TarjetaPrestamoEstudiante) aux.get(i);
-
-                if (tarjetaEstudiante.getEstudiante().getId() == estudiante.getId()) {
-                    System.out.print(tarjetaEstudiante.getLibro().getTitulo());
-                    prestamos.add(tarjetaEstudiante);
-                }
-            }
-
-        }
-        // prestamoService.findAll().parallelStream().forEach((tarjeta) -> {
-        // if (tarjeta instanceof TarjetaPrestamoEstudiante) {
-        // tarjetaEstudiante = (TarjetaPrestamoEstudiante) tarjeta;
-        // System.out.println(tarjetaEstudiante.getEstudiante().getId());
-        // System.out.println(estudiante.getId());
-
-        // if (tarjetaEstudiante.getEstudiante().getId() == estudiante.getId()) {
-        // prestamos.add(tarjetaEstudiante);
-        // }
-        // }
-        // });
-        grid.setItems(prestamos);
-    }
+    
 
     /* Filtros */
     private void Filtros() {
@@ -297,7 +268,7 @@ public class TarjetaPrestamoEstudianteView extends Div {
     /* Barra de menu */
     private HorizontalLayout menuBar() {
         HorizontalLayout buttons = new HorizontalLayout();
-        Button refreshButton = new Button(VaadinIcon.REFRESH.create(), click -> refreshGrid());
+        Button refreshButton = new Button(VaadinIcon.REFRESH.create(), click -> updateList());
         refreshButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         Button deleteButton = new Button(VaadinIcon.TRASH.create(), click -> deleteLibro());
         deleteButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
@@ -342,7 +313,6 @@ public class TarjetaPrestamoEstudianteView extends Div {
                 notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
             } else {
                 deleteItems(grid.getSelectedItems().size(), grid.getSelectedItems());
-                refreshGrid();
                 updateList();
                 info.remove(total);
                 if (prestamos.size() == 1) {
@@ -518,22 +488,10 @@ public class TarjetaPrestamoEstudianteView extends Div {
                 tarjetaEstudiante = (TarjetaPrestamoEstudiante) aux.get(i);
 
                 if (tarjetaEstudiante.getEstudiante().getId() == estudiante.getId()) {
-                    System.out.println(tarjetaEstudiante.getLibro().getTitulo());
                     prestamos.add(tarjetaEstudiante);
                 }
-                System.out.println(prestamos.size());
             }
-
         }
-        System.out.println(prestamos.size());
-        // prestamoService.findAll().parallelStream().forEach((tarjeta) -> {
-        // if (tarjeta instanceof TarjetaPrestamoEstudiante) {
-        // tarjetaEstudiante = (TarjetaPrestamoEstudiante) tarjeta;
-        // if (tarjetaEstudiante.getEstudiante().getId() == estudiante.getId()) {
-        // prestamos.add(tarjetaEstudiante);
-        // }
-        // }
-        // });
         grid.setItems(prestamos);
     }
     /* Fin-Barra de menu */

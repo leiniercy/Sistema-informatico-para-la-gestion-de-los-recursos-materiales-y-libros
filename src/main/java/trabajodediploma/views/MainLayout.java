@@ -46,7 +46,7 @@ import trabajodediploma.views.inicio.InicioView;
 import trabajodediploma.views.libros.LibroView;
 import trabajodediploma.views.libros.estadisticas.EstadisticasView;
 import trabajodediploma.views.menu_personal.modificar_perfil.ModificarPerfilView;
-import trabajodediploma.views.modeoPago.ModeloPagoView;
+import trabajodediploma.views.modeloPago.ModeloPagoView;
 import trabajodediploma.views.modulo.ModuloView;
 import trabajodediploma.views.usuarios.UsuarioView;
 import trabajodediploma.views.recursosmateriales.RecursosMaterialesView;

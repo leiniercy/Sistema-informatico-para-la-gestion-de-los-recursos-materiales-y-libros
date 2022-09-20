@@ -1,4 +1,4 @@
-package trabajodediploma.views.modeoPago;
+package trabajodediploma.views.modeloPago;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -56,12 +56,12 @@ import com.itextpdf.layout.property.HorizontalAlignment;
 import com.itextpdf.layout.property.TextAlignment;
 import com.itextpdf.layout.property.VerticalAlignment;
 
-import trabajodediploma.data.entity.Estudiante;
+import trabajodediploma.data.entity.Trabajador;
 import trabajodediploma.data.entity.Libro;
 import trabajodediploma.data.entity.ModeloPago;
-import trabajodediploma.data.entity.ModeloPagoEstudiante;
+import trabajodediploma.data.entity.ModeloPagoTrabajador;
 import trabajodediploma.data.entity.RecursoMaterial;
-import trabajodediploma.data.service.EstudianteService;
+import trabajodediploma.data.service.TrabajadorService;
 import trabajodediploma.data.service.LibroService;
 import trabajodediploma.data.service.ModeloPagoService;
 import trabajodediploma.data.service.RecursoMaterialService;
@@ -78,18 +78,15 @@ import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 
-@PageTitle("Modelo de Pago")
-@Route(value = "modelo-pago", layout = MainLayout.class)
-@RolesAllowed("RESP_ALMACEN")
-public class ModeloPagoView extends Div {
+public class ModeloPagoTrabajadorView extends Div {
 
         private Grid<ModeloPago> grid = new Grid<>(ModeloPago.class, false);
         private GridListDataView<ModeloPago> gridListDataView;
         private Grid.Column<ModeloPago> imagenColumn;
-        private Grid.Column<ModeloPago> estudianteColumn;
+        private Grid.Column<ModeloPago> trabajadorColumn;
         private Grid.Column<ModeloPago> librosColumn;
         private Grid.Column<ModeloPago> editColumn;
-        private EstudianteService estudianteService;
+        private TrabajadorService trabajadorService;
         private LibroService libroService;
         private Dialog dialog;
         private Html total;
@@ -99,29 +96,26 @@ public class ModeloPagoView extends Div {
         private Dialog reportDialog;
         private ModeloPagoService modeloPagoService;
         private List<ModeloPago> listModelosPago;
-        private ModeloPagoEstudiante modeloEstudiante;
-        private MyFooter footer;
-        private ComboBox<Estudiante> estudianteFilter;
+        private ModeloPagoTrabajador modeloTrabajador;
+        private ComboBox<Trabajador> trabajadorFilter;
 
-        ModeloPagoForm form;
+        ModeloPagoTrabajadorForm form;
 
-        ComboBox<Estudiante> estudiante = new ComboBox<>();
+        ComboBox<Trabajador> trabajador = new ComboBox<>();
         MultiselectComboBox<Libro> libros = new MultiselectComboBox<>();
 
-        public ModeloPagoView(
-                        @Autowired ModeloPagoService modeloPagoService,
-                        @Autowired EstudianteService estudianteService,
+        public ModeloPagoTrabajadorView(@Autowired ModeloPagoService modeloPagoService,
+                        @Autowired TrabajadorService trabajadorService,
                         @Autowired LibroService libroService) {
                 addClassName("modelo_pago_view");
                 this.modeloPagoService = modeloPagoService;
-                this.estudianteService = estudianteService;
+                this.trabajadorService = trabajadorService;
                 this.libroService = libroService;
                 listModelosPago = new LinkedList<>();
-                footer = new MyFooter();
                 updateList();
                 configureForm();
                 configureGrid();
-                add(menuBar(), getContent(), footer);
+                add(menuBar(), getContent());
         }
 
         /* Contenido de la vista */
@@ -156,7 +150,7 @@ public class ModeloPagoView extends Div {
         /* Tabla */
         /* Configuracion de la tabla */
         private void configureGrid() {
-                grid.setClassName("tarjeta_estudiante__content__grid-content__table");
+                grid.setClassName("tarjeta_Trabajador__content__grid-content__table");
 
                 LitRenderer<ModeloPago> imagenRenderer = LitRenderer
                                 .<ModeloPago>of("<img style='height: 64px' src=${item.imagen} />")
@@ -164,32 +158,32 @@ public class ModeloPagoView extends Div {
 
                 imagenColumn = grid.addColumn(imagenRenderer).setHeader("Imagen").setAutoWidth(true);
 
-                estudianteColumn = grid.addColumn(new ComponentRenderer<>(modelo -> {
-                        modeloEstudiante = (ModeloPagoEstudiante) modelo;
+                trabajadorColumn = grid.addColumn(new ComponentRenderer<>(modelo -> {
+                        modeloTrabajador = (ModeloPagoTrabajador) modelo;
                         HorizontalLayout hl = new HorizontalLayout();
                         hl.setAlignItems(Alignment.CENTER);
-                        Avatar avatar = new Avatar(modeloEstudiante.getEstudiante().getUser().getName(),
-                                        modeloEstudiante.getEstudiante().getUser().getProfilePictureUrl());
+                        Avatar avatar = new Avatar(modeloTrabajador.getTrabajador().getUser().getName(),
+                                        modeloTrabajador.getTrabajador().getUser().getProfilePictureUrl());
                         VerticalLayout vl = new VerticalLayout();
                         vl.getStyle().set("line-height", "0");
                         Span name = new Span();
                         name.addClassNames("name");
-                        name.setText(modeloEstudiante.getEstudiante().getUser().getName());
+                        name.setText(modeloTrabajador.getTrabajador().getUser().getName());
                         Span email = new Span();
                         email.addClassNames("text-s", "text-secondary");
-                        email.setText(modeloEstudiante.getEstudiante().getEmail());
+                        email.setText(modeloTrabajador.getTrabajador().getEmail());
                         vl.add(name, email);
                         hl.add(avatar, vl);
                         return hl;
-                })).setHeader("Estudiante").setFrozen(true).setAutoWidth(true).setSortable(true);
+                })).setHeader("Trabajador").setFrozen(true).setAutoWidth(true).setSortable(true);
 
                 librosColumn = grid.addColumn(new ComponentRenderer<>(modelo -> {
                         VerticalLayout layout = new VerticalLayout();
                         layout.getStyle().set("line-height", "0.5");
-                        modeloEstudiante = (ModeloPagoEstudiante) modelo;
+                        modeloTrabajador = (ModeloPagoTrabajador) modelo;
                         Span span_libros = new Span();
                         span_libros.setWidth("100%");
-                        List<Libro> libros = new LinkedList<>(modeloEstudiante.getLibros());
+                        List<Libro> libros = new LinkedList<>(modeloTrabajador.getLibros());
                         String listLibros = new String();
                         if (libros.size() != 0) {
                                 listLibros += "" + libros.get(0).getTitulo();
@@ -204,9 +198,9 @@ public class ModeloPagoView extends Div {
                 })).setHeader("Libros").setAutoWidth(true);
 
                 editColumn = grid.addComponentColumn(modelo -> {
-                        modeloEstudiante = (ModeloPagoEstudiante) modelo;
+                        modeloTrabajador = (ModeloPagoTrabajador) modelo;
                         Button editButton = new Button(VaadinIcon.EDIT.create());
-                        editButton.addClickListener(e -> this.editModelo(modeloEstudiante));
+                        editButton.addClickListener(e -> this.editModelo(modeloTrabajador));
                         editButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
                         return editButton;
                 }).setTextAlign(ColumnTextAlign.CENTER).setFrozen(true).setFlexGrow(0);
@@ -214,7 +208,7 @@ public class ModeloPagoView extends Div {
                 Filtros();
 
                 HeaderRow headerRow = grid.appendHeaderRow();
-                headerRow.getCell(estudianteColumn).setComponent(estudianteFilter);
+                headerRow.getCell(trabajadorColumn).setComponent(trabajadorFilter);
 
                 gridListDataView = grid.setItems(listModelosPago);
                 grid.setAllRowsVisible(true);
@@ -231,28 +225,28 @@ public class ModeloPagoView extends Div {
         /* Filtros */
         private void Filtros() {
 
-                estudianteFilter = new ComboBox<>();
-                estudianteFilter.setItems(estudianteService.findAll());
-                estudianteFilter.setItemLabelGenerator(estudiante -> estudiante.getUser().getName());
-                estudianteFilter.setPlaceholder("Filtrar");
-                estudianteFilter.setClearButtonVisible(true);
-                estudianteFilter.setWidth("100%");
-                estudianteFilter.addValueChangeListener(event -> {
-                        if (estudianteFilter.getValue() == null) {
+                trabajadorFilter = new ComboBox<>();
+                trabajadorFilter.setItems(trabajadorService.findAll());
+                trabajadorFilter.setItemLabelGenerator(trabajador -> trabajador.getUser().getName());
+                trabajadorFilter.setPlaceholder("Filtrar");
+                trabajadorFilter.setClearButtonVisible(true);
+                trabajadorFilter.setWidth("100%");
+                trabajadorFilter.addValueChangeListener(event -> {
+                        if (trabajadorFilter.getValue() == null) {
                                 gridListDataView = grid.setItems(listModelosPago);
                         } else {
-                                gridListDataView.addFilter(modelo -> areEstudianteEqual(modelo, estudianteFilter));
+                                gridListDataView.addFilter(modelo -> areTrabajadorEqual(modelo, trabajadorFilter));
                         }
                 });
 
         }
 
-        private boolean areEstudianteEqual(ModeloPago modelo, ComboBox<Estudiante> estudianteFilter) {
-                String estudianteFilterValue = estudianteFilter.getValue().getUser().getName();
-                modeloEstudiante = (ModeloPagoEstudiante) modelo;
-                if (estudianteFilterValue != null) {
-                        return StringUtils.equals(modeloEstudiante.getEstudiante().getUser().getName(),
-                                        estudianteFilterValue);
+        private boolean areTrabajadorEqual(ModeloPago modelo, ComboBox<Trabajador> trabajadorFilter) {
+                String trabajadorFilterValue = trabajadorFilter.getValue().getUser().getName();
+                modeloTrabajador = (ModeloPagoTrabajador) modelo;
+                if (trabajadorFilterValue != null) {
+                        return StringUtils.equals(modeloTrabajador.getTrabajador().getUser().getName(),
+                                        trabajadorFilterValue);
                 }
                 return true;
         }
@@ -317,7 +311,7 @@ public class ModeloPagoView extends Div {
                 } catch (Exception e) {
                         e.printStackTrace();
                         Notification notification = Notification.show(
-                                        "Ocurrió un problema al intentar eliminar el estudiante",
+                                        "Ocurrió un problema al intentar eliminar el Trabajador",
                                         2000,
                                         Notification.Position.MIDDLE);
                         ;
@@ -339,28 +333,28 @@ public class ModeloPagoView extends Div {
         }
 
         private void configureForm() {
-                form = new ModeloPagoForm(estudianteService.findAll(), libroService.findAll());
+                form = new ModeloPagoTrabajadorForm(trabajadorService.findAll(), libroService.findAll());
                 form.setWidth("25em");
-                form.addListener(ModeloPagoForm.SaveEvent.class, this::saveModelo);
-                form.addListener(ModeloPagoForm.CloseEvent.class, e -> closeEditor());
+                form.addListener(ModeloPagoTrabajadorForm.SaveEvent.class, this::saveModelo);
+                form.addListener(ModeloPagoTrabajadorForm.CloseEvent.class, e -> closeEditor());
         }
 
-        private void saveModelo(ModeloPagoForm.SaveEvent event) {
+        private void saveModelo(ModeloPagoTrabajadorForm.SaveEvent event) {
 
                 listModelosPago.clear();
                 modeloPagoService.findAll().stream().forEach(modelo -> {
-                        if (modelo instanceof ModeloPagoEstudiante) {
-                                modeloEstudiante = (ModeloPagoEstudiante) modelo;
-                                if (modeloEstudiante.getEstudiante().getId() == event.getModeloPago().getEstudiante().getId()
-                                ) {
-                                        listModelosPago.add(modeloEstudiante);
+                        if (modelo instanceof ModeloPagoTrabajador) {
+                                modeloTrabajador = (ModeloPagoTrabajador) modelo;
+                                if (modeloTrabajador.getTrabajador().getId() == event.getModeloPago().getTrabajador()
+                                                .getId()) {
+                                        listModelosPago.add(modeloTrabajador);
                                 }
                         }
                 });
 
                 if (listModelosPago.size() != 0) {
                         Notification notification = Notification.show(
-                                "Este estudiante ya tiene un modelo de pago",
+                                        "Este trabajador ya tiene un modelo de pago",
                                         5000,
                                         Notification.Position.MIDDLE);
                         notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
@@ -393,7 +387,7 @@ public class ModeloPagoView extends Div {
                 closeEditor();
         }
 
-        private void editModelo(ModeloPagoEstudiante modeloPago) {
+        private void editModelo(ModeloPagoTrabajador modeloPago) {
                 if (modeloPago == null) {
                         closeEditor();
                 } else {
@@ -406,13 +400,13 @@ public class ModeloPagoView extends Div {
 
         private void addModelo() {
                 grid.asMultiSelect().clear();
-                ModeloPagoEstudiante modelo = new ModeloPagoEstudiante();
+                ModeloPagoTrabajador modelo = new ModeloPagoTrabajador();
                 modelo.setImagen("");
                 editModelo(modelo);
         }
 
         private void closeEditor() {
-                ModeloPagoEstudiante modelo = new ModeloPagoEstudiante();
+                ModeloPagoTrabajador modelo = new ModeloPagoTrabajador();
                 modelo.setImagen("");
                 form.setModeloPago(modelo);
                 form.setVisible(false);
@@ -425,18 +419,11 @@ public class ModeloPagoView extends Div {
                 listModelosPago.clear();
                 List<ModeloPago> aux = modeloPagoService.findAll();
                 for (int i = 0; i < aux.size(); i++) {
-                        if (aux.get(i) instanceof ModeloPagoEstudiante) {
-                                modeloEstudiante = (ModeloPagoEstudiante) aux.get(i);
-                                System.out.println(modeloEstudiante.getEstudiante().getUser().getName());
-                                listModelosPago.add(modeloEstudiante);
+                        if (aux.get(i) instanceof ModeloPagoTrabajador) {
+                                modeloTrabajador = (ModeloPagoTrabajador) aux.get(i);
+                                listModelosPago.add(modeloTrabajador);
                         }
                 }
-                // modeloPagoService.findAll().stream().forEach(modelo -> {
-                //         if (modelo instanceof ModeloPagoEstudiante) {
-                //                 modeloEstudiante = (ModeloPagoEstudiante) modelo;
-                //                 listModelosPago.add(modeloEstudiante);
-                //         }
-                // });
                 grid.setItems(listModelosPago);
         }
 
@@ -458,10 +445,10 @@ public class ModeloPagoView extends Div {
                 header.addClassName("div-dialog-header");
                 /* Dialog Header */
 
-                estudiante.setPlaceholder("Estudiante");
-                estudiante.setRequired(true);
-                estudiante.setItems(estudianteService.findAll());
-                estudiante.setItemLabelGenerator(estudiante -> estudiante.getUser().getName());
+                trabajador.setPlaceholder("Trabajador");
+                trabajador.setRequired(true);
+                trabajador.setItems(trabajadorService.findAll());
+                trabajador.setItemLabelGenerator(t -> t.getUser().getName());
 
                 libros.setPlaceholder("Libros");
                 libros.setRequired(true);
@@ -473,28 +460,28 @@ public class ModeloPagoView extends Div {
                 reporteLink.setEnabled(false);
                 reporteLink.setTarget("_BLANK");
 
-                reportContainer.add(header, estudiante, libros, reporteLink);
+                reportContainer.add(header, trabajador, libros, reporteLink);
                 reportDialog.add(reportContainer);
                 reportDialog.open();
 
-                estudiante.addValueChangeListener(e -> {
+                trabajador.addValueChangeListener(e -> {
                         libros.addValueChangeListener(event -> {
-                                if (estudiante.getValue() != null && libros.getValue() != null) {
+                                if (trabajador.getValue() != null && libros.getValue() != null) {
                                         reporteLink.setEnabled(true);
                                 }
                         });
                 });
 
                 libros.addValueChangeListener(e -> {
-                        estudiante.addValueChangeListener(event -> {
-                                if (estudiante.getValue() != null && libros.getValue() != null) {
+                        trabajador.addValueChangeListener(event -> {
+                                if (trabajador.getValue() != null && libros.getValue() != null) {
                                         reporteLink.setEnabled(true);
                                 }
                         });
                 });
 
                 reporteLink.addBlurListener(e -> {
-                        if (!estudiante.isEmpty() && !libros.isEmpty()) {
+                        if (!trabajador.isEmpty() && !libros.isEmpty()) {
                                 reportDialog.close();
                         } else {
                                 Notification notification = Notification.show(
@@ -600,7 +587,7 @@ public class ModeloPagoView extends Div {
                                 .setFontSize(10f));
                 /* Segunda Fila */
                 /* Tercera Fila */
-                firstGrow.addCell(new Cell().add("Unidad/Almacén: " + estudiante.getValue().getFacultad())
+                firstGrow.addCell(new Cell().add("Unidad/Almacén: " + trabajador.getValue().getArea())
                                 .setTextAlignment(TextAlignment.LEFT)
                                 .setVerticalAlignment(VerticalAlignment.MIDDLE)
                                 .setMarginTop(1f)
@@ -628,7 +615,7 @@ public class ModeloPagoView extends Div {
                                 .setFontSize(10f));
                 /* Tercera Fila */
                 /* Cuarta Fila */
-                firstGrow.addCell(new Cell().add("Suministrador: " + estudiante.getValue().getUser().getName())
+                firstGrow.addCell(new Cell().add("Suministrador: " + trabajador.getValue().getUser().getName())
                                 .setTextAlignment(TextAlignment.LEFT)
                                 .setVerticalAlignment(VerticalAlignment.MIDDLE)
                                 .setMarginTop(1f)

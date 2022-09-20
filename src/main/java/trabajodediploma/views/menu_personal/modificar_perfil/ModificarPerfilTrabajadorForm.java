@@ -98,7 +98,7 @@ public class ModificarPerfilTrabajadorForm extends FormLayout {
         });
         // categoria
         categoria.setPlaceholder("Categoría");
-        categoria.setItems("Tabajador", "otras");
+        categoria.setItems("Instructor", "Asistente","Profesor Auxiliar","Profesor Titular");
         categoria.setValue(trabajador.getCategoria());
         // Area
         area.setPlaceholder("Area");
