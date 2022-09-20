@@ -19,12 +19,15 @@ import lombok.ToString;
 @ToString(onlyExplicitlyIncluded = true)
 @Entity
 public class DestinoFinalTrabajador extends DestinoFinal {
-    
-    @JoinColumn(name = "trabajador_id",  updatable = true, unique = false)
+
+    @EqualsAndHashCode.Include
+    @ToString.Include
+
+    @JoinColumn(name = "trabajador_id", updatable = true, unique = false)
     @ManyToOne()
     private Trabajador trabajador;
 
-    public DestinoFinalTrabajador(LocalDate fecha, Modulo modulo,Trabajador trabajador){
+    public DestinoFinalTrabajador(LocalDate fecha, Modulo modulo, Trabajador trabajador) {
         super(fecha, modulo);
         this.trabajador = trabajador;
     }

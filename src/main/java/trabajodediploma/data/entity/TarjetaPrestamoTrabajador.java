@@ -20,13 +20,16 @@ import javax.persistence.ManyToOne;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(onlyExplicitlyIncluded = true)
 @Entity
-public class TarjetaPrestamoTrabajador  extends TarjetaPrestamo{
-    
-    @JoinColumn(name = "trabajador_id",  updatable = true, unique = false)
+public class TarjetaPrestamoTrabajador extends TarjetaPrestamo {
+
+    @EqualsAndHashCode.Include
+    @ToString.Include
+
+    @JoinColumn(name = "trabajador_id", updatable = true, unique = false)
     @ManyToOne()
     private Trabajador trabajador;
 
-    public TarjetaPrestamoTrabajador(Libro libro, LocalDate fechaPrestamo,LocalDate fechaDevolucion,Trabajador trabajador){
+    public TarjetaPrestamoTrabajador(Libro libro, LocalDate fechaPrestamo, LocalDate fechaDevolucion, Trabajador trabajador) {
         super(libro, fechaPrestamo, fechaDevolucion);
         this.trabajador = trabajador;
     }

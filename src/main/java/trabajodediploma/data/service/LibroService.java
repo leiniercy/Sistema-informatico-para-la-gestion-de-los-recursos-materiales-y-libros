@@ -5,9 +5,7 @@ import java.util.Set;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.vaadin.crudui.crud.CrudListener;
 import trabajodediploma.data.entity.Libro;
-import lombok.RequiredArgsConstructor;
 import trabajodediploma.data.repository.LibroRepository;
 
 @Service

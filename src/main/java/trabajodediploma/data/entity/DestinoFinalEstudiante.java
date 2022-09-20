@@ -18,15 +18,18 @@ import lombok.ToString;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(onlyExplicitlyIncluded = true)
 @Entity
-public class DestinoFinalEstudiante extends DestinoFinal{
-     
-    @JoinColumn(name = "estudiante_id",  updatable = true, unique = false)
+public class DestinoFinalEstudiante extends DestinoFinal {
+
+    @EqualsAndHashCode.Include
+    @ToString.Include
+
+    @JoinColumn(name = "estudiante_id", updatable = true, unique = false)
     @ManyToOne()
     private Estudiante estudiante;
 
-    public DestinoFinalEstudiante (LocalDate fecha, Modulo modulo, Estudiante estudiante){
+    public DestinoFinalEstudiante(LocalDate fecha, Modulo modulo, Estudiante estudiante) {
         super(fecha, modulo);
-        this.estudiante = estudiante; 
+        this.estudiante = estudiante;
     }
 
 }

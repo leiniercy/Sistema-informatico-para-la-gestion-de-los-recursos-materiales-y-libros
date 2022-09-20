@@ -21,15 +21,17 @@ import javax.persistence.ManyToOne;
 @ToString(onlyExplicitlyIncluded = true)
 @Entity
 public class TarjetaPrestamoEstudiante extends TarjetaPrestamo {
-    
-    @JoinColumn(name = "estudiante_id",  updatable = true, unique = false)
+
+    @EqualsAndHashCode.Include
+    @ToString.Include
+
+    @JoinColumn(name = "estudiante_id", updatable = true, unique = false)
     @ManyToOne()
     private Estudiante estudiante;
 
-    public TarjetaPrestamoEstudiante(Libro libro, LocalDate fechaPrestamo,LocalDate fechaDevolucion,Estudiante estudiante){
+    public TarjetaPrestamoEstudiante(Libro libro, LocalDate fechaPrestamo, LocalDate fechaDevolucion, Estudiante estudiante) {
         super(libro, fechaPrestamo, fechaDevolucion);
         this.estudiante = estudiante;
     }
-
 
 }

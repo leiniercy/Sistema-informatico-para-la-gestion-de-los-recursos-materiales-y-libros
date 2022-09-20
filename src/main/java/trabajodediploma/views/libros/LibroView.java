@@ -381,7 +381,7 @@ public class LibroView extends Div {
         if (listLibros.size() != 0) {
             Notification notification = Notification.show(
                     "El libro ya existe",
-                    5000,
+                    2000,
                     Notification.Position.MIDDLE);
             notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
         } else {

@@ -1,6 +1,7 @@
 package trabajodediploma.views.modeoPago;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -9,12 +10,14 @@ import javax.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Html;
+import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.contextmenu.ContextMenu;
 import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.HeaderRow;
@@ -30,8 +33,12 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
+import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
@@ -51,6 +58,8 @@ import com.itextpdf.layout.property.VerticalAlignment;
 
 import trabajodediploma.data.entity.Estudiante;
 import trabajodediploma.data.entity.Libro;
+import trabajodediploma.data.entity.ModeloPago;
+import trabajodediploma.data.entity.ModeloPagoEstudiante;
 import trabajodediploma.data.entity.RecursoMaterial;
 import trabajodediploma.data.service.EstudianteService;
 import trabajodediploma.data.service.LibroService;
@@ -74,6 +83,12 @@ import java.time.LocalDate;
 @RolesAllowed("RESP_ALMACEN")
 public class ModeloPagoView extends Div {
 
+        private Grid<ModeloPago> grid = new Grid<>(ModeloPago.class, false);
+        private GridListDataView<ModeloPago> gridListDataView;
+        private Grid.Column<ModeloPago> imagenColumn;
+        private Grid.Column<ModeloPago> estudianteColumn;
+        private Grid.Column<ModeloPago> librosColumn;
+        private Grid.Column<ModeloPago> editColumn;
         private EstudianteService estudianteService;
         private LibroService libroService;
         private Dialog dialog;
@@ -83,6 +98,10 @@ public class ModeloPagoView extends Div {
         private Div header;
         private Dialog reportDialog;
         private ModeloPagoService modeloPagoService;
+        private List<ModeloPago> listModelosPago;
+        private ModeloPagoEstudiante modeloEstudiante;
+        private MyFooter footer;
+        private ComboBox<Estudiante> estudianteFilter;
 
         ModeloPagoForm form;
 
@@ -97,34 +116,171 @@ public class ModeloPagoView extends Div {
                 this.modeloPagoService = modeloPagoService;
                 this.estudianteService = estudianteService;
                 this.libroService = libroService;
-                add(menuBar());
+                listModelosPago = new LinkedList<>();
+                footer = new MyFooter();
+                updateList();
+                configureForm();
+                configureGrid();
+                add(menuBar(), getContent(), footer);
+        }
+
+        /* Contenido de la vista */
+        private Div getContent() {
+
+                Div formContent = new Div(form);
+                formContent.addClassName("form_content");
+                Div gridContent = new Div(grid);
+                gridContent.addClassName("grid_content");
+
+                Div container = new Div(gridContent);
+                container.addClassName("container");
+                container.setSizeFull();
+
+                /* Dialog Header */
+                Button closeButton = new Button(new Icon("lumo", "cross"), (e) -> dialog.close());
+                closeButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+                Span title = new Span("Libro");
+                Div titleDiv = new Div(title);
+                titleDiv.addClassName("div-dialog-title");
+                Div buttonDiv = new Div(closeButton);
+                buttonDiv.addClassName("div-dialog-button");
+                header = new Div(titleDiv, buttonDiv);
+                header.addClassName("div-dialog-header");
+                /* Dialog Header */
+
+                dialog = new Dialog(header, formContent);
+
+                return container;
+        }
+
+        /* Tabla */
+        /* Configuracion de la tabla */
+        private void configureGrid() {
+                grid.setClassName("tarjeta_estudiante__content__grid-content__table");
+
+                LitRenderer<ModeloPago> imagenRenderer = LitRenderer
+                                .<ModeloPago>of("<img style='height: 64px' src=${item.imagen} />")
+                                .withProperty("imagen", ModeloPago::getImagen);
+
+                imagenColumn = grid.addColumn(imagenRenderer).setHeader("Imagen").setAutoWidth(true);
+
+                estudianteColumn = grid.addColumn(new ComponentRenderer<>(modelo -> {
+                        modeloEstudiante = (ModeloPagoEstudiante) modelo;
+                        HorizontalLayout hl = new HorizontalLayout();
+                        hl.setAlignItems(Alignment.CENTER);
+                        Avatar avatar = new Avatar(modeloEstudiante.getEstudiante().getUser().getName(),
+                                        modeloEstudiante.getEstudiante().getUser().getProfilePictureUrl());
+                        VerticalLayout vl = new VerticalLayout();
+                        vl.getStyle().set("line-height", "0");
+                        Span name = new Span();
+                        name.addClassNames("name");
+                        name.setText(modeloEstudiante.getEstudiante().getUser().getName());
+                        Span email = new Span();
+                        email.addClassNames("text-s", "text-secondary");
+                        email.setText(modeloEstudiante.getEstudiante().getEmail());
+                        vl.add(name, email);
+                        hl.add(avatar, vl);
+                        return hl;
+                })).setHeader("Estudiante").setFrozen(true).setAutoWidth(true).setSortable(true);
+
+                librosColumn = grid.addColumn(new ComponentRenderer<>(modelo -> {
+                        VerticalLayout layout = new VerticalLayout();
+                        layout.getStyle().set("line-height", "0.5");
+                        modeloEstudiante = (ModeloPagoEstudiante) modelo;
+                        Span span_libros = new Span();
+                        span_libros.setWidth("100%");
+                        List<Libro> libros = new LinkedList<>(modeloEstudiante.getLibros());
+                        String listLibros = new String();
+                        if (libros.size() != 0) {
+                                listLibros += "" + libros.get(0).getTitulo();
+                                for (int i = 1; i < libros.size(); i++) {
+                                        listLibros += ", " + libros.get(i).getTitulo();
+                                }
+                        }
+                        span_libros.setText(listLibros);
+                        layout.add(span_libros);
+                        layout.setWidth("100%");
+                        return layout;
+                })).setHeader("Libros").setAutoWidth(true);
+
+                editColumn = grid.addComponentColumn(modelo -> {
+                        modeloEstudiante = (ModeloPagoEstudiante) modelo;
+                        Button editButton = new Button(VaadinIcon.EDIT.create());
+                        editButton.addClickListener(e -> this.editModelo(modeloEstudiante));
+                        editButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+                        return editButton;
+                }).setTextAlign(ColumnTextAlign.CENTER).setFrozen(true).setFlexGrow(0);
+
+                Filtros();
+
+                HeaderRow headerRow = grid.appendHeaderRow();
+                headerRow.getCell(estudianteColumn).setComponent(estudianteFilter);
+
+                gridListDataView = grid.setItems(listModelosPago);
+                grid.setAllRowsVisible(true);
+                grid.setSizeFull();
+                grid.setWidthFull();
+                grid.setHeightFull();
+                grid.setSelectionMode(Grid.SelectionMode.MULTI);
+                grid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS);
+                grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
+                grid.addThemeVariants(GridVariant.LUMO_WRAP_CELL_CONTENT);
+
+        }
+
+        /* Filtros */
+        private void Filtros() {
+
+                estudianteFilter = new ComboBox<>();
+                estudianteFilter.setItems(estudianteService.findAll());
+                estudianteFilter.setItemLabelGenerator(estudiante -> estudiante.getUser().getName());
+                estudianteFilter.setPlaceholder("Filtrar");
+                estudianteFilter.setClearButtonVisible(true);
+                estudianteFilter.setWidth("100%");
+                estudianteFilter.addValueChangeListener(event -> {
+                        if (estudianteFilter.getValue() == null) {
+                                gridListDataView = grid.setItems(listModelosPago);
+                        } else {
+                                gridListDataView.addFilter(modelo -> areEstudianteEqual(modelo, estudianteFilter));
+                        }
+                });
+
+        }
+
+        private boolean areEstudianteEqual(ModeloPago modelo, ComboBox<Estudiante> estudianteFilter) {
+                String estudianteFilterValue = estudianteFilter.getValue().getUser().getName();
+                modeloEstudiante = (ModeloPagoEstudiante) modelo;
+                if (estudianteFilterValue != null) {
+                        return StringUtils.equals(modeloEstudiante.getEstudiante().getUser().getName(),
+                                        estudianteFilterValue);
+                }
+                return true;
         }
 
         // Barra de menu
         private HorizontalLayout menuBar() {
                 buttons = new HorizontalLayout();
                 Button refreshButton = new Button(VaadinIcon.REFRESH.create());
-                // refreshButton.addClickListener(click -> refreshGrid());
+                refreshButton.addClickListener(click -> updateList());
                 refreshButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
                 Button deleteButton = new Button(VaadinIcon.TRASH.create());
-                // deleteButton.addClickListener(click -> deleteModelo());
+                deleteButton.addClickListener(click -> deleteModelo());
                 deleteButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
                 Button addButton = new Button(VaadinIcon.PLUS.create());
-                // addButton.addClickListener(click -> addModulo());
+                addButton.addClickListener(click -> addModelo());
                 addButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
                 Button modelButton = new Button(VaadinIcon.FILE.create());
                 modelButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
                 modelButton.addClickListener(click -> formModeloPago());
 
                 buttons.add(refreshButton, deleteButton, addButton, modelButton);
-                total = new Html("<span>hola</span>");
-                // if (moduloService.count() == 1) {
-                // total = new Html("<span>Total: <b>" + moduloService.count() + "</b>
-                // modulo</span>");
-                // } else if (moduloService.count() == 0 || moduloService.count() > 1) {
-                // total = new Html("<span>Total: <b>" + moduloService.count() + "</b>
-                // modulos</span>");
-                // }
+
+                if (listModelosPago.size() == 1) {
+                        total = new Html("<span>Total: <b>" + listModelosPago.size() + "</b> modelo</span>");
+                } else if (listModelosPago.size() > 1 || listModelosPago.size() == 0) {
+                        total = new Html("<span>Total: <b>" + listModelosPago.size() + "</b> modelos</span>");
+                }
+
                 toolbar = new HorizontalLayout(buttons, total);
                 toolbar.addClassName("toolbar");
                 toolbar.setAlignItems(FlexComponent.Alignment.CENTER);
@@ -134,6 +290,154 @@ public class ModeloPagoView extends Div {
                                 .set("padding", "var(--lumo-space-wide-m)");
 
                 return toolbar;
+        }
+
+        private void deleteModelo() {
+                try {
+
+                        if (grid.asMultiSelect().isEmpty()) {
+                                Notification notification = Notification.show("Debe elegir al menos un campo", 5000,
+                                                Notification.Position.MIDDLE);
+                                notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+                        } else {
+                                deleteItems(grid.getSelectedItems().size(), grid.getSelectedItems());
+                                updateList();
+                                toolbar.remove(total);
+                                if (listModelosPago.size() == 1) {
+                                        total = new Html("<span>Total: <b>" + listModelosPago.size()
+                                                        + "</b> modelo</span>");
+                                } else if (listModelosPago.size() > 1 || listModelosPago.size() == 0) {
+                                        total = new Html("<span>Total: <b>" + listModelosPago.size()
+                                                        + "</b> modelos</span>");
+                                }
+                                toolbar.addComponentAtIndex(1, total);
+                                toolbar.setFlexGrow(1, buttons);
+                        }
+
+                } catch (Exception e) {
+                        e.printStackTrace();
+                        Notification notification = Notification.show(
+                                        "Ocurrió un problema al intentar eliminar el estudiante",
+                                        2000,
+                                        Notification.Position.MIDDLE);
+                        ;
+                        notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+                }
+        }
+
+        private void deleteItems(int cantidad, Set<ModeloPago> modelo) {
+                Notification notification;
+                modeloPagoService.deleteAll(modelo);
+                if (cantidad == 1) {
+                        notification = Notification.show("Modelo de pago eliminado", 2000,
+                                        Notification.Position.BOTTOM_START);
+                } else {
+                        notification = Notification.show("Han sido eliminados" + cantidad + " modelos de pago", 5000,
+                                        Notification.Position.BOTTOM_START);
+                }
+                notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+        }
+
+        private void configureForm() {
+                form = new ModeloPagoForm(estudianteService.findAll(), libroService.findAll());
+                form.setWidth("25em");
+                form.addListener(ModeloPagoForm.SaveEvent.class, this::saveModelo);
+                form.addListener(ModeloPagoForm.CloseEvent.class, e -> closeEditor());
+        }
+
+        private void saveModelo(ModeloPagoForm.SaveEvent event) {
+
+                listModelosPago.clear();
+                modeloPagoService.findAll().stream().forEach(modelo -> {
+                        if (modelo instanceof ModeloPagoEstudiante) {
+                                modeloEstudiante = (ModeloPagoEstudiante) modelo;
+                                if (modeloEstudiante.getEstudiante().getId() == event.getModeloPago().getEstudiante().getId()
+                                ) {
+                                        listModelosPago.add(modeloEstudiante);
+                                }
+                        }
+                });
+
+                if (listModelosPago.size() != 0) {
+                        Notification notification = Notification.show(
+                                "Este estudiante ya tiene un modelo de pago",
+                                        5000,
+                                        Notification.Position.MIDDLE);
+                        notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+                } else {
+                        if (event.getModeloPago().getId() == null) {
+                                modeloPagoService.save(event.getModeloPago());
+                                Notification notification = Notification.show(
+                                                "Modelo de pago añadido",
+                                                2000,
+                                                Notification.Position.BOTTOM_START);
+                                notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+                        } else {
+                                modeloPagoService.update(event.getModeloPago());
+                                Notification notification = Notification.show(
+                                                "Modelo modificado",
+                                                5000,
+                                                Notification.Position.BOTTOM_START);
+                                notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+                        }
+                }
+                toolbar.remove(total);
+                if (listModelosPago.size() == 1) {
+                        total = new Html("<span>Total: <b>" + listModelosPago.size() + "</b> modelo</span>");
+                } else if (listModelosPago.size() > 1 || listModelosPago.size() == 0) {
+                        total = new Html("<span>Total: <b>" + listModelosPago.size() + "</b> modelos</span>");
+                }
+                toolbar.addComponentAtIndex(1, total);
+                toolbar.setFlexGrow(1, buttons);
+                updateList();
+                closeEditor();
+        }
+
+        private void editModelo(ModeloPagoEstudiante modeloPago) {
+                if (modeloPago == null) {
+                        closeEditor();
+                } else {
+                        form.setModeloPago(modeloPago);
+                        form.setVisible(true);
+                        addClassName("editing");
+                        dialog.open();
+                }
+        }
+
+        private void addModelo() {
+                grid.asMultiSelect().clear();
+                ModeloPagoEstudiante modelo = new ModeloPagoEstudiante();
+                modelo.setImagen("");
+                editModelo(modelo);
+        }
+
+        private void closeEditor() {
+                ModeloPagoEstudiante modelo = new ModeloPagoEstudiante();
+                modelo.setImagen("");
+                form.setModeloPago(modelo);
+                form.setVisible(false);
+                removeClassName("editing");
+                dialog.close();
+        }
+
+        private void updateList() {
+
+                listModelosPago.clear();
+                List<ModeloPago> aux = modeloPagoService.findAll();
+                for (int i = 0; i < aux.size(); i++) {
+                        if (aux.get(i) instanceof ModeloPagoEstudiante) {
+                                modeloEstudiante = (ModeloPagoEstudiante) aux.get(i);
+                                System.out.println(modeloEstudiante.getEstudiante().getUser().getName());
+                                listModelosPago.add(modeloEstudiante);
+                        }
+                }
+                // modeloPagoService.findAll().stream().forEach(modelo -> {
+                //         if (modelo instanceof ModeloPagoEstudiante) {
+                //                 modeloEstudiante = (ModeloPagoEstudiante) modelo;
+                //                 listModelosPago.add(modeloEstudiante);
+                //         }
+                // });
+                grid.setItems(listModelosPago);
         }
 
         /* Form crear modelo de pago */
@@ -168,27 +472,27 @@ public class ModeloPagoView extends Div {
                 reporteLink.addClassNames("link-modelo");
                 reporteLink.setEnabled(false);
                 reporteLink.setTarget("_BLANK");
-                
+
                 reportContainer.add(header, estudiante, libros, reporteLink);
                 reportDialog.add(reportContainer);
                 reportDialog.open();
 
                 estudiante.addValueChangeListener(e -> {
                         libros.addValueChangeListener(event -> {
-                                if (estudiante.getValue()!= null && libros.getValue() != null) {
+                                if (estudiante.getValue() != null && libros.getValue() != null) {
                                         reporteLink.setEnabled(true);
-                                } 
+                                }
                         });
                 });
-                
+
                 libros.addValueChangeListener(e -> {
                         estudiante.addValueChangeListener(event -> {
-                                if (estudiante.getValue()!= null && libros.getValue() != null) {
+                                if (estudiante.getValue() != null && libros.getValue() != null) {
                                         reporteLink.setEnabled(true);
-                                } 
+                                }
                         });
                 });
-                
+
                 reporteLink.addBlurListener(e -> {
                         if (!estudiante.isEmpty() && !libros.isEmpty()) {
                                 reportDialog.close();
@@ -200,17 +504,7 @@ public class ModeloPagoView extends Div {
                                 notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
                         }
                 });
-                
 
-        }
-
-        private void saveModelo(ModeloPagoForm.SaveEvent event) {
-                modeloPagoService.save(event.getModeloPago());
-                Notification notification = Notification.show(
-                                "Modelo añadido",
-                                2000,
-                                Notification.Position.BOTTOM_START);
-                notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
         }
 
         /* cear pdf modelo de pago */
@@ -728,6 +1022,5 @@ public class ModeloPagoView extends Div {
 
                 return octavaFila;
         }
-
         /* Fin-> cear pdf modelo de pago */
 }

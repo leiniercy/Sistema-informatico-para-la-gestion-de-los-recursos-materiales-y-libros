@@ -1,6 +1,7 @@
 package trabajodediploma.data.entity;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -81,6 +82,187 @@ public class Libro extends AbstractEntity {
     private List<TarjetaPrestamo> tarjetas;
 
     @ManyToMany(mappedBy = "libros", cascade = CascadeType.ALL)
-    Set<ModeloPago> modelos;
+    private Set<ModeloPago> modelos;
 
+//    public Libro() {
+//    }
+//
+//    public Libro(String imagen, String titulo, String autor, Integer volumen, Integer tomo, Integer parte, Integer cantidad, Double precio) {
+//        this.imagen = imagen;
+//        this.titulo = titulo;
+//        this.autor = autor;
+//        this.volumen = volumen;
+//        this.tomo = tomo;
+//        this.parte = parte;
+//        this.cantidad = cantidad;
+//        this.precio = precio;
+//    }
+//
+//    public Libro(String imagen, String titulo, String autor, Integer volumen, Integer tomo, Integer parte, Integer cantidad, Double precio, List<TarjetaPrestamo> tarjetas, Set<ModeloPago> modelos) {
+//        this.imagen = imagen;
+//        this.titulo = titulo;
+//        this.autor = autor;
+//        this.volumen = volumen;
+//        this.tomo = tomo;
+//        this.parte = parte;
+//        this.cantidad = cantidad;
+//        this.precio = precio;
+//        this.tarjetas = tarjetas;
+//        this.modelos = modelos;
+//    }
+//
+//    public String getImagen() {
+//        return imagen;
+//    }
+//
+//    public void setImagen(String imagen) {
+//        this.imagen = imagen;
+//    }
+//
+//    public String getTitulo() {
+//        return titulo;
+//    }
+//
+//    public void setTitulo(String titulo) {
+//        this.titulo = titulo;
+//    }
+//
+//    public String getAutor() {
+//        return autor;
+//    }
+//
+//    public void setAutor(String autor) {
+//        this.autor = autor;
+//    }
+//
+//    public Integer getVolumen() {
+//        return volumen;
+//    }
+//
+//    public void setVolumen(Integer volumen) {
+//        this.volumen = volumen;
+//    }
+//
+//    public Integer getTomo() {
+//        return tomo;
+//    }
+//
+//    public void setTomo(Integer tomo) {
+//        this.tomo = tomo;
+//    }
+//
+//    public Integer getParte() {
+//        return parte;
+//    }
+//
+//    public void setParte(Integer parte) {
+//        this.parte = parte;
+//    }
+//
+//    public Integer getCantidad() {
+//        return cantidad;
+//    }
+//
+//    public void setCantidad(Integer cantidad) {
+//        this.cantidad = cantidad;
+//    }
+//
+//    public Double getPrecio() {
+//        return precio;
+//    }
+//
+//    public void setPrecio(Double precio) {
+//        this.precio = precio;
+//    }
+//
+//    public List<TarjetaPrestamo> getTarjetas() {
+//        return tarjetas;
+//    }
+//
+//    public void setTarjetas(List<TarjetaPrestamo> tarjetas) {
+//        this.tarjetas = tarjetas;
+//    }
+//
+//    public Set<ModeloPago> getModelos() {
+//        return modelos;
+//    }
+//
+//    public void setModelos(Set<ModeloPago> modelos) {
+//        this.modelos = modelos;
+//    }
+//
+//    public Integer getId() {
+//        return id;
+//    }
+//
+//    public void setId(Integer id) {
+//        this.id = id;
+//    }
+//
+//    @Override
+//    public int hashCode() {
+//        int hash = 7;
+//        hash = 79 * hash + Objects.hashCode(this.imagen);
+//        hash = 79 * hash + Objects.hashCode(this.titulo);
+//        hash = 79 * hash + Objects.hashCode(this.autor);
+//        hash = 79 * hash + Objects.hashCode(this.volumen);
+//        hash = 79 * hash + Objects.hashCode(this.tomo);
+//        hash = 79 * hash + Objects.hashCode(this.parte);
+//        hash = 79 * hash + Objects.hashCode(this.cantidad);
+//        hash = 79 * hash + Objects.hashCode(this.precio);
+//        hash = 79 * hash + Objects.hashCode(this.tarjetas);
+//        hash = 79 * hash + Objects.hashCode(this.modelos);
+//        return hash;
+//    }
+//
+//    @Override
+//    public boolean equals(Object obj) {
+//        if (this == obj) {
+//            return true;
+//        }
+//        if (obj == null) {
+//            return false;
+//        }
+//        if (getClass() != obj.getClass()) {
+//            return false;
+//        }
+//        final Libro other = (Libro) obj;
+//        if (!Objects.equals(this.imagen, other.imagen)) {
+//            return false;
+//        }
+//        if (!Objects.equals(this.titulo, other.titulo)) {
+//            return false;
+//        }
+//        if (!Objects.equals(this.autor, other.autor)) {
+//            return false;
+//        }
+//        if (!Objects.equals(this.volumen, other.volumen)) {
+//            return false;
+//        }
+//        if (!Objects.equals(this.tomo, other.tomo)) {
+//            return false;
+//        }
+//        if (!Objects.equals(this.parte, other.parte)) {
+//            return false;
+//        }
+//        if (!Objects.equals(this.cantidad, other.cantidad)) {
+//            return false;
+//        }
+//        if (!Objects.equals(this.precio, other.precio)) {
+//            return false;
+//        }
+//        if (!Objects.equals(this.tarjetas, other.tarjetas)) {
+//            return false;
+//        }
+//        if (!Objects.equals(this.modelos, other.modelos)) {
+//            return false;
+//        }
+//        return true;
+//    }
+//
+//    @Override
+//    public String toString() {
+//        return "Libro{" + "imagen=" + imagen + ", titulo=" + titulo + ", autor=" + autor + ", volumen=" + volumen + ", tomo=" + tomo + ", parte=" + parte + ", cantidad=" + cantidad + ", precio=" + precio + ", tarjetas=" + tarjetas + ", modelos=" + modelos + '}';
+//    }
+//    
 }
