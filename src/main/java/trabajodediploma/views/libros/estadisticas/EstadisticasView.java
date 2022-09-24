@@ -59,6 +59,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.annotation.security.RolesAllowed;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.JFreeChart;
+import org.jfree.data.general.DefaultPieDataset;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -74,9 +77,9 @@ import trabajodediploma.views.footer.MyFooter;
  *
  * @author leinier
  */
-//@PageTitle("Estadísticas")
-//@Route(value = "estadisticas-view", layout = MainLayout.class)
-//@RolesAllowed("RESP_ALMACEN")
+@PageTitle("Estadísticas")
+@Route(value = "estadisticas-view", layout = MainLayout.class)
+@RolesAllowed("RESP_ALMACEN")
 public class EstadisticasView extends Div {
 
     private LibroService libroService;
@@ -85,8 +88,7 @@ public class EstadisticasView extends Div {
     private MyFooter footer;
     private List<TarjetaPrestamo> tarjetas;
     private List<Libro> listLibros;
-    private Configuration configuration;
-    private Chart chart;
+    private GraficoPastel graficoPastel;
 
     public EstadisticasView(
             @Autowired LibroService libroService,
@@ -100,7 +102,8 @@ public class EstadisticasView extends Div {
         footer = new MyFooter();
 
         updateList();
-        container.add(getBoard(), getGraficosPasteles());
+        getGraficoCirciular();
+        container.add(getEstadisticas(), graficoPastel);
         add(getBarraDeMenu(), container, footer);
     }
 
@@ -129,35 +132,6 @@ public class EstadisticasView extends Div {
         return toolbar;
     }
 
-    private Component getBoard() {
-
-        Board board = new Board();
-        board.addClassName("estadistica_view__container__basic_board");
-        board.addRow(
-                createHighlight("Cantidad real de libros", new Span(String.format("%d", cantRealLibros()))),
-                createHighlight("Cantidad de libros en el álmacen",
-                        new Span(String.format("%d", cantRealLibrosAlmacen()))),
-                createHighlight("Cantidad de libros prestados",
-                        new Span(String.format("%d", cantRealLibrosPrestados()))));
-        return board;
-    }
-
-    private Component createHighlight(String title, Span span) {
-
-        H1 h1 = new H1(title);
-        h1.addClassNames("font-normal", "m-0", "text-secondary", "text-xs");
-
-        span.addClassNames("font-semibold", "text-3xl");
-
-        VerticalLayout layout = new VerticalLayout(h1, span);
-        layout.addClassName("p-l");
-        layout.setPadding(false);
-        layout.setSpacing(false);
-        layout.getElement().getThemeList().add("spacing-l");
-        layout.setDefaultHorizontalComponentAlignment(FlexComponent.Alignment.CENTER);
-        return layout;
-    }
-
     // Cantidad real de libros
     public int cantRealLibros() {
         int cantReal = 0;
@@ -184,47 +158,37 @@ public class EstadisticasView extends Div {
         return cantRealLibros() - cantRealLibrosAlmacen();
     }
 
+    //Estaidisticas
+    private HorizontalLayout getEstadisticas() {
+
+        HorizontalLayout barra_info = new HorizontalLayout();
+
+        VerticalLayout cantLibrosReal_div = new VerticalLayout();
+        H1 cantLibrosReal_h1 = new H1("Cantidad real de libros");
+        Span cantLibrosReal_span = new Span(String.format("%d", cantRealLibros()));
+        cantLibrosReal_div.add(cantLibrosReal_h1, cantLibrosReal_span);
+
+        VerticalLayout cantLibrosAlmacen_div = new VerticalLayout();
+        H1 cantLibrosAlmacen_h1 = new H1("Cantidad de libros en el álmacen");
+        Span cantLibrosAlmacen_span = new Span(String.format("%d", cantRealLibrosAlmacen()));
+        cantLibrosAlmacen_div.add(cantLibrosAlmacen_h1, cantLibrosAlmacen_span);
+
+        VerticalLayout cantLibrosPrestados_div = new VerticalLayout();
+        H1 cantLibrosPrestados_h1 = new H1("Cantidad de libros prestados");
+        Span cantLibrosPrestados_span = new Span(String.format("%d", cantRealLibrosPrestados()));
+        cantLibrosPrestados_div.add(cantLibrosPrestados_h1, cantLibrosPrestados_span);
+
+        barra_info.add(cantLibrosReal_div, cantLibrosAlmacen_div, cantLibrosPrestados_div);
+
+        return barra_info;
+    }
+
     // Graficos de pasteles
-    private Component getGraficosPasteles() {
-        Board board = new Board();
-        board.addClassName("estadistica_view__container__grafics_key_board");
-        board.addRow(
-                getEstadisticasProrcientoLibros());
-
-        return board;
+    private void getGraficoCirciular() {
+        graficoPastel = new GraficoPastel(cantRealLibrosAlmacen(), cantRealLibrosPrestados(), cantRealLibros());
     }
 
-    private Component getEstadisticasProrcientoLibros() {
-        configuration = new Configuration();
-        chart = new Chart(ChartType.PIE);
-
-        float promedioP = 0;
-        float promedioA = 0;
-        if (cantRealLibros() != 0) {
-            promedioP = cantRealLibrosPrestados() * 100 / cantRealLibros();
-            promedioA = cantRealLibrosAlmacen() * 100 / cantRealLibros();
-        }
-
-        DataSeries dataSeries = new DataSeries();
-        dataSeries.add(new DataSeriesItem(String.format("Libros prestados: %.0f", promedioP ) + "%", promedioP));
-        dataSeries
-                .add(new DataSeriesItem(String.format("Libros en el álmacen: %.0f", promedioA ) + "%", promedioA));
-
-        chart.getConfiguration().setSeries(dataSeries);
-        chart.getConfiguration().setTitle("Distribución de libros");
-        chart.getConfiguration().setSubTitle(String.format("Cantidad real de libros: %d", cantRealLibros()));
-        configuration = chart.getConfiguration();
-        chart.addClassNames("text-xl", "mt-m");
-
-        VerticalLayout serviceHealth = new VerticalLayout(chart);
-        serviceHealth.addClassName("p-l");
-        serviceHealth.setPadding(false);
-        serviceHealth.setSpacing(false);
-        serviceHealth.getElement().getThemeList().add("spacing-l");
-        serviceHealth.setDefaultHorizontalComponentAlignment(FlexComponent.Alignment.CENTER);
-        return serviceHealth;
-    }
-
+    //exportar informacion
     private StreamResource exportChart() {
 
         /*
@@ -242,7 +206,6 @@ public class EstadisticasView extends Div {
          * System.out.print("Error al exportar csv");
          * }
          */
-
         StreamResource source = new StreamResource("ReporteEvaluaciones.pdf", () -> {
             String path = "src/main/resources/META-INF/resources/archivos/RecurosMateriales.pdf";
 
@@ -270,9 +233,10 @@ public class EstadisticasView extends Div {
         return source;
 
     }
-    
+
+    //informacion del pdf
     private Table infoPdf() {
-        float firstGrow_columnWidth[] = { 600 };
+        float firstGrow_columnWidth[] = {600};
 
         Table firstGrow = new Table(firstGrow_columnWidth);
 

@@ -228,8 +228,7 @@ public class MainLayout extends AppLayout {
 
                 new MenuItemInfo("Usuario", "la la-user", UsuarioView.class), //
 
-//                new MenuItemInfo("Estadística", "la la-chart-bar", EstadisticasView.class), //
-                new MenuItemInfo("Estadística", "la la-chart-bar", GraficoPastel.class), //
+                new MenuItemInfo("Estadística", "la la-chart-bar", EstadisticasView.class), //
 
                 new MenuItemInfo("Libros", "la la-book", LibroView.class), //
 
