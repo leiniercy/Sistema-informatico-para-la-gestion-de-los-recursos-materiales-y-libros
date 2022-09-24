@@ -45,6 +45,7 @@ import trabajodediploma.views.catalogo.CatalogoView;
 import trabajodediploma.views.inicio.InicioView;
 import trabajodediploma.views.libros.LibroView;
 import trabajodediploma.views.libros.estadisticas.EstadisticasView;
+import trabajodediploma.views.libros.estadisticas.GraficoPastel;
 import trabajodediploma.views.menu_personal.modificar_perfil.ModificarPerfilView;
 import trabajodediploma.views.modeloPago.ModeloPagoView;
 import trabajodediploma.views.modulo.ModuloView;
@@ -227,7 +228,8 @@ public class MainLayout extends AppLayout {
 
                 new MenuItemInfo("Usuario", "la la-user", UsuarioView.class), //
 
-                new MenuItemInfo("Estadística", "la la-chart-bar", EstadisticasView.class), //
+//                new MenuItemInfo("Estadística", "la la-chart-bar", EstadisticasView.class), //
+                new MenuItemInfo("Estadística", "la la-chart-bar", GraficoPastel.class), //
 
                 new MenuItemInfo("Libros", "la la-book", LibroView.class), //
 

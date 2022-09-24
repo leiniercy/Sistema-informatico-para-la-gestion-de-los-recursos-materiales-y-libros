@@ -182,7 +182,7 @@
             <version>2.1.7.js6</version>
         </dependency>-->
         
-         <dependency>
+        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <type>jar</type>
@@ -223,9 +223,22 @@
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin-charts-flow-svg-generator</artifactId>
         </dependency>
+        
+        <dependency>
+            <groupId>org.jfree</groupId>
+            <artifactId>jfreechart</artifactId>
+            <version>1.5.3</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.vaadin.addon</groupId>
+            <artifactId>jfreechartwrapper</artifactId>
+            <version>4.0.0</version>
+        </dependency>
+
         <!-- Chart -->
         <!--Multiselect-Combobox-->
-<!--        <dependency>
+        <!--        <dependency>
             <groupId>org.vaadin.gatanaso</groupId>
             <artifactId>multiselect-combo-box-flow</artifactId>
             <version>3.0.2</version>

@@ -74,9 +74,9 @@ import trabajodediploma.views.footer.MyFooter;
  *
  * @author leinier
  */
-@PageTitle("Estadísticas")
-@Route(value = "estadisticas-view", layout = MainLayout.class)
-@RolesAllowed("RESP_ALMACEN")
+//@PageTitle("Estadísticas")
+//@Route(value = "estadisticas-view", layout = MainLayout.class)
+//@RolesAllowed("RESP_ALMACEN")
 public class EstadisticasView extends Div {
 
     private LibroService libroService;
