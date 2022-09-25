@@ -5,6 +5,8 @@
  */
 package trabajodediploma.views.libros.estadisticas;
 
+import com.itextpdf.io.image.ImageData;
+import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.kernel.color.Color;
 import com.itextpdf.kernel.color.DeviceRgb;
 import com.itextpdf.kernel.pdf.PdfDocument;
@@ -14,6 +16,7 @@ import com.itextpdf.layout.border.Border;
 import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
+import com.itextpdf.layout.element.Image;
 import com.itextpdf.layout.property.HorizontalAlignment;
 import com.itextpdf.layout.property.TextAlignment;
 import com.itextpdf.layout.property.VerticalAlignment;
@@ -38,7 +41,7 @@ import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.html.Image;
+
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -52,10 +55,13 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.StreamResource;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import javax.annotation.security.RolesAllowed;
@@ -162,18 +168,22 @@ public class EstadisticasView extends Div {
     private HorizontalLayout getEstadisticas() {
 
         HorizontalLayout barra_info = new HorizontalLayout();
+        barra_info.addClassName("barra_info");
 
         VerticalLayout cantLibrosReal_div = new VerticalLayout();
+        cantLibrosReal_div.addClassName("barra_info__vl");
         H1 cantLibrosReal_h1 = new H1("Cantidad real de libros");
         Span cantLibrosReal_span = new Span(String.format("%d", cantRealLibros()));
         cantLibrosReal_div.add(cantLibrosReal_h1, cantLibrosReal_span);
 
         VerticalLayout cantLibrosAlmacen_div = new VerticalLayout();
+        cantLibrosAlmacen_div.addClassName("barra_info__vl");
         H1 cantLibrosAlmacen_h1 = new H1("Cantidad de libros en el álmacen");
         Span cantLibrosAlmacen_span = new Span(String.format("%d", cantRealLibrosAlmacen()));
         cantLibrosAlmacen_div.add(cantLibrosAlmacen_h1, cantLibrosAlmacen_span);
 
         VerticalLayout cantLibrosPrestados_div = new VerticalLayout();
+        cantLibrosPrestados_div.addClassName("barra_info__vl");
         H1 cantLibrosPrestados_h1 = new H1("Cantidad de libros prestados");
         Span cantLibrosPrestados_span = new Span(String.format("%d", cantRealLibrosPrestados()));
         cantLibrosPrestados_div.add(cantLibrosPrestados_h1, cantLibrosPrestados_span);
@@ -214,13 +224,17 @@ public class EstadisticasView extends Div {
                 PdfDocument pdfDocument = new PdfDocument(pdfWriter);
                 Document document = new Document(pdfDocument);
 
+//                ImageData imageData = ImageDataFactory.create("src/main/resources/META-INF/resources/images/logo_pag_2.png");
+//                Image img = new Image(imageData);
+                
                 document.add(infoPdf());
+               // document.add(img);
                 document.close();
 
                 File initialFile = new File(path);
                 InputStream targetStream = new FileInputStream(initialFile);
                 return targetStream;
-            } catch (FileNotFoundException e) {
+            } catch (FileNotFoundException /*| MalformedURLException*/ e) {
                 e.printStackTrace();
                 Notification notification = Notification.show("Ocurrió al exportar el documento", 5000,
                         Notification.Position.MIDDLE);

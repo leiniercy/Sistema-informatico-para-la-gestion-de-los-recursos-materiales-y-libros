@@ -39,8 +39,6 @@ public class GraficoPastel extends Div {
         DefaultPieDataset datos = new DefaultPieDataset();
         datos.setValue("Libros prestados "+( (cantRealLibrosPrestados * 100) / cantRealLibros)+"%", cantRealLibrosPrestados);
         datos.setValue("Libros almacenados "+( (cantRealLibrosAlmacen * 100) / cantRealLibros)+"%" , cantRealLibrosAlmacen);
-//        datos.setValue("Internet", n3);
-//        datos.setValue("Libros", n4);
 
         JFreeChart grafico_circular = ChartFactory.createPieChart(
                 "Reparto de libros", // Nombre del Grafico

@@ -5,44 +5,34 @@
   width: 100%;
 }
 .estadistica_view___barra_menu {
-    display: flex;
-    flex-grow: 1;
-    flex-shrink: 0;
-    flex-basis: 60px;
-    max-height: 90px;
-    flex-direction: row;
-    width: 100%;
-    justify-content: end;
-    align-items: baseline;
+  display: flex;
+  flex-grow: 1;
+  flex-shrink: 0;
+  flex-basis: 60px;
+  max-height: 90px;
+  flex-direction: row;
+  width: 100%;
+  justify-content: end;
+  align-items: baseline;
 }
 .estadistica_view__container {
-    width: 100%;
-    flex-basis: 300px;
-    flex-grow: 2;
-    flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
-}
-.estadistica_view__container__basic_board {
-    width: 100%;
-    flex-grow: 1;
-    flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
-    flex-wrap: wrap;
-}
-.estadistica_view__container__grafics_key_board {
   width: 100%;
-  flex-grow: 3;
-}
-.barra-menu-date {
+  flex-basis: 300px;
+  flex-grow: 2;
+  flex-shrink: 0;
   display: flex;
-  flex-direction: row;
-  height: 100px;
-  width: 432px;
-  align-items: inherit;
-  justify-content: space-evenly;
-  margin: 5px;
+  flex-direction: column;
+}
+.barra_info__vl h1 {
+  width: 100%;
+  text-align: center;
+  font-size: var(--lumo-font-size-m);
+}
+.barra_info__vl span {
+  width: 100%;
+  text-align: center;
+  font-weight: bold;
+  font-size: var(--lumo-font-size-xxl);
 }
 
 .estadistica_view___barra_menu__export {
@@ -50,7 +40,7 @@
   height: 44px;
   width: 120px;
 }
-.estadistica_view___barra_menu__export__link{
+.estadistica_view___barra_menu__export__link {
   text-decoration: none;
   display: inline-flex;
   align-items: center;
@@ -69,16 +59,15 @@
   margin-top: 10px;
   font-size: var(--lumo-font-size-m);
 }
-.estadistica_view___barra_menu__export__link vaadin-icon{
+.estadistica_view___barra_menu__export__link vaadin-icon {
   height: var(--lumo-font-size-m);
 }
-.estadistica_view___barra_menu__export__link:hover{
+.estadistica_view___barra_menu__export__link:hover {
   text-decoration: none;
 }
-.estadistica_view___barra_menu__export__link:active{
+.estadistica_view___barra_menu__export__link:active {
   color: #ffffff;
   background-color: rgb(154, 196, 221);
   text-decoration: none;
 }
-.estadisticas {
-}
+
