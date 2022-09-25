@@ -224,7 +224,7 @@ public class MainLayout extends AppLayout {
 
                 new MenuItemInfo("Catálogo", "la la-th-list", CatalogoView.class), //
 
-                new MenuItemInfo("Tarjeta Personal", "la la-columns", TarjetaPersonalPrestamoView.class), //
+                new MenuItemInfo("Tarjeta Personal", "la la-file", TarjetaPersonalPrestamoView.class), //
 
                 new MenuItemInfo("Usuario", "la la-user", UsuarioView.class), //
 
@@ -234,9 +234,9 @@ public class MainLayout extends AppLayout {
 
                 new MenuItemInfo("Recursos Materiales ", "la la-tools", RecursosMaterialesView.class), //
 
-                new MenuItemInfo("Tarjeta Prestamo", "la la-columns", TarjetaPrestamoView.class), //
+                new MenuItemInfo("Tarjeta Prestamo", "la la-file-invoice", TarjetaPrestamoView.class), //
 
-                new MenuItemInfo("Modelo de Pago", "la la-columns", ModeloPagoView.class), //
+                new MenuItemInfo("Modelo de Pago", "la la-file-contract", ModeloPagoView.class), //
                 
                 new MenuItemInfo("Modulo", "la la-gift", ModuloView.class), //
 
