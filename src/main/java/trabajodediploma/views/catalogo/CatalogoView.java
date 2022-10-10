@@ -128,6 +128,8 @@ public class CatalogoView extends Div {
                 tomo = new String("Tomo: " + libros.get(i).getTomo().toString());
                 card = CrearCard(imagen, titulo, titulo, autor, tomo);
                 band = true;
+            }else if(libros.get(i).getVolumen() == null && libros.get(i).getParte() == null && libros.get(i).getTomo() == null ){
+                card = CrearCardV2(imagen, titulo, titulo, autor);
             }
             
             target.add(card, link);
@@ -144,7 +146,7 @@ public class CatalogoView extends Div {
         Div card = new Div();
         card.addClassName("target__div__card");
 
-        Image imagen = new Image(img, img_alt);
+        Image imagen = new Image(img, img_alt);    
         card.add(imagen);
 
         Div card__content = new Div();
@@ -155,6 +157,24 @@ public class CatalogoView extends Div {
         Paragraph card__description1 = new Paragraph(autor);
         Paragraph card__description2 = new Paragraph(volumen);
         card__content.add(card__title, card__description1, card__description2);
+        return card;
+    }
+
+    private Div CrearCardV2(String img, String img_alt, String titulo, String autor) {
+        Div card = new Div();
+        card.addClassName("target__div__card");
+
+        Image imagen = new Image(img, img_alt);    
+
+        card.add(imagen);
+
+        Div card__content = new Div();
+        card__content.addClassName("target__div__card__content");
+        card.add(card__content);
+
+        H2 card__title = new H2(titulo);
+        Paragraph card__description1 = new Paragraph(autor);
+        card__content.add(card__title, card__description1);
         return card;
     }
 

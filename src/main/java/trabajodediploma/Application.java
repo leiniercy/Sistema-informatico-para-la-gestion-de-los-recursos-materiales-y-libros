@@ -17,6 +17,8 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import org.springframework.context.event.EventListener;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import trabajodediploma.data.Rol;
+import trabajodediploma.data.entity.Estudiante;
+import trabajodediploma.data.entity.Grupo;
 import trabajodediploma.data.entity.User;
 import trabajodediploma.data.repository.UserRepository;
 import trabajodediploma.data.tools.EmailSenderService;
@@ -30,10 +32,10 @@ import trabajodediploma.data.tools.EmailSenderService;
  */
 @SpringBootApplication
 @Theme(value = "scdrm")
-@PWA(   name = "GENIUS", 
+@PWA(name = "GENIUS",
         shortName = "GENIUS",
-        offlinePath="offline.html", 
-        offlineResources = { "images/logo.png", "images/offline.png"  })
+        offlinePath = "offline.html",
+        offlineResources = {"images/logo.png", "images/offline.png"})
 @NpmPackage(value = "line-awesome", version = "1.3.0")
 public class Application extends SpringBootServletInitializer implements AppShellConfigurator {
 
@@ -56,18 +58,30 @@ public class Application extends SpringBootServletInitializer implements AppShel
         }
 
         logger.info("Generating demo data");
-        logger.info("... generando 1 Usuario");
+        logger.info("... generando Usuarios");
 
-        // Vicedecano
-        createUser1("User", "user", "user");
-        createUser2("Asistente", "asistente", "asistente");
-        createUser3("Almacenero", "almacen", "almacen");
-        createUser4("Admin", "admin", "admin");
-        createUser5("Leinier", "leiniercy", "1234");
-        createUser6("Vicedecano", "vicedecano", "vicedecano");
+        // Estudiantes
+        createUser1("Leinier Caraballo Yanes", "leiniercy", "1234");
+        createUser("Frank A Valero López", "frankavl", "1234");
+        createUser("Daryan Gustavo Góngora", "daryanggg", "1234");
+        createUser("Christian Sosa Jímenez", "christiansj", "1234");
+        createUser("Catherín Mya Zamora Hernández", "catherinmzh", "1234");
+        createUser("Leanet Alfonso Tirse", "leanetat", "1234");
+        createUser("Sabrina Izquierdo Borrero", "sabrinadlcib", "1234");
+        createUser("Sulennis Saray Jiménez Viltres", "sulennissjv", "1234");
+        
+        //Trabajadores
+        createUser("José Emilio Badia Valdés", "jebadia", "1234");
+        createUser("Aranelys Lazo Campo", "amlazo", "1234");
+        createUser("Marcos Henrique Pelegrino Infante", "mhpelegrino", "1234");
+        createUser("Maydalis Hernández Pérez", "mhernandezp", "1234");
+        createUser("Reiman Alfonso Azcuy", "razcuy", "1234");
+        createUser("Angel Alberto Vazquez Sánchez", "aavazquez", "1234");
+        createUser("Yadira Ramírez Rodríguez", "yramirezr", "1234");
+        createUser("Yordankis Matos López", "yluguen", "1234");
     }
 
-    private User createUser1(String name, String username, String password) {
+    private User createUser(String name, String username, String password) {
         User user = new User();
         user.setName(name);
         user.setUsername(username);
@@ -76,38 +90,8 @@ public class Application extends SpringBootServletInitializer implements AppShel
         userRepository.saveAndFlush(user);
         return user;
     }
-
-    private User createUser2(String name, String username, String password) {
-        User user = new User();
-        user.setName(name);
-        user.setUsername(username);
-        user.setHashedPassword(passwordEncoder.encode(password));
-        user.setRoles(Collections.singleton(Rol.ASISTENTE_CONTROL));
-        userRepository.saveAndFlush(user);
-        return user;
-    }
-
-    private User createUser3(String name, String username, String password) {
-        User user = new User();
-        user.setName(name);
-        user.setUsername(username);
-        user.setHashedPassword(passwordEncoder.encode(password));
-        user.setRoles(Collections.singleton(Rol.RESP_ALMACEN));
-        userRepository.saveAndFlush(user);
-        return user;
-    }
-
-    private User createUser4(String name, String username, String password) {
-        User user = new User();
-        user.setName(name);
-        user.setUsername(username);
-        user.setHashedPassword(passwordEncoder.encode(password));
-        user.setRoles(Collections.singleton(Rol.ADMIN));
-        userRepository.saveAndFlush(user);
-        return user;
-    }
-
-    private User createUser5(String name, String username, String password) {
+    
+    private User createUser1(String name, String username, String password) {
         User user = new User();
         user.setName(name);
         user.setUsername(username);
@@ -118,19 +102,8 @@ public class Application extends SpringBootServletInitializer implements AppShel
         return user;
     }
 
-    private User createUser6(String name, String username, String password) {
-        User user = new User();
-        user.setName(name);
-        user.setUsername(username);
-        user.setHashedPassword(passwordEncoder.encode(password));
-        user.setRoles(Collections.singleton(Rol.VD_ADIMN_ECONOMIA));
-        userRepository.saveAndFlush(user);
-        return user;
-    }
-
     // @Autowired
     // private EmailSenderService senderService;
-
     // @EventListener(ApplicationReadyEvent.class)
     // public void triggerMail() {
     // senderService.sendSimpleEmail("leiniercaraballo08@gmail.com",

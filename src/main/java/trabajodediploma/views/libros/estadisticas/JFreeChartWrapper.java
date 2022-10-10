@@ -5,23 +5,25 @@
  */
 package trabajodediploma.views.libros.estadisticas;
 
+import java.awt.Rectangle;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.apache.batik.svggen.SVGGraphics2D;
+import org.jfree.chart.JFreeChart;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasSize;
 import com.vaadin.flow.component.HasStyle;
 import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.StreamResourceWriter;
-import org.apache.batik.svggen.SVGGraphics2D;
-import org.jfree.chart.JFreeChart;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import java.awt.*;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 
 /**
  *

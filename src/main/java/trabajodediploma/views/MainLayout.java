@@ -234,11 +234,11 @@ public class MainLayout extends AppLayout {
 
                 new MenuItemInfo("Recursos Materiales ", "la la-tools", RecursosMaterialesView.class), //
 
-                new MenuItemInfo("Tarjeta Prestamo", "la la-file-invoice", TarjetaPrestamoView.class), //
+                new MenuItemInfo("Tarjeta Préstamo", "la la-file-invoice", TarjetaPrestamoView.class), //
 
                 new MenuItemInfo("Modelo de Pago", "la la-file-contract", ModeloPagoView.class), //
                 
-                new MenuItemInfo("Modulo", "la la-gift", ModuloView.class), //
+                new MenuItemInfo("Módulo", "la la-gift", ModuloView.class), //
 
                 new MenuItemInfo("Destino Final", "la la-user-check", TarjetaDestinoFinalView.class), //
         };
