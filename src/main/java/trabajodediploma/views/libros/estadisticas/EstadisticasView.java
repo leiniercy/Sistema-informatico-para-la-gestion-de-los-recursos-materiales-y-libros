@@ -56,6 +56,7 @@ import com.vaadin.flow.server.StreamResource;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.LinkedList;
@@ -226,9 +227,8 @@ public class EstadisticasView extends Div {
 
 //                ImageData imageData = ImageDataFactory.create("src/main/resources/META-INF/resources/images/logo_pag_2.png");
 //                Image img = new Image(imageData);
-                
                 document.add(infoPdf());
-               // document.add(img);
+                // document.add(img);
                 document.close();
 
                 File initialFile = new File(path);

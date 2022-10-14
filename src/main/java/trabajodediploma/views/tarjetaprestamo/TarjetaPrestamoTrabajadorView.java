@@ -347,20 +347,25 @@ public class TarjetaPrestamoTrabajadorView extends Div {
 
     private void saveLibro(TarjetaPrestamoTrabajadorForm.SaveEvent event) {
         prestamos.clear();
-        prestamoService.findAll().parallelStream()
-                .filter(target -> target instanceof TarjetaPrestamoTrabajador
-                        && (event.getTarjetaPrestamo().getFechaDevolucion() != null
-                                && event.getTarjetaPrestamo().getFechaDevolucion().equals(target.getFechaDevolucion()))
-                        && event.getTarjetaPrestamo().getLibro().equals(target.getLibro())
-                        && event.getTarjetaPrestamo().getFechaPrestamo().equals(target.getFechaPrestamo()))
-                .forEach((tarjeta) -> {
-                    if (tarjeta instanceof TarjetaPrestamoTrabajador) {
-                        tarjetaTrabajador = (TarjetaPrestamoTrabajador) tarjeta;
-                        if (tarjetaTrabajador.getTrabajador().equals(trabajador)) {
-                            prestamos.add(tarjetaTrabajador);
-                        }
+       List<TarjetaPrestamo> listTarjetas = prestamoService.findAll();
+        boolean band = false;
+        for (int i = 0; i < listTarjetas.size() && band == false; i++) {
+            if (listTarjetas.get(i) instanceof TarjetaPrestamoTrabajador) {
+                tarjetaTrabajador = (TarjetaPrestamoTrabajador) listTarjetas.get(i);
+                if (tarjetaTrabajador.getTrabajador().getId() == trabajador.getId()
+                        && event.getTarjetaPrestamo().getTrabajador().getId() == trabajador.getId()) {
+                    if (event.getTarjetaPrestamo().getId() == null && event.getTarjetaPrestamo().getLibro().getId() == tarjetaTrabajador.getLibro().getId()) {
+                        prestamos.add(tarjetaTrabajador);
+                        band = true;
+                    } else if (event.getTarjetaPrestamo().getId() != null
+                            && event.getTarjetaPrestamo().getLibro().getId() == tarjetaTrabajador.getLibro().getId()
+                            && event.getTarjetaPrestamo().getFechaPrestamo().equals(tarjetaTrabajador.getFechaPrestamo())) {
+                        prestamos.add(tarjetaTrabajador);
+                        band = true;
                     }
-                });
+                }
+            }
+        }
 
         if (prestamos.size() != 0) {
             Notification notification = Notification.show(

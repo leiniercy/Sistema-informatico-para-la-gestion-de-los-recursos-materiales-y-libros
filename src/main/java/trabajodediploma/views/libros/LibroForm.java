@@ -81,7 +81,7 @@ public class LibroForm extends FormLayout {
         //Config form
         //imagen
         //int maxFileSizeInBytes = 10 * 1024 * 1024; // 10MB
-        imageSize = new Label("Tamaño maximo: 400kb");
+        imageSize = new Label("Tamaño maximo: 1MB");
         imageSize.getStyle().set("color", "var(--lumo-secondary-text-color)");
         imagePreview = new Image();
         imagePreview.setWidth("100%");
@@ -215,7 +215,7 @@ public class LibroForm extends FormLayout {
         i18n.getDropFiles().setOne("Arrastra la imágen aquí");
 
         i18n.getError()
-                .setFileIsTooBig("El archivo excede el tamaño máximo permitido de 400 Kb.")
+                .setFileIsTooBig("El archivo excede el tamaño máximo permitido de 1 MB.")
                 .setIncorrectFileType("El archivo seleccionado no es una imágen png o jpg.");;
         imagen.setI18n(i18n);
 
@@ -228,7 +228,7 @@ public class LibroForm extends FormLayout {
         upload.setReceiver((fileName, mimeType) -> {
             return uploadBuffer;
         });
-        upload.setMaxFileSize(400 * 1024);
+        upload.setMaxFileSize(1 * 1024 * 1024);
         upload.addFileRejectedListener(event -> {
             String errorMessage = event.getErrorMessage();
 

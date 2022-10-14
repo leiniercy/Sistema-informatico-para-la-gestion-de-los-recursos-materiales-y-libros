@@ -90,7 +90,7 @@ public class TarjetaPrestamoEstudianteView extends Div {
         this.libroService = libroService;
         this.libros = libroService.findAll();
         this.senderService = senderService;
-        prestamos = new ArrayList<>();
+        prestamos = new LinkedList<>();
         updateList();
         configureForm();
         configureGrid();
@@ -136,7 +136,7 @@ public class TarjetaPrestamoEstudianteView extends Div {
     }
 
     /* Tabla */
-    /* Configuracion de la tabla */
+ /* Configuracion de la tabla */
     private void configureGrid() {
         grid.setClassName("container__tarjeta_estudiante__grid");
 
@@ -189,8 +189,6 @@ public class TarjetaPrestamoEstudianteView extends Div {
         grid.addThemeVariants(GridVariant.LUMO_WRAP_CELL_CONTENT);
 
     }
-
-    
 
     /* Filtros */
     private void Filtros() {
@@ -263,9 +261,10 @@ public class TarjetaPrestamoEstudianteView extends Div {
         }
         return true;
     }
+
     /* Fin-Filtros */
 
-    /* Barra de menu */
+ /* Barra de menu */
     private HorizontalLayout menuBar() {
         HorizontalLayout buttons = new HorizontalLayout();
         Button refreshButton = new Button(VaadinIcon.REFRESH.create(), click -> updateList());
@@ -354,21 +353,25 @@ public class TarjetaPrestamoEstudianteView extends Div {
 
     private void saveLibro(TarjetaPrestamoEstudianteForm.SaveEvent event) {
         prestamos.clear();
-        prestamoService.findAll().parallelStream()
-                .filter(target -> target instanceof TarjetaPrestamoEstudiante
-                        && (event.getTarjetaPrestamo().getFechaDevolucion() != null
-                                && event.getTarjetaPrestamo().getFechaDevolucion().equals(target.getFechaDevolucion()))
-                        && event.getTarjetaPrestamo().getLibro().equals(target.getLibro())
-                        && event.getTarjetaPrestamo().getFechaPrestamo().equals(target.getFechaPrestamo()))
-
-                .forEach((tarjeta) -> {
-                    if (tarjeta instanceof TarjetaPrestamoEstudiante) {
-                        tarjetaEstudiante = (TarjetaPrestamoEstudiante) tarjeta;
-                        if (tarjetaEstudiante.getEstudiante().equals(estudiante)) {
-                            prestamos.add(tarjetaEstudiante);
-                        }
+        List<TarjetaPrestamo> listTarjetas = prestamoService.findAll();
+        boolean band = false;
+        for (int i = 0; i < listTarjetas.size() && band == false; i++) {
+            if (listTarjetas.get(i) instanceof TarjetaPrestamoEstudiante) {
+                tarjetaEstudiante = (TarjetaPrestamoEstudiante) listTarjetas.get(i);
+                if (tarjetaEstudiante.getEstudiante().getId() == estudiante.getId()
+                        && event.getTarjetaPrestamo().getEstudiante().getId() == estudiante.getId()) {
+                    if (event.getTarjetaPrestamo().getId() == null && event.getTarjetaPrestamo().getLibro().getId() == tarjetaEstudiante.getLibro().getId()) {
+                        prestamos.add(tarjetaEstudiante);
+                        band = true;
+                    } else if (event.getTarjetaPrestamo().getId() != null
+                            && event.getTarjetaPrestamo().getLibro().getId() == tarjetaEstudiante.getLibro().getId()
+                            && event.getTarjetaPrestamo().getFechaPrestamo().equals(tarjetaEstudiante.getFechaPrestamo())) {
+                        prestamos.add(tarjetaEstudiante);
+                        band = true;
                     }
-                });
+                }
+            }
+        }
 
         if (prestamos.size() != 0) {
             Notification notification = Notification.show(
@@ -383,24 +386,22 @@ public class TarjetaPrestamoEstudianteView extends Div {
                 try {
                     prestamoService.save(event.getTarjetaPrestamo());
                     senderService.sendSimpleEmail(
-                            /* enviado a: */ estudiante.getEmail(),
+                            /* enviado a: */estudiante.getEmail(),
                             /* asunto: */ "Entrega de libros",
                             /* mensaje: */ "Sistema de Gestión Académica Genius \n"
-                                    + "Usted ha recibido el libro: "
-                                    + event.getTarjetaPrestamo().getLibro().getTitulo()
-                                    + " el día: "
-                                    +
-                                    formatter.format(event.getTarjetaPrestamo().getFechaPrestamo()).toString());
+                            + "Usted ha recibido el libro: "
+                            + event.getTarjetaPrestamo().getLibro().getTitulo()
+                            + " el día: "
+                            + formatter.format(event.getTarjetaPrestamo().getFechaPrestamo()).toString());
                     if (event.getTarjetaPrestamo().getFechaDevolucion() != null) {
                         senderService.sendSimpleEmail(
-                                /* enviado a: */ estudiante.getEmail(),
+                                /* enviado a: */estudiante.getEmail(),
                                 /* asunto: */ "Devolución de libros",
                                 /* mensaje: */ "Sistema de Gestión Académica Genius \n"
-                                        + "Usted ha entregado el libro: "
-                                        + event.getTarjetaPrestamo().getLibro().getTitulo()
-                                        + " el día: "
-                                        +
-                                        formatter.format(event.getTarjetaPrestamo().getFechaDevolucion()).toString());
+                                + "Usted ha entregado el libro: "
+                                + event.getTarjetaPrestamo().getLibro().getTitulo()
+                                + " el día: "
+                                + formatter.format(event.getTarjetaPrestamo().getFechaDevolucion()).toString());
                     }
                     Notification notification = Notification.show(
                             "Libro añadido",
@@ -421,13 +422,13 @@ public class TarjetaPrestamoEstudianteView extends Div {
                     prestamoService.update(event.getTarjetaPrestamo());
                     if (event.getTarjetaPrestamo().getFechaDevolucion() != null) {
                         senderService.sendSimpleEmail(
-                                /* enviado a: */ estudiante.getEmail(),
+                                /* enviado a: */estudiante.getEmail(),
                                 /* asunto: */ "Devolución de libros",
                                 /* mensaje: */ "Sistema de Gestión Académica Genius \n"
-                                        + "Usted ha entregado el libro: "
-                                        + event.getTarjetaPrestamo().getLibro().getTitulo()
-                                        + " el día: "
-                                        + formatter.format(event.getTarjetaPrestamo().getFechaDevolucion()).toString());
+                                + "Usted ha entregado el libro: "
+                                + event.getTarjetaPrestamo().getLibro().getTitulo()
+                                + " el día: "
+                                + formatter.format(event.getTarjetaPrestamo().getFechaDevolucion()).toString());
                     }
                     Notification notification = Notification.show(
                             "Libro modificado",
@@ -482,11 +483,10 @@ public class TarjetaPrestamoEstudianteView extends Div {
         prestamos.clear();
         List<TarjetaPrestamo> aux = prestamoService.findAll();
         tarjetaEstudiante = new TarjetaPrestamoEstudiante();
+        TarjetaPrestamoEstudianteForm form;
         for (int i = 0; i < aux.size(); i++) {
             if (aux.get(i) instanceof TarjetaPrestamoEstudiante) {
-                tarjetaEstudiante = new TarjetaPrestamoEstudiante();
                 tarjetaEstudiante = (TarjetaPrestamoEstudiante) aux.get(i);
-
                 if (tarjetaEstudiante.getEstudiante().getId() == estudiante.getId()) {
                     prestamos.add(tarjetaEstudiante);
                 }

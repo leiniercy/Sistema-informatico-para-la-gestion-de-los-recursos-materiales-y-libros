@@ -73,12 +73,13 @@ public class CatalogoView extends Div {
     private void BarraDeNavegacion() {
         filtrar = new TextField();
         filtrar.addClassName("div_nav_bar__filtrar");
+        filtrar.setLabel("Filtrar por título o autor");
         filtrar.setPlaceholder("Filtrar...");
         filtrar.setPrefixComponent(VaadinIcon.SEARCH.create());
         filtrar.setClearButtonVisible(true);
         filtrar.setValueChangeMode(ValueChangeMode.EAGER);
         filtrar.addValueChangeListener(event -> {
-            if (filtrar.getValue().isEmpty()) {
+            if (filtrar.isEmpty()) {
                 libros = libroService.findAll();
                 content.removeAll();
                 CrearTarjetas();
@@ -86,11 +87,12 @@ public class CatalogoView extends Div {
                 libros = libros.parallelStream()
                         .filter(lib -> StringUtils.containsIgnoreCase(lib.getAutor(), filtrar.getValue())
                                 || StringUtils.containsIgnoreCase(lib.getTitulo(), filtrar.getValue())
-                                || StringUtils.containsIgnoreCase(Integer.toString(lib.getVolumen()),
-                                        filtrar.getValue())
-                                || StringUtils.containsIgnoreCase(Integer.toString(lib.getTomo()), filtrar.getValue())
-                                || StringUtils.containsIgnoreCase(Integer.toString(lib.getParte()), filtrar.getValue()))
+//                                || StringUtils.containsIgnoreCase(Integer.toString(lib.getVolumen()),filtrar.getValue())
+//                                || StringUtils.containsIgnoreCase(Integer.toString(lib.getTomo()), filtrar.getValue())
+//                                || StringUtils.containsIgnoreCase(Integer.toString(lib.getParte()), filtrar.getValue())
+                        )
                         .collect(Collectors.toList());
+                System.out.println(libros);
                 content.removeAll();
                 CrearTarjetas();
             }
