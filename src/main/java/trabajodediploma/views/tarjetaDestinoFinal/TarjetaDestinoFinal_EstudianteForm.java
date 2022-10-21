@@ -1,20 +1,26 @@
-
 package trabajodediploma.views.tarjetaDestinoFinal;
 
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Key;
+import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.ValidationException;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
+import com.vaadin.flow.data.renderer.LitRenderer;
+import com.vaadin.flow.data.renderer.Renderer;
 import com.vaadin.flow.shared.Registration;
 import trabajodediploma.data.entity.DestinoFinal;
 import trabajodediploma.data.entity.DestinoFinalEstudiante;
@@ -24,40 +30,54 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
 
-
 /**
  *
  * @author leinier
  */
+public class TarjetaDestinoFinal_EstudianteForm extends FormLayout {
 
-public class TarjetaDestinoFinal_EstudianteForm  extends FormLayout{
-   
     DestinoFinalEstudiante tarjeta;
     ComboBox<Estudiante> estudiante = new ComboBox<>("Estudiante");
     ComboBox<Modulo> modulo = new ComboBox<>("Modulo");
     DatePicker fecha = new DatePicker("Fecha Entrega");
-   
+
     Button save = new Button("Añadir", VaadinIcon.PLUS.create());
     Button close = new Button("Cancelar", VaadinIcon.ERASER.create());
 
     BeanValidationBinder<DestinoFinal> binder = new BeanValidationBinder<>(DestinoFinal.class);
 
-    public TarjetaDestinoFinal_EstudianteForm(List<Estudiante> estudiantes, List<Modulo> modulos){
-      
+    public TarjetaDestinoFinal_EstudianteForm(List<Estudiante> estudiantes, List<Modulo> modulos) {
+
         addClassNames("tarjeta-estudiante-form");
         binder.bindInstanceFields(this);
-        
+
         /*Config form*/
-        
-        /*Estudiante*/
+ /*Estudiante*/
         estudiante.setItems(estudiantes);
-        estudiante.setItemLabelGenerator(est->est.getUser().getName());
+        estudiante.setItemLabelGenerator(est -> est.getUser().getName());
+        estudiante.setRenderer(new ComponentRenderer<>(event -> {
+            HorizontalLayout hl = new HorizontalLayout();
+            hl.setAlignItems(FlexComponent.Alignment.CENTER);
+            Avatar avatar = new Avatar(event.getUser().getName(), event.getUser().getProfilePictureUrl());
+            VerticalLayout vl = new VerticalLayout();
+            vl.getStyle().set("line-height", "0");
+            Span name = new Span();
+            name.addClassNames("name");
+            name.setText(event.getUser().getName());
+            Span email = new Span();
+            email.addClassNames("text-s", "text-secondary");
+            email.setText(event.getEmail());
+            vl.add(name, email);
+            hl.add(avatar, vl);
+            return hl;
+        })
+        );
         /*Libros*/
         modulo.setItems(modulos);
         modulo.setItemLabelGenerator(Modulo::getNombre);
         /*fecha de entrega*/
         fecha.setMin(LocalDate.now(ZoneId.systemDefault()));
-        
+
         add(estudiante, modulo, fecha, createButtonsLayout());
 
     }
@@ -100,9 +120,9 @@ public class TarjetaDestinoFinal_EstudianteForm  extends FormLayout{
                     Notification.Position.MIDDLE
             );
             notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+
         }
     }
-
 
     // Events
     public static abstract class DestinoFinalEstudianteFormEvent extends ComponentEvent<TarjetaDestinoFinal_EstudianteForm> {
@@ -145,6 +165,5 @@ public class TarjetaDestinoFinal_EstudianteForm  extends FormLayout{
             ComponentEventListener<T> listener) {
         return getEventBus().addListener(eventType, listener);
     }
-
 
 }
