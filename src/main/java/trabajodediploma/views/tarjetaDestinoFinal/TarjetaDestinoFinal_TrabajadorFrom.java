@@ -4,17 +4,22 @@ package trabajodediploma.views.tarjetaDestinoFinal;
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Key;
+import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.ValidationException;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.shared.Registration;
 import trabajodediploma.data.entity.DestinoFinal;
 import trabajodediploma.data.entity.DestinoFinalTrabajador;
@@ -51,6 +56,23 @@ public class TarjetaDestinoFinal_TrabajadorFrom  extends FormLayout{
         
         /*Trabajador*/
         trabajador.setItems(trabajadors);
+        trabajador.setRenderer(new ComponentRenderer<>(event -> {
+            HorizontalLayout hl = new HorizontalLayout();
+            hl.setAlignItems(FlexComponent.Alignment.CENTER);
+            Avatar avatar = new Avatar(event.getUser().getName(), event.getUser().getProfilePictureUrl());
+            VerticalLayout vl = new VerticalLayout();
+            vl.getStyle().set("line-height", "0");
+            Span name = new Span();
+            name.addClassNames("name");
+            name.setText(event.getUser().getName());
+            Span email = new Span();
+            email.addClassNames("text-s", "text-secondary");
+            email.setText(event.getEmail());
+            vl.add(name, email);
+            hl.add(avatar, vl);
+            return hl;
+        })
+        );
         trabajador.setItemLabelGenerator(est->est.getUser().getName());
         /*Libros*/
         modulo.setItems(modulos);
