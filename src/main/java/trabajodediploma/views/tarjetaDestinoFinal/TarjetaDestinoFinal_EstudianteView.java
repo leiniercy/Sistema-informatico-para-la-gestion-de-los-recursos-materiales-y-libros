@@ -216,6 +216,23 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
         estudianteFilter.setPlaceholder("Filtrar");
         estudianteFilter.setClearButtonVisible(true);
         estudianteFilter.setWidth("100%");
+        estudianteFilter.setRenderer(new ComponentRenderer<>(event -> {
+            HorizontalLayout hl = new HorizontalLayout();
+            hl.setAlignItems(FlexComponent.Alignment.CENTER);
+            Avatar avatar = new Avatar(event.getUser().getName(), event.getUser().getProfilePictureUrl());
+            VerticalLayout vl = new VerticalLayout();
+            vl.getStyle().set("line-height", "0");
+            Span name = new Span();
+            name.addClassNames("name");
+            name.setText(event.getUser().getName());
+            Span email = new Span();
+            email.addClassNames("text-s", "text-secondary");
+            email.setText(event.getEmail());
+            vl.add(name, email);
+            hl.add(avatar, vl);
+            return hl;
+        })
+        );
         estudianteFilter.addValueChangeListener(event -> {
             if (estudianteFilter.getValue() == null) {
                 gridListDataView = grid.setItems(tarjetas);
@@ -287,7 +304,7 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
             Notification notification;
             if (grid.getSelectedItems().size() == 0) {
                 notification = Notification.show(
-                        "Seleccione un elemento",
+                        "Debe elegir al menos un elemento",
                         2000,
                         Notification.Position.MIDDLE);
                 notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
@@ -370,7 +387,7 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
         try {
 
             if (grid.asMultiSelect().isEmpty()) {
-                Notification notification = Notification.show("Debe elegir al menos un campo", 5000,
+                Notification notification = Notification.show("Debe elegir al menos un elemento", 2000,
                         Notification.Position.MIDDLE);
                 notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
             } else {
@@ -478,7 +495,7 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
     //Busqueda Binaria
     private boolean busquedaBinariaEstudiante(List<Estudiante> list, Estudiante e) {
         int inicio = 0;
-        int fin = list.size()-1;
+        int fin = list.size() - 1;
         while (inicio <= fin) {
             int mitad = (inicio + fin) / 2;
             if (e.getId().equals(list.get(mitad).getId())) {
