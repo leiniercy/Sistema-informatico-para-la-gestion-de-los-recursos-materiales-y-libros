@@ -28,19 +28,21 @@ import trabajodediploma.data.entity.Estudiante;
 import trabajodediploma.data.entity.Modulo;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
+import java.util.stream.Collectors;
+import org.vaadin.gatanaso.MultiselectComboBox;
+import trabajodediploma.data.entity.Grupo;
 
 /**
  *
  * @author leinier
  */
-public class TarjetaDestinoFinal_EstudianteForm extends FormLayout {
+public class TarjetaDestinoFinal_EstudianteForm_V2 extends FormLayout {
 
     DestinoFinalEstudiante tarjeta;
-    ComboBox<Estudiante> estudiante = new ComboBox<>("Estudiante");
+    ComboBox<Grupo> grupo = new ComboBox<>("Grupo");
+    MultiselectComboBox<Estudiante> multiSelectEstudiante = new MultiselectComboBox<>("Estudiante");
     ComboBox<Modulo> modulo = new ComboBox<>("Modulo");
     DatePicker fecha = new DatePicker("Fecha Entrega");
 
@@ -49,16 +51,19 @@ public class TarjetaDestinoFinal_EstudianteForm extends FormLayout {
 
     BeanValidationBinder<DestinoFinal> binder = new BeanValidationBinder<>(DestinoFinal.class);
 
-    public TarjetaDestinoFinal_EstudianteForm(List<Estudiante> estudiantes, List<Modulo> modulos) {
+    public TarjetaDestinoFinal_EstudianteForm_V2(List<Grupo> grupos, List<Estudiante> estudiantes, List<Modulo> modulos) {
 
         addClassNames("tarjeta-estudiante-form");
         binder.bindInstanceFields(this);
 
         /*Config form*/
- /*Estudiante*/
-        estudiante.setItems(estudiantes);
-        estudiante.setItemLabelGenerator(est -> est.getUser().getName());
-        estudiante.setRenderer(new ComponentRenderer<>(event -> {
+        grupo.setItems(grupos);
+        grupo.setItemLabelGenerator(Grupo::getNumero);
+
+        /*Estudiante*/
+        multiSelectEstudiante.setItems(estudiantes);
+        multiSelectEstudiante.setItemLabelGenerator(est -> est.getUser().getName());
+        multiSelectEstudiante.setRenderer(new ComponentRenderer<>(event -> {
             HorizontalLayout hl = new HorizontalLayout();
             hl.setAlignItems(FlexComponent.Alignment.CENTER);
             Avatar avatar = new Avatar(event.getUser().getName(), event.getUser().getProfilePictureUrl());
@@ -75,13 +80,34 @@ public class TarjetaDestinoFinal_EstudianteForm extends FormLayout {
             return hl;
         })
         );
+        multiSelectEstudiante.setReadOnly(true);
+
         /*Libros*/
         modulo.setItems(modulos);
         modulo.setItemLabelGenerator(Modulo::getNombre);
+        modulo.setReadOnly(true);
+
         /*fecha de entrega*/
         fecha.setMin(LocalDate.now(ZoneId.systemDefault()));
+        fecha.setReadOnly(true);
 
-        add(estudiante, modulo, fecha, createButtonsLayout());
+        grupo.addValueChangeListener(event -> {
+            if (grupo.isEmpty()) {
+                multiSelectEstudiante.setReadOnly(true);
+                modulo.setReadOnly(true);
+                fecha.setReadOnly(true);
+            } else {
+                List<Estudiante> estudiantesPorGrupo = estudiantes.stream().filter(e -> e.getGrupo().getId() == event.getValue().getId()).collect(Collectors.toList());
+                multiSelectEstudiante.setReadOnly(false);
+                multiSelectEstudiante.setValue(null);
+                multiSelectEstudiante.setItems(estudiantesPorGrupo);
+                modulo.setReadOnly(false);
+                fecha.setReadOnly(false);
+            }
+
+        });
+
+        add(grupo, multiSelectEstudiante, modulo, fecha, createButtonsLayout());
 
     }
 
@@ -93,7 +119,7 @@ public class TarjetaDestinoFinal_EstudianteForm extends FormLayout {
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         save.addClickShortcut(Key.ENTER);
 
-        close.addClickListener(event -> fireEvent(new TarjetaDestinoFinal_EstudianteForm.CloseEvent(this)));
+        close.addClickListener(event -> fireEvent(new TarjetaDestinoFinal_EstudianteForm_V2.CloseEvent(this)));
         close.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         close.addClickShortcut(Key.ESCAPE);
 
@@ -108,8 +134,9 @@ public class TarjetaDestinoFinal_EstudianteForm extends FormLayout {
         binder.readBean(tarjeta);
         if (tarjeta.getEstudiantes() != null) {
             List<Estudiante> list = new LinkedList<>(tarjeta.getEstudiantes());
-            if (list.size() >= 1) {
-                estudiante.setValue(list.get(0));
+            if (tarjeta.getEstudiantes().size() >= 1) {
+                grupo.setValue(list.get(0).getGrupo());
+                multiSelectEstudiante.setValue(tarjeta.getEstudiantes());
                 modulo.setValue(tarjeta.getModulo());
                 fecha.setValue(tarjeta.getFecha());
             }
@@ -119,17 +146,16 @@ public class TarjetaDestinoFinal_EstudianteForm extends FormLayout {
     private void validateAndSave() {
         try {
             binder.writeBean(tarjeta);
-            Set<Estudiante> est = new HashSet<Estudiante>();
-            est.add(estudiante.getValue());
-            this.tarjeta.setEstudiantes(est);
+            this.tarjeta.setEstudiantes(multiSelectEstudiante.getSelectedItems());
             this.tarjeta.setModulo(modulo.getValue());
             this.tarjeta.setFecha(fecha.getValue());
-            fireEvent(new TarjetaDestinoFinal_EstudianteForm.SaveEvent(this, tarjeta));
+            fireEvent(new TarjetaDestinoFinal_EstudianteForm_V2.SaveEvent(this, tarjeta));
+
         } catch (ValidationException e) {
             e.printStackTrace();
             Notification notification = Notification.show(
                     "Ocurrió un problema al intentar almacenar La tarjeta",
-                    2000,
+                    5000,
                     Notification.Position.MIDDLE
             );
             notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
@@ -138,13 +164,13 @@ public class TarjetaDestinoFinal_EstudianteForm extends FormLayout {
     }
 
     // Events
-    public static abstract class DestinoFinalEstudianteFormEvent extends ComponentEvent<TarjetaDestinoFinal_EstudianteForm> {
+    public static abstract class DestinoFinalEstudianteFormEvent extends ComponentEvent<TarjetaDestinoFinal_EstudianteForm_V2> {
 
         private DestinoFinalEstudiante destinoFinal;
 
-        protected DestinoFinalEstudianteFormEvent(TarjetaDestinoFinal_EstudianteForm source, DestinoFinalEstudiante destinoFinal) {
+        protected DestinoFinalEstudianteFormEvent(TarjetaDestinoFinal_EstudianteForm_V2 source, DestinoFinalEstudiante DestinoFinal) {
             super(source, false);
-            this.destinoFinal = destinoFinal;
+            this.destinoFinal = DestinoFinal;
         }
 
         public DestinoFinalEstudiante getDestinoFinal() {
@@ -154,14 +180,14 @@ public class TarjetaDestinoFinal_EstudianteForm extends FormLayout {
 
     public static class SaveEvent extends DestinoFinalEstudianteFormEvent {
 
-        SaveEvent(TarjetaDestinoFinal_EstudianteForm source, DestinoFinalEstudiante DestinoFinal) {
+        SaveEvent(TarjetaDestinoFinal_EstudianteForm_V2 source, DestinoFinalEstudiante DestinoFinal) {
             super(source, DestinoFinal);
         }
     }
 
     public static class DeleteEvent extends DestinoFinalEstudianteFormEvent {
 
-        DeleteEvent(TarjetaDestinoFinal_EstudianteForm source, DestinoFinalEstudiante DestinoFinal) {
+        DeleteEvent(TarjetaDestinoFinal_EstudianteForm_V2 source, DestinoFinalEstudiante DestinoFinal) {
             super(source, DestinoFinal);
         }
 
@@ -169,7 +195,7 @@ public class TarjetaDestinoFinal_EstudianteForm extends FormLayout {
 
     public static class CloseEvent extends DestinoFinalEstudianteFormEvent {
 
-        CloseEvent(TarjetaDestinoFinal_EstudianteForm source) {
+        CloseEvent(TarjetaDestinoFinal_EstudianteForm_V2 source) {
             super(source, null);
         }
     }
