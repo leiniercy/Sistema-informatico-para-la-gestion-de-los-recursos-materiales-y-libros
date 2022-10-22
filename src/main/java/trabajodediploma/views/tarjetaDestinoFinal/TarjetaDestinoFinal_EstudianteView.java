@@ -220,7 +220,7 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
             if (estudianteFilter.getValue() == null) {
                 gridListDataView = grid.setItems(tarjetas);
             } else {
-//                gridListDataView.addFilter(tarjeta -> areEstudianteEqual(tarjeta, estudianteFilter));
+                gridListDataView.addFilter(tarjeta -> areEstudianteEqual(tarjeta, estudianteFilter));
             }
         });
 
@@ -253,14 +253,16 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
 
     }
 
-//    private boolean areEstudianteEqual(DestinoFinal tarjeta, ComboBox<Estudiante> estudianteFilter) {
-//        String estudianteFilterValue = estudianteFilter.getValue().getUser().getName();
-//        tarjetaEstudiante = (DestinoFinalEstudiante) tarjeta;
-//        if (estudianteFilterValue != null) {
-//            return StringUtils.equals(tarjetaEstudiante.getEstudiante().getUser().getName(), estudianteFilterValue);
-//        }
-//        return true;
-//    }
+    private boolean areEstudianteEqual(DestinoFinal tarjeta, ComboBox<Estudiante> estudianteFilter) {
+        Estudiante estudianteFilterValue = estudianteFilter.getValue();
+        tarjetaEstudiante = (DestinoFinalEstudiante) tarjeta;
+        if (estudianteFilterValue != null) {
+            List<Estudiante> list = new LinkedList<>(tarjetaEstudiante.getEstudiantes());
+            return busquedaBinariaEstudiante(list, estudianteFilterValue);
+        }
+        return true;
+    }
+
     private boolean areFechaInicioEqual(DestinoFinal tarjeta, DatePicker dateFilter) {
         String dateFilterValue = dateFilter.getValue().toString();
         String tareaDate = tarjeta.getFecha().toString();
@@ -300,9 +302,9 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
                 DestinoFinal tarjeta = list.get(0);
                 tarjetaEstudiante = (DestinoFinalEstudiante) tarjeta;
                 List<Estudiante> listEstudiantes = new LinkedList<>(tarjetaEstudiante.getEstudiantes());
-                if(listEstudiantes.size() == 1){
+                if (listEstudiantes.size() == 1) {
                     editTarjeta(tarjetaEstudiante);
-                }else if(listEstudiantes.size() > 1){
+                } else if (listEstudiantes.size() > 1) {
                     editTarjeta_V2(tarjetaEstudiante);
                 }
             }
@@ -310,7 +312,7 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
         });
         MenuBar anadirButton = new MenuBar();
         anadirButton.addThemeVariants(MenuBarVariant.LUMO_PRIMARY);
-        MenuItem addAlls = createIconItem(anadirButton, VaadinIcon.PLUS, "",
+        MenuItem addAlls = createIconItem(anadirButton, VaadinIcon.PLUS, "Añadir",
                 null);
         SubMenu shareSubMenu = addAlls.getSubMenu();
         MenuItem individual = createIconItem(shareSubMenu, VaadinIcon.USER, "Individual", null, true);
@@ -420,25 +422,28 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
     private void saveTarjeta(TarjetaDestinoFinal_EstudianteForm.SaveEvent event) {
 
         tarjetas.clear();
-        destinoService.findAll().forEach((target) -> {
-            if (target instanceof DestinoFinalEstudiante) {
-                tarjetaEstudiante = (DestinoFinalEstudiante) target;
-                boolean band = false;
-                List<Estudiante> listTragetEstudiantes = new LinkedList<>(tarjetaEstudiante.getEstudiantes());
-                listTragetEstudiantes.sort(Comparator.comparing(Estudiante::getId));
-                List<Estudiante> listevent = new LinkedList<>(event.getDestinoFinal().getEstudiantes());
-                for (int i = 0; i < listevent.size() && band == false; i++) {
-                    if (busquedaBinariaEstudiante(listTragetEstudiantes, listevent.get(i)) == true) {
-                        if (tarjetaEstudiante.getModulo().getId() == event.getDestinoFinal().getModulo().getId()) {
-                            band = true;
-                            tarjetas.add(tarjetaEstudiante);
+        boolean band = false;
+        for (int i = 0; i < destinoService.findAll().size() && band == false; i++) {
+            if (destinoService.findAll().get(i) instanceof DestinoFinalEstudiante) {
+                tarjetaEstudiante = (DestinoFinalEstudiante) destinoService.findAll().get(i);
+                if (tarjetaEstudiante.getEstudiantes() != null) {
+                    tarjetas.add(destinoService.findAll().get(i));
+                    List<Estudiante> listTragetEstudiantes = new LinkedList<>(tarjetaEstudiante.getEstudiantes());
+                    listTragetEstudiantes.sort(Comparator.comparing(Estudiante::getId));
+                    List<Estudiante> listevent = new LinkedList<>(event.getDestinoFinal().getEstudiantes());
+                    for (int j = 0; j < listevent.size() && band == false; j++) {
+                        if (busquedaBinariaEstudiante(listTragetEstudiantes, listevent.get(j)) == true) {
+                            if (tarjetaEstudiante.getModulo().getId() == event.getDestinoFinal().getModulo().getId()) {
+                                band = true;
+                                tarjetas.add(tarjetaEstudiante);
+                            }
                         }
                     }
                 }
             }
-        });
+        }
 
-        if (tarjetas.size() != 0 || tarjetas.size() > 0) {
+        if (tarjetas.size() > 0) {
             Notification notification = Notification.show(
                     "La tarjeta ya existe",
                     2000,
@@ -472,13 +477,12 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
 
     //Busqueda Binaria
     private boolean busquedaBinariaEstudiante(List<Estudiante> list, Estudiante e) {
-        boolean band = false;
         int inicio = 0;
-        int fin = list.size();
-        while (inicio < fin && !band) {
+        int fin = list.size()-1;
+        while (inicio <= fin) {
             int mitad = (inicio + fin) / 2;
-            if (e.getId() == list.get(mitad).getId()) {
-                band = true;
+            if (e.getId().equals(list.get(mitad).getId())) {
+                return true;
             }
             if (e.getId() > list.get(mitad).getId()) {
                 inicio = mitad + 1;
@@ -487,28 +491,32 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
                 fin = mitad - 1;
             }
         }
-        return band;
+        return false;
     }
 
     private void saveTarjeta_V2(TarjetaDestinoFinal_EstudianteForm_V2.SaveEvent event) {
+
         tarjetas.clear();
-        destinoService.findAll().forEach((target) -> {
-            if (target instanceof DestinoFinalEstudiante) {
-                tarjetaEstudiante = (DestinoFinalEstudiante) target;
-                boolean band = false;
-                List<Estudiante> listTragetEstudiantes = new LinkedList<>(tarjetaEstudiante.getEstudiantes());
-                listTragetEstudiantes.sort(Comparator.comparing(Estudiante::getId));
-                List<Estudiante> listevent = new LinkedList<>(event.getDestinoFinal().getEstudiantes());
-                for (int i = 0; i < listevent.size() && band == false; i++) {
-                    if (busquedaBinariaEstudiante(listTragetEstudiantes, listevent.get(i)) == true) {
-                        if (tarjetaEstudiante.getModulo().getId() == event.getDestinoFinal().getModulo().getId()) {
-                            band = true;
-                            tarjetas.add(tarjetaEstudiante);
+        boolean band = false;
+        for (int i = 0; i < destinoService.findAll().size() && band == false; i++) {
+            if (destinoService.findAll().get(i) instanceof DestinoFinalEstudiante) {
+                tarjetaEstudiante = (DestinoFinalEstudiante) destinoService.findAll().get(i);
+                if (tarjetaEstudiante.getEstudiantes() != null) {
+                    tarjetas.add(destinoService.findAll().get(i));
+                    List<Estudiante> listTragetEstudiantes = new LinkedList<>(tarjetaEstudiante.getEstudiantes());
+                    listTragetEstudiantes.sort(Comparator.comparing(Estudiante::getId));
+                    List<Estudiante> listevent = new LinkedList<>(event.getDestinoFinal().getEstudiantes());
+                    for (int j = 0; j < listevent.size() && band == false; j++) {
+                        if (busquedaBinariaEstudiante(listTragetEstudiantes, listevent.get(j)) == true) {
+                            if (tarjetaEstudiante.getModulo().getId() == event.getDestinoFinal().getModulo().getId()) {
+                                band = true;
+                                tarjetas.add(tarjetaEstudiante);
+                            }
                         }
                     }
                 }
             }
-        });
+        }
 
         if (tarjetas.size() != 0) {
             Notification notification = Notification.show(
@@ -595,14 +603,14 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
 
     private void updateList() {
         tarjetas.clear();
-        destinoService.findAll().parallelStream().forEach((target) -> {
-            if (target instanceof DestinoFinalEstudiante) {
-                tarjetaEstudiante = (DestinoFinalEstudiante) target;
+        for (int i = 0; i < destinoService.findAll().size(); i++) {
+            if (destinoService.findAll().get(i) instanceof DestinoFinalEstudiante) {
+                tarjetaEstudiante = (DestinoFinalEstudiante) destinoService.findAll().get(i);
                 if (tarjetaEstudiante.getEstudiantes() != null) {
-                    tarjetas.add(target);
+                    tarjetas.add(destinoService.findAll().get(i));
                 }
             }
-        });
+        }
         grid.setItems(tarjetas);
     }
     /* Fin-Barra de tarjetas */
