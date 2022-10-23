@@ -117,7 +117,7 @@ public class LibroView extends Div {
     }
 
     /* Tabla */
-    /* Configuracion de la tabla */
+ /* Configuracion de la tabla */
     private void configureGrid() {
         grid.setClassName("grid_content__table");
         LitRenderer<Libro> imagenRenderer = LitRenderer.<Libro>of("<img style='height: 64px' src=${item.imagen} />")
@@ -132,6 +132,7 @@ public class LibroView extends Div {
         precioColumn = grid.addColumn(Libro::getPrecio).setHeader("Precio").setAutoWidth(true).setSortable(true);
         editColumn = grid.addComponentColumn(libro -> {
             Button editButton = new Button(VaadinIcon.EDIT.create());
+            editButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
             editButton.addClickListener(e -> this.editLibro(libro));
             return editButton;
         }).setFlexGrow(0);
@@ -203,7 +204,7 @@ public class LibroView extends Div {
         filterVolumen.addValueChangeListener(
                 event -> gridListDataView
                         .addFilter(libro -> StringUtils.containsIgnoreCase(Integer.toString(libro.getVolumen()),
-                                Integer.toString(filterVolumen.getValue()))));
+                        Integer.toString(filterVolumen.getValue()))));
 
         filterTomo = new IntegerField();
         filterTomo.setPlaceholder("Filtrar");
@@ -214,7 +215,7 @@ public class LibroView extends Div {
         filterTomo.addValueChangeListener(
                 event -> gridListDataView
                         .addFilter(libro -> StringUtils.containsIgnoreCase(Integer.toString(libro.getTomo()),
-                                Integer.toString(filterTomo.getValue()))));
+                        Integer.toString(filterTomo.getValue()))));
 
         // Parte
         filterParte = new IntegerField();
@@ -226,7 +227,7 @@ public class LibroView extends Div {
         filterParte.addValueChangeListener(
                 event -> gridListDataView
                         .addFilter(libro -> StringUtils.containsIgnoreCase(Integer.toString(libro.getParte()),
-                                Integer.toString(filterParte.getValue()))));
+                        Integer.toString(filterParte.getValue()))));
 
         // Cantidad
         filterCantidad = new IntegerField();
@@ -238,7 +239,7 @@ public class LibroView extends Div {
         filterCantidad.addValueChangeListener(
                 event -> gridListDataView
                         .addFilter(libro -> StringUtils.containsIgnoreCase(Integer.toString(libro.getCantidad()),
-                                Integer.toString(filterCantidad.getValue()))));
+                        Integer.toString(filterCantidad.getValue()))));
 
         // Precio
         filterPrecio = new NumberField();
@@ -250,20 +251,24 @@ public class LibroView extends Div {
         filterPrecio.addValueChangeListener(
                 event -> gridListDataView
                         .addFilter(libro -> StringUtils.containsIgnoreCase(Double.toString(libro.getPrecio()),
-                                Double.toString(filterPrecio.getValue()))));
+                        Double.toString(filterPrecio.getValue()))));
 
     }
+
     /* Fin-Filtros */
 
-    /* Barra de menu */
+ /* Barra de menu */
     private HorizontalLayout menuBar() {
         buttons = new HorizontalLayout();
         Button refreshButton = new Button(VaadinIcon.REFRESH.create());
         refreshButton.addClickListener(click -> refreshGrid());
+        refreshButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         Button deleteButton = new Button(VaadinIcon.TRASH.create());
         deleteButton.addClickListener(click -> deleteLibro());
+        deleteButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         Button addButton = new Button(VaadinIcon.PLUS.create());
         addButton.addClickListener(click -> addLibro());
+        addButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         buttons.add(refreshButton, watchColumns(), deleteButton, addButton);
 
         total = new Html("<span>Total: <b>" + libroService.count() + "</b> libros</span>");
@@ -278,6 +283,7 @@ public class LibroView extends Div {
 
         return toolbar;
     }
+
     /* Fin-Barra de menu */
 
     private void deleteLibro() {
@@ -321,7 +327,7 @@ public class LibroView extends Div {
     /* Menu de Columnas */
     private Button watchColumns() {
         Button menuButton = new Button(/* "Mostar/Ocultar Columnas" */VaadinIcon.EYE.create());
-
+        menuButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         ColumnToggleContextMenu columnToggleContextMenu = new ColumnToggleContextMenu(
                 menuButton);
         columnToggleContextMenu.addColumnToggleItem("Autor", autorColumn);
@@ -351,11 +357,12 @@ public class LibroView extends Div {
 
         }
     }
+
     /* Fin-Menu de Columnas */
 
-    /* Fin-Tabla */
+ /* Fin-Tabla */
 
-    /* Formulario */
+ /* Formulario */
     private void configureForm() {
         form = new LibroForm();
         form.setWidth("25em");
@@ -369,13 +376,13 @@ public class LibroView extends Div {
 
         listLibros = listLibros.parallelStream()
                 .filter(lib -> event.getLibro().getImagen().equals(lib.getImagen())
-                        && event.getLibro().getTitulo().equals(lib.getTitulo())
-                        && event.getLibro().getAutor().equals(lib.getAutor())
-                        && (event.getLibro().getVolumen() != null && event.getLibro().getVolumen().equals(lib.getVolumen()))
-                        && ( event.getLibro().getTomo() != null && event.getLibro().getTomo().equals(lib.getTomo()))
-                        && ( event.getLibro().getParte() != null  && event.getLibro().getParte().equals(lib.getParte()) )
-                        && event.getLibro().getCantidad().equals(lib.getCantidad())
-                        && event.getLibro().getPrecio().equals(lib.getPrecio()))
+                && event.getLibro().getTitulo().equals(lib.getTitulo())
+                && event.getLibro().getAutor().equals(lib.getAutor())
+                && (event.getLibro().getVolumen() != null && event.getLibro().getVolumen().equals(lib.getVolumen()))
+                && (event.getLibro().getTomo() != null && event.getLibro().getTomo().equals(lib.getTomo()))
+                && (event.getLibro().getParte() != null && event.getLibro().getParte().equals(lib.getParte()))
+                && event.getLibro().getCantidad().equals(lib.getCantidad())
+                && event.getLibro().getPrecio().equals(lib.getPrecio()))
                 .collect(Collectors.toList());
 
         if (listLibros.size() != 0) {
