@@ -17,6 +17,7 @@ import trabajodediploma.data.service.EstudianteService;
 import trabajodediploma.data.service.GrupoService;
 import trabajodediploma.data.service.ModuloService;
 import trabajodediploma.data.service.TrabajadorService;
+import trabajodediploma.data.tools.EmailSenderService;
 import trabajodediploma.views.MainLayout;
 import trabajodediploma.views.footer.MyFooter;
 
@@ -31,6 +32,7 @@ public class TarjetaDestinoFinalView extends Div {
     private TrabajadorService trabajadorService;
     private ModuloService moduloService;
     private GrupoService grupoService;
+    private EmailSenderService senderService;
     private Div content;
     private Tab estudiante;
     private Tab trabajador;
@@ -44,7 +46,8 @@ public class TarjetaDestinoFinalView extends Div {
             @Autowired EstudianteService estudianteService,
             @Autowired TrabajadorService trabajadorService,
             @Autowired ModuloService moduloService,
-            @Autowired GrupoService grupoService
+            @Autowired GrupoService grupoService,
+            @Autowired EmailSenderService senderService
     ) {
         addClassNames("tarjeta_destino_final_view");
         this.destinoService = destinoService;
@@ -52,9 +55,10 @@ public class TarjetaDestinoFinalView extends Div {
         this.trabajadorService = trabajadorService;
         this.moduloService = moduloService;
         this.grupoService = grupoService;
+        this.senderService = senderService;
         myFooter = new MyFooter();
         trabajadorView = new TarjetaDestinoFinal_TrabajadorView(moduloService, trabajadorService, destinoService);
-        estudianteView = new TarjetaDestinoFinal_EstudianteView(moduloService, estudianteService, destinoService, grupoService);
+        estudianteView = new TarjetaDestinoFinal_EstudianteView(moduloService, estudianteService, destinoService, grupoService, senderService);
         content = new Div();
         content.addClassName("tarjeta_destino_final_view__container");
         content.add(estudianteView);

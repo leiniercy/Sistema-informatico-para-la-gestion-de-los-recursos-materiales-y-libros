@@ -50,6 +50,7 @@ import trabajodediploma.data.service.DestinoFinalService;
 import trabajodediploma.data.service.EstudianteService;
 import trabajodediploma.data.service.GrupoService;
 import trabajodediploma.data.service.ModuloService;
+import trabajodediploma.data.tools.EmailSenderService;
 
 public class TarjetaDestinoFinal_EstudianteView extends Div {
 
@@ -64,6 +65,7 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
     private EstudianteService estudianteService;
     private DestinoFinalService destinoService;
     private GrupoService grupoService;
+    private EmailSenderService senderService;
     private DestinoFinalEstudiante tarjetaEstudiante;
     private TarjetaDestinoFinal_EstudianteForm form;
     private TarjetaDestinoFinal_EstudianteForm_V2 form_V2;
@@ -81,13 +83,15 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
             ModuloService moduloService,
             EstudianteService estudianteService,
             DestinoFinalService destinoService,
-            GrupoService grupoService
+            GrupoService grupoService,
+            EmailSenderService senderService
     ) {
         addClassName("tarjeta_estudiante");
         this.moduloService = moduloService;
         this.estudianteService = estudianteService;
         this.destinoService = destinoService;
         this.grupoService = grupoService;
+        this.senderService = senderService;
         tarjetas = new LinkedList<>();
         updateList();
         configureGrid();
@@ -444,13 +448,12 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
             if (destinoService.findAll().get(i) instanceof DestinoFinalEstudiante) {
                 tarjetaEstudiante = (DestinoFinalEstudiante) destinoService.findAll().get(i);
                 if (tarjetaEstudiante.getEstudiantes() != null) {
-                    tarjetas.add(destinoService.findAll().get(i));
                     List<Estudiante> listTragetEstudiantes = new LinkedList<>(tarjetaEstudiante.getEstudiantes());
                     listTragetEstudiantes.sort(Comparator.comparing(Estudiante::getId));
                     List<Estudiante> listevent = new LinkedList<>(event.getDestinoFinal().getEstudiantes());
                     for (int j = 0; j < listevent.size() && band == false; j++) {
                         if (busquedaBinariaEstudiante(listTragetEstudiantes, listevent.get(j)) == true) {
-                            if (tarjetaEstudiante.getModulo().getId() == event.getDestinoFinal().getModulo().getId()) {
+                            if (tarjetaEstudiante.getModulo().getId().equals(event.getDestinoFinal().getModulo().getId())) {
                                 band = true;
                                 tarjetas.add(tarjetaEstudiante);
                             }
@@ -467,20 +470,64 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
                     Notification.Position.MIDDLE);
             notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
         } else {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/YYYY");
             if (event.getDestinoFinal().getId() == null) {
-                destinoService.save(event.getDestinoFinal());
-                Notification notification = Notification.show(
-                        "Tarjeta añadida",
-                        2000,
-                        Notification.Position.BOTTOM_START);
-                notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+                try {
+                    destinoService.save(event.getDestinoFinal());
+                    List<Estudiante> listTragetEstudiantes = new LinkedList<>(event.getDestinoFinal().getEstudiantes());
+                    for (int i = 0; i < listTragetEstudiantes.size(); i++) {
+                        senderService.sendSimpleEmail(
+                                /* enviado a: */listTragetEstudiantes.get(i).getEmail(),
+                                /* asunto: */ "Entrega de Módulo",
+                                /* mensaje: */ "Genius \n"
+                                + "Sistema Informático para la gestión de la información de los recursos materiales y libros en la facultad 4. \n"
+                                + "Usted ha recibido el Módulo: "
+                                + event.getDestinoFinal().getModulo().getNombre()
+                                + " el día: "
+                                + formatter.format(event.getDestinoFinal().getFecha()).toString());
+
+                    }
+                    Notification notification = Notification.show(
+                            "Tarjeta añadida",
+                            2000,
+                            Notification.Position.BOTTOM_START);
+                    notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+                } catch (Exception e) {
+                    Notification notification = Notification.show(
+                            "Error al enviar correo electrónico a la dirección de correo seleccionada",
+                            2000,
+                            Notification.Position.MIDDLE);
+                    notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+                }
+
             } else {
-                destinoService.update(event.getDestinoFinal());
-                Notification notification = Notification.show(
-                        "Tarjeta modificada",
-                        2000,
-                        Notification.Position.BOTTOM_START);
-                notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+                try {
+                    destinoService.update(event.getDestinoFinal());
+                    List<Estudiante> listTragetEstudiantes = new LinkedList<>(event.getDestinoFinal().getEstudiantes());
+                    for (int i = 0; i < listTragetEstudiantes.size(); i++) {
+                        senderService.sendSimpleEmail(
+                                /* enviado a: */listTragetEstudiantes.get(i).getEmail(),
+                                /* asunto: */ "Entrega de Módulo",
+                                /* mensaje: */ "Genius \n"
+                                + "Sistema Informático para la gestión de la información de los recursos materiales y libros en la facultad 4. \n"
+                                + "Usted ha recibido el Módulo: "
+                                + event.getDestinoFinal().getModulo().getNombre()
+                                + " el día: "
+                                + formatter.format(event.getDestinoFinal().getFecha()).toString());
+
+                    }
+                    Notification notification = Notification.show(
+                            "Tarjeta modificada",
+                            2000,
+                            Notification.Position.BOTTOM_START);
+                    notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+                } catch (Exception e) {
+                    Notification notification = Notification.show(
+                            "Error al enviar correo electrónico a la dirección de correo seleccionada",
+                            2000,
+                            Notification.Position.MIDDLE);
+                    notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+                }
             }
             toolbar.remove(total);
             total = new Html("<span>Total: <b>" + tarjetas.size() + "</b></span>");
@@ -491,8 +538,8 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
         }
 
     }
-
     //Busqueda Binaria
+
     private boolean busquedaBinariaEstudiante(List<Estudiante> list, Estudiante e) {
         int inicio = 0;
         int fin = list.size() - 1;
@@ -515,17 +562,16 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
 
         tarjetas.clear();
         boolean band = false;
-        for (int i = 0; i < destinoService.findAll().size() && band == false; i++) {
+         for (int i = 0; i < destinoService.findAll().size() && band == false; i++) {
             if (destinoService.findAll().get(i) instanceof DestinoFinalEstudiante) {
                 tarjetaEstudiante = (DestinoFinalEstudiante) destinoService.findAll().get(i);
                 if (tarjetaEstudiante.getEstudiantes() != null) {
-                    tarjetas.add(destinoService.findAll().get(i));
                     List<Estudiante> listTragetEstudiantes = new LinkedList<>(tarjetaEstudiante.getEstudiantes());
                     listTragetEstudiantes.sort(Comparator.comparing(Estudiante::getId));
                     List<Estudiante> listevent = new LinkedList<>(event.getDestinoFinal().getEstudiantes());
                     for (int j = 0; j < listevent.size() && band == false; j++) {
                         if (busquedaBinariaEstudiante(listTragetEstudiantes, listevent.get(j)) == true) {
-                            if (tarjetaEstudiante.getModulo().getId() == event.getDestinoFinal().getModulo().getId()) {
+                            if (tarjetaEstudiante.getModulo().getId().equals(event.getDestinoFinal().getModulo().getId())) {
                                 band = true;
                                 tarjetas.add(tarjetaEstudiante);
                             }
@@ -535,27 +581,71 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
             }
         }
 
-        if (tarjetas.size() != 0) {
+        if (tarjetas.size() > 0) {
             Notification notification = Notification.show(
                     "La tarjeta ya existe",
                     2000,
                     Notification.Position.MIDDLE);
             notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
         } else {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/YYYY");
             if (event.getDestinoFinal().getId() == null) {
-                destinoService.save(event.getDestinoFinal());
-                Notification notification = Notification.show(
-                        "Tarjeta añadida",
-                        2000,
-                        Notification.Position.BOTTOM_START);
-                notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+                try {
+                    destinoService.save(event.getDestinoFinal());
+                    List<Estudiante> listTragetEstudiantes = new LinkedList<>(event.getDestinoFinal().getEstudiantes());
+                    for (int i = 0; i < listTragetEstudiantes.size(); i++) {
+                        senderService.sendSimpleEmail(
+                                /* enviado a: */listTragetEstudiantes.get(i).getEmail(),
+                                /* asunto: */ "Entrega de Módulo",
+                                /* mensaje: */ "Genius \n"
+                                + "Sistema Informático para la gestión de la información de los recursos materiales y libros en la facultad 4. \n"
+                                + "Usted ha recibido el Módulo: "
+                                + event.getDestinoFinal().getModulo().getNombre()
+                                + " el día: "
+                                + formatter.format(event.getDestinoFinal().getFecha()).toString());
+
+                    }
+                    Notification notification = Notification.show(
+                            "Tarjeta añadida",
+                            2000,
+                            Notification.Position.BOTTOM_START);
+                    notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+                } catch (Exception e) {
+                    Notification notification = Notification.show(
+                            "Error al enviar correo electrónico a la dirección de correo seleccionada",
+                            2000,
+                            Notification.Position.MIDDLE);
+                    notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+                }
+
             } else {
-                destinoService.update(event.getDestinoFinal());
-                Notification notification = Notification.show(
-                        "Tarjeta modificada",
-                        2000,
-                        Notification.Position.BOTTOM_START);
-                notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+                try {
+                    destinoService.update(event.getDestinoFinal());
+                    List<Estudiante> listTragetEstudiantes = new LinkedList<>(event.getDestinoFinal().getEstudiantes());
+                    for (int i = 0; i < listTragetEstudiantes.size(); i++) {
+                        senderService.sendSimpleEmail(
+                                /* enviado a: */listTragetEstudiantes.get(i).getEmail(),
+                                /* asunto: */ "Entrega de Módulo",
+                                /* mensaje: */ "Genius \n"
+                                + "Sistema Informático para la gestión de la información de los recursos materiales y libros en la facultad 4. \n"
+                                + "Usted ha recibido el Módulo: "
+                                + event.getDestinoFinal().getModulo().getNombre()
+                                + " el día: "
+                                + formatter.format(event.getDestinoFinal().getFecha()).toString());
+
+                    }
+                    Notification notification = Notification.show(
+                            "Tarjeta modificada",
+                            2000,
+                            Notification.Position.BOTTOM_START);
+                    notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+                } catch (Exception e) {
+                    Notification notification = Notification.show(
+                            "Error al enviar correo electrónico a la dirección de correo seleccionada",
+                            2000,
+                            Notification.Position.MIDDLE);
+                    notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+                }
             }
             toolbar.remove(total);
             total = new Html("<span>Total: <b>" + tarjetas.size() + "</b></span>");
