@@ -44,7 +44,6 @@ public class Estudiante extends AbstractEntity {
     @JoinColumn(name = "user_id", nullable = false, updatable = false)
     private User user;
 
-    
     @Email
     @NotEmpty
     @NotBlank(message = "El correo proporcionado no es correcto")
@@ -67,19 +66,19 @@ public class Estudiante extends AbstractEntity {
 
     @Column()
     private String facultad;
-    
+
     @NotNull(message = "debe elegir un campo")
-    @JoinColumn(name = "grupo_id",nullable = false, updatable = false )
+    @JoinColumn(name = "grupo_id", nullable = false, updatable = false)
     @ManyToOne(optional = false)
     private Grupo grupo;
 
-     @ManyToMany(mappedBy = "estudiantes", cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "estudiantes", cascade = CascadeType.ALL)
     Set<DestinoFinalEstudiante> tarjetasDestinoFinal;
 
     @OneToMany(mappedBy = "estudiante", cascade = CascadeType.ALL)
     List<TarjetaPrestamoEstudiante> tarjetaPrestamo;
 
-    @OneToMany(mappedBy = "estudiante",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "estudiante", cascade = CascadeType.ALL)
     List<ModeloPagoEstudiante> modeloPagos;
 
     public String getNombreApellidos() {

@@ -1,11 +1,13 @@
 package trabajodediploma.data.entity;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -57,14 +59,14 @@ public class Trabajador extends AbstractEntity {
     @NotBlank(message = "debe elegir un campo")
     @Column(name = "categoria", nullable = false)
     private String categoria;
-    
+
     @NotNull(message = "debe elegir un campo de área")
-    @JoinColumn(name = "area_id",nullable = false, updatable = false)
+    @JoinColumn(name = "area_id", nullable = false, updatable = false)
     @ManyToOne()
     private Area area;
-    
-    @OneToMany(mappedBy = "trabajador", cascade = CascadeType.ALL)
-    List<DestinoFinalTrabajador> destinoFinal;
+
+    @ManyToMany(mappedBy = "trabajadores", cascade = CascadeType.ALL)
+    Set<DestinoFinalTrabajador> tarjetasDestinoFinal;
 
     @OneToMany(mappedBy = "trabajador", cascade = CascadeType.ALL)
     List<TarjetaPrestamoTrabajador> tarjetaPrestamo;

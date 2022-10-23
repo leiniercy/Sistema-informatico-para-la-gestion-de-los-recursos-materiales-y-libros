@@ -12,6 +12,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
 import trabajodediploma.data.entity.DestinoFinal;
+import trabajodediploma.data.service.AreaService;
 import trabajodediploma.data.service.DestinoFinalService;
 import trabajodediploma.data.service.EstudianteService;
 import trabajodediploma.data.service.GrupoService;
@@ -32,6 +33,7 @@ public class TarjetaDestinoFinalView extends Div {
     private TrabajadorService trabajadorService;
     private ModuloService moduloService;
     private GrupoService grupoService;
+    private AreaService areaService;
     private EmailSenderService senderService;
     private Div content;
     private Tab estudiante;
@@ -47,6 +49,7 @@ public class TarjetaDestinoFinalView extends Div {
             @Autowired TrabajadorService trabajadorService,
             @Autowired ModuloService moduloService,
             @Autowired GrupoService grupoService,
+            @Autowired AreaService areaService,
             @Autowired EmailSenderService senderService
     ) {
         addClassNames("tarjeta_destino_final_view");
@@ -55,9 +58,10 @@ public class TarjetaDestinoFinalView extends Div {
         this.trabajadorService = trabajadorService;
         this.moduloService = moduloService;
         this.grupoService = grupoService;
+        this.areaService = areaService;
         this.senderService = senderService;
         myFooter = new MyFooter();
-        trabajadorView = new TarjetaDestinoFinal_TrabajadorView(moduloService, trabajadorService, destinoService);
+        trabajadorView = new TarjetaDestinoFinal_TrabajadorView(moduloService, trabajadorService, destinoService, areaService, senderService);
         estudianteView = new TarjetaDestinoFinal_EstudianteView(moduloService, estudianteService, destinoService, grupoService, senderService);
         content = new Div();
         content.addClassName("tarjeta_destino_final_view__container");

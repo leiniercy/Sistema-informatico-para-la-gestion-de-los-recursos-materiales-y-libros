@@ -1,8 +1,13 @@
 package trabajodediploma.data.entity;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -23,12 +28,22 @@ public class DestinoFinalTrabajador extends DestinoFinal {
     @EqualsAndHashCode.Include
     @ToString.Include
 
-    @JoinColumn(name = "trabajador_id", updatable = true, unique = false)
-    @ManyToOne()
-    private Trabajador trabajador;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "tarjetaDestino_trabajadores",
+            joinColumns = @JoinColumn(name = "tarjetaDestino_id", nullable = false),
+            inverseJoinColumns = @JoinColumn(name = "trabajador_id", unique = false, nullable = false, updatable = true))
+    private Set<Trabajador> trabajadores;
 
-    public DestinoFinalTrabajador(LocalDate fecha, Modulo modulo, Trabajador trabajador) {
+    public void addMaterial(Trabajador trabajador) {
+        if (this.trabajadores == null) {
+            this.trabajadores = new HashSet<>();
+        }
+
+        this.trabajadores.add(trabajador);
+    }
+
+    public DestinoFinalTrabajador(LocalDate fecha, Modulo modulo, Set<Trabajador> trabajadores) {
         super(fecha, modulo);
-        this.trabajador = trabajador;
+        this.trabajadores = trabajadores;
     }
 }
