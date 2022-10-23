@@ -44,10 +44,9 @@ public class LibroForm extends FormLayout {
 
     private Libro libro;
     private List<Asignatura> asignaturas;
-    private Image imagePreview;
     private Label imageSize;
+    private Image imagePreview;
     Upload imagen = new Upload();
-    Upload documento = new Upload();
     TextField titulo = new TextField();
     TextField autor = new TextField();
     IntegerField volumen = new IntegerField();
@@ -56,14 +55,12 @@ public class LibroForm extends FormLayout {
     IntegerField cantidad = new IntegerField();
     NumberField precio = new NumberField();
     IntegerField anno_academico = new IntegerField();
-    ComboBox<Asignatura>  asignatura = new ComboBox<>();
-    
+    ComboBox<Asignatura> asignatura = new ComboBox<>();
 
     Button save = new Button("Añadir", VaadinIcon.PLUS.create());
     Button close = new Button("Cancelar", VaadinIcon.ERASER.create());
 
     BeanValidationBinder<Libro> binder = new BeanValidationBinder<>(Libro.class);
-    
 
     public LibroForm(List<Asignatura> asignaturas) {
         addClassName("libro-form");
@@ -84,9 +81,9 @@ public class LibroForm extends FormLayout {
                 asignatura,
                 createButtonsLayout());
     }
-    
+
     //Configuration
-    private void Configuration(){
+    private void Configuration() {
         //Config form
         //imagen
         //int maxFileSizeInBytes = 10 * 1024 * 1024; // 10MB
@@ -255,7 +252,7 @@ public class LibroForm extends FormLayout {
 
             Notification notification = Notification.show(
                     errorMessage,
-                    5000,
+                    2000,
                     Notification.Position.MIDDLE
             );
 

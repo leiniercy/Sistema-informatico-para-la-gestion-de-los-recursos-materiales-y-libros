@@ -52,5 +52,4 @@ public class RecursoMaterial extends AbstractEntity {
     
     @ManyToMany(mappedBy = "recursosMateriales", cascade = CascadeType.ALL)
     Set<Modulo> modulos;
-
 }
