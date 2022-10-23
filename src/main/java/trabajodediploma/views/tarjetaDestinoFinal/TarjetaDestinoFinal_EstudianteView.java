@@ -171,27 +171,31 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
             return layout;
         })).setHeader("Modulo").setAutoWidth(true);
 
-        fechaEntregaColumn = grid
-                .addColumn(new LocalDateRenderer<>(tarjeta -> tarjeta.getFecha(),
-                        DateTimeFormatter.ofPattern("dd/MM/yyyy")))
-                .setComparator(tarjeta -> tarjeta.getFecha()).setHeader("Fecha de Entrega").setAutoWidth(true)
+        fechaEntregaColumn = grid.addColumn(new ComponentRenderer<>(tarjeta -> {
+            tarjetaEstudiante = (DestinoFinalEstudiante) tarjeta;
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/YYYY");
+            String fecha = formatter.format(tarjetaEstudiante.getFecha()).toString();
+            HorizontalLayout layout = new HorizontalLayout();
+            Span span_fecha = new Span();
+            span_fecha.add(fecha);
+            span_fecha.getStyle()
+                    .set("width","100%")
+                    .set("display","flex")
+                    .set("justify-content","center")
+                    .set("align-items","end");
+            Icon icon = new Icon(VaadinIcon.CHECK_SQUARE_O);
+            icon.getStyle()
+                    .set("color", "var(--lumo-success-text-color)")
+                    .set("margin-left", "10px");
+            span_fecha.add(icon);
+            layout.add(span_fecha);
+//            layout.setDefaultVerticalComponentAlignment(Alignment.CENTER);
+            layout.setAlignItems(FlexComponent.Alignment.CENTER);
+            return layout;
+        })).setComparator(tarjeta -> tarjeta.getFecha()).setHeader("Fecha de Entrega").setAutoWidth(true)
                 .setTextAlign(ColumnTextAlign.CENTER)
                 .setSortable(true);
 
-//        editColumn = grid.addComponentColumn(tarjeta -> {
-//            tarjetaEstudiante = (DestinoFinalEstudiante) tarjeta;
-//            Button editButton = new Button(VaadinIcon.EDIT.create());
-//            if(tarjetaEstudiante.getEstudiantes().size() == 1){
-//                editButton.addClickListener(e ->{
-//                    System.out.println( grid.getSelectedItems() );
-//                    this.editTarjeta(tarjetaEstudiante);
-//                });
-//            }else if(tarjetaEstudiante.getEstudiantes().size() > 1){
-//                editButton.addClickListener(e -> this.editTarjeta_V2(tarjetaEstudiante));
-//            }
-//            editButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-//            return editButton;
-//        }).setTextAlign(ColumnTextAlign.CENTER).setFrozen(true).setFlexGrow(0);
         Filtros();
 
         HeaderRow headerRow = grid.appendHeaderRow();
@@ -562,7 +566,7 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
 
         tarjetas.clear();
         boolean band = false;
-         for (int i = 0; i < destinoService.findAll().size() && band == false; i++) {
+        for (int i = 0; i < destinoService.findAll().size() && band == false; i++) {
             if (destinoService.findAll().get(i) instanceof DestinoFinalEstudiante) {
                 tarjetaEstudiante = (DestinoFinalEstudiante) destinoService.findAll().get(i);
                 if (tarjetaEstudiante.getEstudiantes() != null) {
