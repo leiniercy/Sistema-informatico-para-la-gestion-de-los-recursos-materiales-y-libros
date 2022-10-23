@@ -1,4 +1,4 @@
-package trabajodediploma.views.tarjetaDestinoFinal;
+package trabajodediploma.views.tarjetaDestinoFinal.Estudiante;
 
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;

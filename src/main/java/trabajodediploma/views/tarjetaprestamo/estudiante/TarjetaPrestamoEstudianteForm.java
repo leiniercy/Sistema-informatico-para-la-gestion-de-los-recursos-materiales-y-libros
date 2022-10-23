@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package trabajodediploma.views.tarjetaprestamo;
+package trabajodediploma.views.tarjetaprestamo.estudiante;
 
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;

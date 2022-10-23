@@ -1,6 +1,7 @@
 package trabajodediploma.views.tarjetaprestamo;
 
 
+import trabajodediploma.views.tarjetaprestamo.estudiante.TarjetaPrestamoEstudianteForm;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
@@ -11,6 +12,7 @@ import com.vaadin.flow.router.Route;
 import javax.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 import trabajodediploma.data.service.EstudianteService;
+import trabajodediploma.data.service.GrupoService;
 import trabajodediploma.data.service.LibroService;
 import trabajodediploma.data.service.TarjetaPrestamoService;
 import trabajodediploma.data.service.TrabajadorService;
@@ -37,11 +39,12 @@ public class TarjetaPrestamoView extends Div {
             @Autowired EstudianteService estudianteService,
             @Autowired LibroService libroService,
             @Autowired TrabajadorService trabajadorService,
+            @Autowired GrupoService grupoService,
             @Autowired  EmailSenderService senderService
     ) {
         addClassNames("tarjeta-prestamo-view");
         myFooter = new MyFooter();
-        estudianteGrid = new EstudianteGrid(prestamoService, estudianteService, libroService,senderService);
+        estudianteGrid = new EstudianteGrid(prestamoService, estudianteService, grupoService,libroService,senderService);
         trabajadorGrid = new TrabajadorGrid(prestamoService, trabajadorService, libroService,senderService);
         container = new Div();
         container.addClassName("container");

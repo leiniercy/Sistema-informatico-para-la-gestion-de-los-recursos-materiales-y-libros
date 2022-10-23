@@ -1,4 +1,4 @@
-package trabajodediploma.views.tarjetaDestinoFinal;
+package trabajodediploma.views.tarjetaDestinoFinal.Trabajador;
 
 import java.time.format.DateTimeFormatter;
 import java.util.LinkedList;
@@ -42,33 +42,33 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Objects;
 import trabajodediploma.data.entity.DestinoFinal;
-import trabajodediploma.data.entity.DestinoFinalEstudiante;
-import trabajodediploma.data.entity.Estudiante;
+import trabajodediploma.data.entity.DestinoFinalTrabajador;
+import trabajodediploma.data.entity.Trabajador;
 import trabajodediploma.data.entity.Modulo;
 import trabajodediploma.data.entity.RecursoMaterial;
 import trabajodediploma.data.service.DestinoFinalService;
-import trabajodediploma.data.service.EstudianteService;
-import trabajodediploma.data.service.GrupoService;
+import trabajodediploma.data.service.TrabajadorService;
+import trabajodediploma.data.service.AreaService;
 import trabajodediploma.data.service.ModuloService;
 import trabajodediploma.data.tools.EmailSenderService;
 
-public class TarjetaDestinoFinal_EstudianteView extends Div {
+public class TarjetaDestinoFinal_TrabajadorView extends Div {
 
     Grid<DestinoFinal> grid = new Grid<>(DestinoFinal.class, false);
     GridListDataView<DestinoFinal> gridListDataView;
-    Grid.Column<DestinoFinal> estudianteColumn;
+    Grid.Column<DestinoFinal> trabajadorColumn;
     Grid.Column<DestinoFinal> moduloColumn;
     Grid.Column<DestinoFinal> fechaEntregaColumn;
     private List<DestinoFinal> tarjetas;
     private ModuloService moduloService;
-    private EstudianteService estudianteService;
+    private TrabajadorService trabajadorService;
     private DestinoFinalService destinoService;
-    private GrupoService grupoService;
+    private AreaService areaService;
     private EmailSenderService senderService;
-    private DestinoFinalEstudiante tarjetaEstudiante;
-    private TarjetaDestinoFinal_EstudianteForm form;
-    private TarjetaDestinoFinal_EstudianteForm_V2 form_V2;
-    private ComboBox<Estudiante> estudianteFilter;
+    private DestinoFinalTrabajador tarjetaTrabajador;
+    private TarjetaDestinoFinal_TrabajadorFrom form;
+    private TarjetaDestinoFinal_TrabajadorForm_V2 form_V2;
+    private ComboBox<Trabajador> trabajadorFilter;
     private ComboBox<Modulo> moduloFilter;
     private DatePicker entregaFilter;
     private Dialog dialog;
@@ -78,18 +78,18 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
     private Div header;
     private Div formContent;
 
-    public TarjetaDestinoFinal_EstudianteView(
+    public TarjetaDestinoFinal_TrabajadorView(
             ModuloService moduloService,
-            EstudianteService estudianteService,
+            TrabajadorService trabajadorService,
             DestinoFinalService destinoService,
-            GrupoService grupoService,
+            AreaService areaService,
             EmailSenderService senderService
     ) {
-        addClassName("tarjeta_estudiante");
+        addClassName("tarjeta_trabajador");
         this.moduloService = moduloService;
-        this.estudianteService = estudianteService;
+        this.trabajadorService = trabajadorService;
         this.destinoService = destinoService;
-        this.grupoService = grupoService;
+        this.areaService = areaService;
         this.senderService = senderService;
         tarjetas = new LinkedList<>();
         updateList();
@@ -103,9 +103,9 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
         formContent = new Div();
         formContent.addClassName("form-content");
         Div gridContent = new Div(grid);
-        gridContent.addClassName("tarjeta_estudiante__content__grid-content");
+        gridContent.addClassName("tarjeta_trabajador__content__grid-content");
         Div content = new Div(gridContent);
-        content.addClassName("tarjeta_estudiante__content");
+        content.addClassName("tarjeta_trabajador__content");
         content.setSizeFull();
         /* Dialog Header */
         Button closeButton = new Button(new Icon("lumo", "cross"), (e) -> dialog.close());
@@ -125,30 +125,30 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
     /* Tabla */
  /* Configuracion de la tabla */
     private void configureGrid() {
-        grid.setClassName("tarjeta_estudiante__content__grid-content__table");
+        grid.setClassName("tarjeta_trabajador__content__grid-content__table");
 
-        estudianteColumn = grid.addColumn(new ComponentRenderer<>(tarjeta -> {
-            tarjetaEstudiante = (DestinoFinalEstudiante) tarjeta;
-            List<Estudiante> estudiantes = new LinkedList<>(tarjetaEstudiante.getEstudiantes());
-            VerticalLayout listEstudiantes = new VerticalLayout();
-            for (int i = 0; i < estudiantes.size(); i++) {
+        trabajadorColumn = grid.addColumn(new ComponentRenderer<>(tarjeta -> {
+            tarjetaTrabajador = (DestinoFinalTrabajador) tarjeta;
+            List<Trabajador> trabajadors = new LinkedList<>(tarjetaTrabajador.getTrabajadores());
+            VerticalLayout listTrabajadors = new VerticalLayout();
+            for (int i = 0; i < trabajadors.size(); i++) {
                 HorizontalLayout hl = new HorizontalLayout();
                 hl.setAlignItems(Alignment.CENTER);
-                Avatar avatar = new Avatar(estudiantes.get(i).getUser().getName(), estudiantes.get(i).getUser().getProfilePictureUrl());
+                Avatar avatar = new Avatar(trabajadors.get(i).getUser().getName(), trabajadors.get(i).getUser().getProfilePictureUrl());
                 VerticalLayout vl = new VerticalLayout();
                 vl.getStyle().set("line-height", "0");
                 Span name = new Span();
                 name.addClassNames("name");
-                name.setText(estudiantes.get(i).getUser().getName());
+                name.setText(trabajadors.get(i).getUser().getName());
                 Span email = new Span();
                 email.addClassNames("text-s", "text-secondary");
-                email.setText(estudiantes.get(i).getEmail());
+                email.setText(trabajadors.get(i).getEmail());
                 vl.add(name, email);
                 hl.add(avatar, vl);
-                listEstudiantes.add(hl);
+                listTrabajadors.add(hl);
             }
-            return listEstudiantes;
-        })).setHeader("Estudiante").setFrozen(true).setAutoWidth(true).setSortable(true);
+            return listTrabajadors;
+        })).setHeader("Trabajador").setFrozen(true).setAutoWidth(true).setSortable(true);
 
         moduloColumn = grid.addColumn(new ComponentRenderer<>(tarjeta -> {
             VerticalLayout layout = new VerticalLayout();
@@ -170,10 +170,10 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
             return layout;
         })).setHeader("Modulo").setAutoWidth(true);
 
-        fechaEntregaColumn = grid.addColumn(new ComponentRenderer<>(tarjeta -> {
-            tarjetaEstudiante = (DestinoFinalEstudiante) tarjeta;
+          fechaEntregaColumn = grid.addColumn(new ComponentRenderer<>(tarjeta -> {
+            tarjetaTrabajador = (DestinoFinalTrabajador) tarjeta;
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/YYYY");
-            String fecha = formatter.format(tarjetaEstudiante.getFecha()).toString();
+            String fecha = formatter.format(tarjetaTrabajador.getFecha()).toString();
             HorizontalLayout layout = new HorizontalLayout();
             Span span_fecha = new Span();
             span_fecha.add(fecha);
@@ -197,7 +197,7 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
         Filtros();
 
         HeaderRow headerRow = grid.appendHeaderRow();
-        headerRow.getCell(estudianteColumn).setComponent(estudianteFilter);
+        headerRow.getCell(trabajadorColumn).setComponent(trabajadorFilter);
         headerRow.getCell(moduloColumn).setComponent(moduloFilter);
         headerRow.getCell(fechaEntregaColumn).setComponent(entregaFilter);
 
@@ -216,13 +216,13 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
     /* Filtros */
     private void Filtros() {
 
-        estudianteFilter = new ComboBox<>();
-        estudianteFilter.setItems(estudianteService.findAll());
-        estudianteFilter.setItemLabelGenerator(estudiante -> estudiante.getUser().getName());
-        estudianteFilter.setPlaceholder("Filtrar");
-        estudianteFilter.setClearButtonVisible(true);
-        estudianteFilter.setWidth("100%");
-        estudianteFilter.setRenderer(new ComponentRenderer<>(event -> {
+        trabajadorFilter = new ComboBox<>();
+        trabajadorFilter.setItems(trabajadorService.findAll());
+        trabajadorFilter.setItemLabelGenerator(trabajador -> trabajador.getUser().getName());
+        trabajadorFilter.setPlaceholder("Filtrar");
+        trabajadorFilter.setClearButtonVisible(true);
+        trabajadorFilter.setWidth("100%");
+        trabajadorFilter.setRenderer(new ComponentRenderer<>(event -> {
             HorizontalLayout hl = new HorizontalLayout();
             hl.setAlignItems(FlexComponent.Alignment.CENTER);
             Avatar avatar = new Avatar(event.getUser().getName(), event.getUser().getProfilePictureUrl());
@@ -239,11 +239,11 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
             return hl;
         })
         );
-        estudianteFilter.addValueChangeListener(event -> {
-            if (estudianteFilter.getValue() == null) {
+        trabajadorFilter.addValueChangeListener(event -> {
+            if (trabajadorFilter.getValue() == null) {
                 gridListDataView = grid.setItems(tarjetas);
             } else {
-                gridListDataView.addFilter(tarjeta -> areEstudianteEqual(tarjeta, estudianteFilter));
+                gridListDataView.addFilter(tarjeta -> areTrabajadorEqual(tarjeta, trabajadorFilter));
             }
         });
 
@@ -276,12 +276,12 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
 
     }
 
-    private boolean areEstudianteEqual(DestinoFinal tarjeta, ComboBox<Estudiante> estudianteFilter) {
-        Estudiante estudianteFilterValue = estudianteFilter.getValue();
-        tarjetaEstudiante = (DestinoFinalEstudiante) tarjeta;
-        if (estudianteFilterValue != null) {
-            List<Estudiante> list = new LinkedList<>(tarjetaEstudiante.getEstudiantes());
-            return busquedaBinariaEstudiante(list, estudianteFilterValue);
+    private boolean areTrabajadorEqual(DestinoFinal tarjeta, ComboBox<Trabajador> trabajadorFilter) {
+        Trabajador trabajadorFilterValue = trabajadorFilter.getValue();
+        tarjetaTrabajador = (DestinoFinalTrabajador) tarjeta;
+        if (trabajadorFilterValue != null) {
+            List<Trabajador> list = new LinkedList<>(tarjetaTrabajador.getTrabajadores());
+            return busquedaBinariaTrabajador(list, trabajadorFilterValue);
         }
         return true;
     }
@@ -323,12 +323,12 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
             } else if (grid.getSelectedItems().size() == 1) {
                 List<DestinoFinal> list = new LinkedList<>(grid.getSelectedItems());
                 DestinoFinal tarjeta = list.get(0);
-                tarjetaEstudiante = (DestinoFinalEstudiante) tarjeta;
-                List<Estudiante> listEstudiantes = new LinkedList<>(tarjetaEstudiante.getEstudiantes());
-                if (listEstudiantes.size() == 1) {
-                    editTarjeta(tarjetaEstudiante);
-                } else if (listEstudiantes.size() > 1) {
-                    editTarjeta_V2(tarjetaEstudiante);
+                tarjetaTrabajador = (DestinoFinalTrabajador) tarjeta;
+                List<Trabajador> listTrabajadors = new LinkedList<>(tarjetaTrabajador.getTrabajadores());
+                if (listTrabajadors.size() == 1) {
+                    editTarjeta(tarjetaTrabajador);
+                } else if (listTrabajadors.size() > 1) {
+                    editTarjeta_V2(tarjetaTrabajador);
                 }
             }
 
@@ -342,8 +342,8 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
         individual.addClickListener(click -> {
             addTarjeta();
         });
-        MenuItem porGrupo = createIconItem(shareSubMenu, VaadinIcon.USERS, "Por grupo", null, true);
-        porGrupo.addClickListener(click -> {
+        MenuItem porArea = createIconItem(shareSubMenu, VaadinIcon.USERS, "Por area", null, true);
+        porArea.addClickListener(click -> {
             addTarjeta_V2();
         });
         buttons.add(refreshButton, deleteButton, editButton, anadirButton);
@@ -407,7 +407,7 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
 
         } catch (Exception e) {
             e.printStackTrace();
-            Notification notification = Notification.show("Ocurrió un problema al intentar eliminar el estudiante",
+            Notification notification = Notification.show("Ocurrió un problema al intentar eliminar el trabajador",
                     5000,
                     Notification.Position.MIDDLE);
             ;
@@ -429,35 +429,35 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
 
     // Configuracion del Formulario
     private void configureForm() {
-        form = new TarjetaDestinoFinal_EstudianteForm(estudianteService.findAll(), moduloService.findAll());
+        form = new TarjetaDestinoFinal_TrabajadorFrom(trabajadorService.findAll(), moduloService.findAll());
         form.setWidth("25em");
-        form.addListener(TarjetaDestinoFinal_EstudianteForm.SaveEvent.class,
+        form.addListener(TarjetaDestinoFinal_TrabajadorFrom.SaveEvent.class,
                 this::saveTarjeta);
-        form.addListener(TarjetaDestinoFinal_EstudianteForm.CloseEvent.class, e -> closeEditor());
+        form.addListener(TarjetaDestinoFinal_TrabajadorFrom.CloseEvent.class, e -> closeEditor());
 
-        form_V2 = new TarjetaDestinoFinal_EstudianteForm_V2(grupoService.findAll(), estudianteService.findAll(), moduloService.findAll());
+        form_V2 = new TarjetaDestinoFinal_TrabajadorForm_V2(areaService.findAll(), trabajadorService.findAll(), moduloService.findAll());
         form_V2.setWidth("25em");
-        form_V2.addListener(TarjetaDestinoFinal_EstudianteForm_V2.SaveEvent.class,
+        form_V2.addListener(TarjetaDestinoFinal_TrabajadorForm_V2.SaveEvent.class,
                 this::saveTarjeta_V2);
-        form_V2.addListener(TarjetaDestinoFinal_EstudianteForm_V2.CloseEvent.class, e -> closeEditor());
+        form_V2.addListener(TarjetaDestinoFinal_TrabajadorForm_V2.CloseEvent.class, e -> closeEditor());
     }
 
-    private void saveTarjeta(TarjetaDestinoFinal_EstudianteForm.SaveEvent event) {
+    private void saveTarjeta(TarjetaDestinoFinal_TrabajadorFrom.SaveEvent event) {
 
         tarjetas.clear();
         boolean band = false;
         for (int i = 0; i < destinoService.findAll().size() && band == false; i++) {
-            if (destinoService.findAll().get(i) instanceof DestinoFinalEstudiante) {
-                tarjetaEstudiante = (DestinoFinalEstudiante) destinoService.findAll().get(i);
-                if (tarjetaEstudiante.getEstudiantes() != null) {
-                    List<Estudiante> listTragetEstudiantes = new LinkedList<>(tarjetaEstudiante.getEstudiantes());
-                    listTragetEstudiantes.sort(Comparator.comparing(Estudiante::getId));
-                    List<Estudiante> listevent = new LinkedList<>(event.getDestinoFinal().getEstudiantes());
+            if (destinoService.findAll().get(i) instanceof DestinoFinalTrabajador) {
+                tarjetaTrabajador = (DestinoFinalTrabajador) destinoService.findAll().get(i);
+                if (tarjetaTrabajador.getTrabajadores() != null) {
+                    List<Trabajador> listTragetTrabajadors = new LinkedList<>(tarjetaTrabajador.getTrabajadores());
+                    listTragetTrabajadors.sort(Comparator.comparing(Trabajador::getId));
+                    List<Trabajador> listevent = new LinkedList<>(event.getDestinoFinal().getTrabajadores());
                     for (int j = 0; j < listevent.size() && band == false; j++) {
-                        if (busquedaBinariaEstudiante(listTragetEstudiantes, listevent.get(j)) == true) {
-                            if (tarjetaEstudiante.getModulo().getId().equals(event.getDestinoFinal().getModulo().getId())) {
+                        if (busquedaBinariaTrabajador(listTragetTrabajadors, listevent.get(j)) == true) {
+                            if (tarjetaTrabajador.getModulo().getId().equals(event.getDestinoFinal().getModulo().getId())) {
                                 band = true;
-                                tarjetas.add(tarjetaEstudiante);
+                                tarjetas.add(tarjetaTrabajador);
                             }
                         }
                     }
@@ -476,10 +476,10 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
             if (event.getDestinoFinal().getId() == null) {
                 try {
                     destinoService.save(event.getDestinoFinal());
-                    List<Estudiante> listTragetEstudiantes = new LinkedList<>(event.getDestinoFinal().getEstudiantes());
-                    for (int i = 0; i < listTragetEstudiantes.size(); i++) {
+                    List<Trabajador> listTragetTrabajadors = new LinkedList<>(event.getDestinoFinal().getTrabajadores());
+                    for (int i = 0; i < listTragetTrabajadors.size(); i++) {
                         senderService.sendSimpleEmail(
-                                /* enviado a: */listTragetEstudiantes.get(i).getEmail(),
+                                /* enviado a: */listTragetTrabajadors.get(i).getEmail(),
                                 /* asunto: */ "Entrega de Módulo",
                                 /* mensaje: */ "Genius \n"
                                 + "Sistema Informático para la gestión de la información de los recursos materiales y libros en la facultad 4. \n"
@@ -505,10 +505,10 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
             } else {
                 try {
                     destinoService.update(event.getDestinoFinal());
-                    List<Estudiante> listTragetEstudiantes = new LinkedList<>(event.getDestinoFinal().getEstudiantes());
-                    for (int i = 0; i < listTragetEstudiantes.size(); i++) {
+                    List<Trabajador> listTragetTrabajadors = new LinkedList<>(event.getDestinoFinal().getTrabajadores());
+                    for (int i = 0; i < listTragetTrabajadors.size(); i++) {
                         senderService.sendSimpleEmail(
-                                /* enviado a: */listTragetEstudiantes.get(i).getEmail(),
+                                /* enviado a: */listTragetTrabajadors.get(i).getEmail(),
                                 /* asunto: */ "Entrega de Módulo",
                                 /* mensaje: */ "Genius \n"
                                 + "Sistema Informático para la gestión de la información de los recursos materiales y libros en la facultad 4. \n"
@@ -542,7 +542,7 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
     }
     //Busqueda Binaria
 
-    private boolean busquedaBinariaEstudiante(List<Estudiante> list, Estudiante e) {
+    private boolean busquedaBinariaTrabajador(List<Trabajador> list, Trabajador e) {
         int inicio = 0;
         int fin = list.size() - 1;
         while (inicio <= fin) {
@@ -560,22 +560,22 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
         return false;
     }
 
-    private void saveTarjeta_V2(TarjetaDestinoFinal_EstudianteForm_V2.SaveEvent event) {
+    private void saveTarjeta_V2(TarjetaDestinoFinal_TrabajadorForm_V2.SaveEvent event) {
 
         tarjetas.clear();
         boolean band = false;
-        for (int i = 0; i < destinoService.findAll().size() && band == false; i++) {
-            if (destinoService.findAll().get(i) instanceof DestinoFinalEstudiante) {
-                tarjetaEstudiante = (DestinoFinalEstudiante) destinoService.findAll().get(i);
-                if (tarjetaEstudiante.getEstudiantes() != null) {
-                    List<Estudiante> listTragetEstudiantes = new LinkedList<>(tarjetaEstudiante.getEstudiantes());
-                    listTragetEstudiantes.sort(Comparator.comparing(Estudiante::getId));
-                    List<Estudiante> listevent = new LinkedList<>(event.getDestinoFinal().getEstudiantes());
+         for (int i = 0; i < destinoService.findAll().size() && band == false; i++) {
+            if (destinoService.findAll().get(i) instanceof DestinoFinalTrabajador) {
+                tarjetaTrabajador = (DestinoFinalTrabajador) destinoService.findAll().get(i);
+                if (tarjetaTrabajador.getTrabajadores() != null) {
+                    List<Trabajador> listTragetTrabajadors = new LinkedList<>(tarjetaTrabajador.getTrabajadores());
+                    listTragetTrabajadors.sort(Comparator.comparing(Trabajador::getId));
+                    List<Trabajador> listevent = new LinkedList<>(event.getDestinoFinal().getTrabajadores());
                     for (int j = 0; j < listevent.size() && band == false; j++) {
-                        if (busquedaBinariaEstudiante(listTragetEstudiantes, listevent.get(j)) == true) {
-                            if (tarjetaEstudiante.getModulo().getId().equals(event.getDestinoFinal().getModulo().getId())) {
+                        if (busquedaBinariaTrabajador(listTragetTrabajadors, listevent.get(j)) == true) {
+                            if (tarjetaTrabajador.getModulo().getId().equals(event.getDestinoFinal().getModulo().getId())) {
                                 band = true;
-                                tarjetas.add(tarjetaEstudiante);
+                                tarjetas.add(tarjetaTrabajador);
                             }
                         }
                     }
@@ -594,10 +594,10 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
             if (event.getDestinoFinal().getId() == null) {
                 try {
                     destinoService.save(event.getDestinoFinal());
-                    List<Estudiante> listTragetEstudiantes = new LinkedList<>(event.getDestinoFinal().getEstudiantes());
-                    for (int i = 0; i < listTragetEstudiantes.size(); i++) {
+                    List<Trabajador> listTragetTrabajadors = new LinkedList<>(event.getDestinoFinal().getTrabajadores());
+                    for (int i = 0; i < listTragetTrabajadors.size(); i++) {
                         senderService.sendSimpleEmail(
-                                /* enviado a: */listTragetEstudiantes.get(i).getEmail(),
+                                /* enviado a: */listTragetTrabajadors.get(i).getEmail(),
                                 /* asunto: */ "Entrega de Módulo",
                                 /* mensaje: */ "Genius \n"
                                 + "Sistema Informático para la gestión de la información de los recursos materiales y libros en la facultad 4. \n"
@@ -623,10 +623,10 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
             } else {
                 try {
                     destinoService.update(event.getDestinoFinal());
-                    List<Estudiante> listTragetEstudiantes = new LinkedList<>(event.getDestinoFinal().getEstudiantes());
-                    for (int i = 0; i < listTragetEstudiantes.size(); i++) {
+                    List<Trabajador> listTragetTrabajadors = new LinkedList<>(event.getDestinoFinal().getTrabajadores());
+                    for (int i = 0; i < listTragetTrabajadors.size(); i++) {
                         senderService.sendSimpleEmail(
-                                /* enviado a: */listTragetEstudiantes.get(i).getEmail(),
+                                /* enviado a: */listTragetTrabajadors.get(i).getEmail(),
                                 /* asunto: */ "Entrega de Módulo",
                                 /* mensaje: */ "Genius \n"
                                 + "Sistema Informático para la gestión de la información de los recursos materiales y libros en la facultad 4. \n"
@@ -660,7 +660,7 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
     }
 
     /*Tarjeta de destino individual*/
-    void editTarjeta(DestinoFinalEstudiante tarjeta) {
+    void editTarjeta(DestinoFinalTrabajador tarjeta) {
         if (tarjeta == null) {
             closeEditor();
         } else {
@@ -677,12 +677,12 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
 
     void addTarjeta() {
         grid.asMultiSelect().clear();
-        editTarjeta(new DestinoFinalEstudiante());
+        editTarjeta(new DestinoFinalTrabajador());
     }
 
     /*Fin - > Tarjeta de destino individual*/
- /*Tarjeta de destino por grupo*/
-    void editTarjeta_V2(DestinoFinalEstudiante tarjeta) {
+ /*Tarjeta de destino por area*/
+    void editTarjeta_V2(DestinoFinalTrabajador tarjeta) {
         if (tarjeta == null) {
             closeEditor();
         } else {
@@ -699,12 +699,12 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
 
     void addTarjeta_V2() {
         grid.asMultiSelect().clear();
-        editTarjeta_V2(new DestinoFinalEstudiante());
+        editTarjeta_V2(new DestinoFinalTrabajador());
     }
 
-    /*Fin -> Tarjeta de destino por grupo*/
+    /*Fin -> Tarjeta de destino por area*/
     private void closeEditor() {
-        form.setDestinoFinal(new DestinoFinalEstudiante());
+        form.setDestinoFinal(new DestinoFinalTrabajador());
         form.setVisible(false);
         removeClassName("editing");
         dialog.close();
@@ -713,9 +713,9 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
     private void updateList() {
         tarjetas.clear();
         for (int i = 0; i < destinoService.findAll().size(); i++) {
-            if (destinoService.findAll().get(i) instanceof DestinoFinalEstudiante) {
-                tarjetaEstudiante = (DestinoFinalEstudiante) destinoService.findAll().get(i);
-                if (tarjetaEstudiante.getEstudiantes() != null) {
+            if (destinoService.findAll().get(i) instanceof DestinoFinalTrabajador) {
+                tarjetaTrabajador = (DestinoFinalTrabajador) destinoService.findAll().get(i);
+                if (tarjetaTrabajador.getTrabajadores() != null) {
                     tarjetas.add(destinoService.findAll().get(i));
                 }
             }

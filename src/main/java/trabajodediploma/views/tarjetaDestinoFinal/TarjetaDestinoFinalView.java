@@ -1,5 +1,7 @@
 package trabajodediploma.views.tarjetaDestinoFinal;
 
+import trabajodediploma.views.tarjetaDestinoFinal.Estudiante.TarjetaDestinoFinal_EstudianteView;
+import trabajodediploma.views.tarjetaDestinoFinal.Trabajador.TarjetaDestinoFinal_TrabajadorView;
 import javax.annotation.security.RolesAllowed;
 
 import org.springframework.beans.factory.annotation.Autowired;

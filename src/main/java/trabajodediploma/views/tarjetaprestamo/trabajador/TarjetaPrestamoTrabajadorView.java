@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package trabajodediploma.views.tarjetaprestamo;
+package trabajodediploma.views.tarjetaprestamo.trabajador;
 
 import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.button.Button;
@@ -30,27 +30,26 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.LocalDateRenderer;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import trabajodediploma.data.entity.Estudiante;
+import trabajodediploma.data.entity.Trabajador;
 import trabajodediploma.data.entity.Libro;
 import trabajodediploma.data.entity.TarjetaPrestamo;
-import trabajodediploma.data.entity.TarjetaPrestamoEstudiante;
-import trabajodediploma.data.service.EstudianteService;
+import trabajodediploma.data.entity.TarjetaPrestamoTrabajador;
+import trabajodediploma.data.service.TrabajadorService;
+import trabajodediploma.data.tools.EmailSenderService;
 import trabajodediploma.data.service.LibroService;
 import trabajodediploma.data.service.TarjetaPrestamoService;
-import trabajodediploma.data.tools.EmailSenderService;
+import trabajodediploma.views.tarjetaprestamo.TrabajadorGrid;
 
 /**
  *
  * @author leinier
  */
-public class TarjetaPrestamoEstudianteView extends Div {
+public class TarjetaPrestamoTrabajadorView extends Div {
 
     Grid<TarjetaPrestamo> grid = new Grid<>(TarjetaPrestamo.class, false);
     GridListDataView<TarjetaPrestamo> gridListDataView;
@@ -58,15 +57,15 @@ public class TarjetaPrestamoEstudianteView extends Div {
     Grid.Column<TarjetaPrestamo> fechaEntregaColumn;
     Grid.Column<TarjetaPrestamo> fechaDevolucionColumn;
     Grid.Column<TarjetaPrestamo> editColumn;
-    EstudianteGrid estudianteGrid;
-    private Estudiante estudiante;
+    TrabajadorGrid trabajadorGrid;
+    private Trabajador trabajador;
     private List<Libro> libros;
     private List<TarjetaPrestamo> prestamos;
     private TarjetaPrestamoService prestamoService;
-    private EstudianteService estudiantService;
+    private TrabajadorService trabajadorService;
     private LibroService libroService;
     private EmailSenderService senderService;
-    TarjetaPrestamoEstudianteForm form;
+    TarjetaPrestamoTrabajadorForm form;
     private ComboBox<Libro> libroFilter;
     private DatePicker entregaFilter;
     private DatePicker devolucionFilter;
@@ -75,22 +74,22 @@ public class TarjetaPrestamoEstudianteView extends Div {
     private Div content;
     private Div header;
     private Dialog dialog;
-    private TarjetaPrestamoEstudiante tarjetaEstudiante;
+    private TarjetaPrestamoTrabajador tarjetaTrabajador;
 
-    public TarjetaPrestamoEstudianteView(
-            Estudiante estudiante,
+    public TarjetaPrestamoTrabajadorView(
+            Trabajador trabajador,
             TarjetaPrestamoService prestamoService,
-            EstudianteService estudianteService,
+            TrabajadorService trabajadorService,
             LibroService libroService,
             EmailSenderService senderService) {
 
-        addClassName("container__tarjeta");
-        this.estudiante = estudiante;
+        addClassName("container__modelo");
+        this.trabajador = trabajador;
         this.prestamoService = prestamoService;
-        this.estudiantService = estudianteService;
+        this.trabajadorService = trabajadorService;
         this.libroService = libroService;
-        this.libros = libroService.findAll();
         this.senderService = senderService;
+        this.libros = libroService.findAll();
         prestamos = new LinkedList<>();
         updateList();
         configureForm();
@@ -139,32 +138,31 @@ public class TarjetaPrestamoEstudianteView extends Div {
     /* Tabla */
  /* Configuracion de la tabla */
     private void configureGrid() {
-        grid.setClassName("container__tarjeta_estudiante__grid");
-
+        grid.setClassName("container__modelo__grid");
+        
         libroColumn = grid.addColumn(new ComponentRenderer<>(tarjeta -> {
-            tarjetaEstudiante = (TarjetaPrestamoEstudiante) tarjeta;
             HorizontalLayout hl = new HorizontalLayout();
             hl.setAlignItems(Alignment.CENTER);
-            Image img = new Image(tarjetaEstudiante.getLibro().getImagen(), tarjetaEstudiante.getLibro().getTitulo());
+            Image img = new Image(tarjeta.getLibro().getImagen(), "");
             img.setHeight("3.5rem");
             Span span = new Span();
             span.setClassName("name");
-            span.setText(tarjetaEstudiante.getLibro().getTitulo());
+            span.setText(tarjeta.getLibro().getTitulo());
             hl.add(img, span);
             return hl;
         })).setHeader("Libro").setAutoWidth(true).setSortable(true);
-
-        fechaEntregaColumn =  grid.addColumn(new ComponentRenderer<>(tarjeta -> {
+        
+        fechaEntregaColumn = grid.addColumn(new ComponentRenderer<>(tarjeta -> {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/YYYY");
             String fecha = formatter.format(tarjeta.getFechaPrestamo()).toString();
             HorizontalLayout layout = new HorizontalLayout();
             Span span_fecha = new Span();
             span_fecha.add(fecha);
             span_fecha.getStyle()
-                    .set("width","100%")
-                    .set("display","flex")
-                    .set("justify-content","center")
-                    .set("align-items","end");
+                    .set("width", "100%")
+                    .set("display", "flex")
+                    .set("justify-content", "center")
+                    .set("align-items", "end");
             Icon icon = new Icon(VaadinIcon.CHECK_SQUARE_O);
             icon.getStyle()
                     .set("color", "var(--lumo-primary-color)")
@@ -176,18 +174,18 @@ public class TarjetaPrestamoEstudianteView extends Div {
         })).setComparator(tarjeta -> tarjeta.getFechaPrestamo()).setHeader("Fecha de Préstamo").setAutoWidth(true)
                 .setTextAlign(ColumnTextAlign.CENTER)
                 .setSortable(true);
-        
-        fechaDevolucionColumn =  grid.addColumn(new ComponentRenderer<>(tarjeta -> {
+
+        fechaDevolucionColumn = grid.addColumn(new ComponentRenderer<>(tarjeta -> {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/YYYY");
             String fecha = formatter.format(tarjeta.getFechaDevolucion()).toString();
             HorizontalLayout layout = new HorizontalLayout();
             Span span_fecha = new Span();
             span_fecha.add(fecha);
             span_fecha.getStyle()
-                    .set("width","100%")
-                    .set("display","flex")
-                    .set("justify-content","center")
-                    .set("align-items","end");
+                    .set("width", "100%")
+                    .set("display", "flex")
+                    .set("justify-content", "center")
+                    .set("align-items", "end");
             Icon icon = new Icon(VaadinIcon.CHECK_SQUARE_O);
             icon.getStyle()
                     .set("color", "var(--lumo-success-text-color)")
@@ -199,11 +197,10 @@ public class TarjetaPrestamoEstudianteView extends Div {
         })).setComparator(tarjeta -> tarjeta.getFechaDevolucion()).setHeader("Fecha de Devolución").setAutoWidth(true)
                 .setTextAlign(ColumnTextAlign.CENTER)
                 .setSortable(true);
-
         editColumn = grid.addComponentColumn(target -> {
             Button editButton = new Button(VaadinIcon.EDIT.create());
             editButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-            editButton.addClickListener(e -> this.editLibro((TarjetaPrestamoEstudiante) target));
+            editButton.addClickListener(e -> this.editLibro((TarjetaPrestamoTrabajador) target));
             return editButton;
         }).setFlexGrow(0);
 
@@ -215,7 +212,7 @@ public class TarjetaPrestamoEstudianteView extends Div {
         headerRow.getCell(fechaDevolucionColumn).setComponent(devolucionFilter);
 
         gridListDataView = grid.setItems(prestamos);
-        // grid.setAllRowsVisible(true);
+        grid.setAllRowsVisible(true);
         grid.setSizeFull();
         grid.setWidthFull();
         grid.setHeightFull();
@@ -311,14 +308,14 @@ public class TarjetaPrestamoEstudianteView extends Div {
         addButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         buttons.add(refreshButton, deleteButton, addButton);
 
-        H6 nombreEstudiante = new H6();
-        nombreEstudiante.add(estudiante.getNombreApellidos());
+        H6 nombreTrabajador = new H6();
+        nombreTrabajador.add(trabajador.getNombreApellidos());
         Button salirButton = new Button(new Icon(VaadinIcon.ARROW_RIGHT),
                 click -> volverAtras());
         salirButton.setIconAfterText(true);
         salirButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
-        nombreEstudiante.add(salirButton);
-        HorizontalLayout personalInfo = new HorizontalLayout(nombreEstudiante);
+        nombreTrabajador.add(salirButton);
+        HorizontalLayout personalInfo = new HorizontalLayout(nombreTrabajador);
         personalInfo.setAlignItems(FlexComponent.Alignment.CENTER);
 
         HorizontalLayout toolbar = new HorizontalLayout(buttons, personalInfo);
@@ -333,9 +330,9 @@ public class TarjetaPrestamoEstudianteView extends Div {
     }
 
     public void volverAtras() {
-        estudianteGrid = new EstudianteGrid(prestamoService, estudiantService, libroService, senderService);
+        trabajadorGrid = new TrabajadorGrid(prestamoService, trabajadorService, libroService, senderService);
         content.removeAll();
-        content.add(estudianteGrid);
+        content.add(trabajadorGrid);
     }
 
     private void deleteLibro() {
@@ -381,28 +378,28 @@ public class TarjetaPrestamoEstudianteView extends Div {
 
     // Configuracion del Formulario
     private void configureForm() {
-        form = new TarjetaPrestamoEstudianteForm(estudiante, libros);
+        form = new TarjetaPrestamoTrabajadorForm(trabajador, libros);
         form.setWidth("25em");
-        form.addListener(TarjetaPrestamoEstudianteForm.SaveEvent.class, this::saveLibro);
-        form.addListener(TarjetaPrestamoEstudianteForm.CloseEvent.class, e -> closeEditor());
+        form.addListener(TarjetaPrestamoTrabajadorForm.SaveEvent.class, this::saveLibro);
+        form.addListener(TarjetaPrestamoTrabajadorForm.CloseEvent.class, e -> closeEditor());
     }
 
-    private void saveLibro(TarjetaPrestamoEstudianteForm.SaveEvent event) {
+    private void saveLibro(TarjetaPrestamoTrabajadorForm.SaveEvent event) {
         prestamos.clear();
         List<TarjetaPrestamo> listTarjetas = prestamoService.findAll();
         boolean band = false;
         for (int i = 0; i < listTarjetas.size() && band == false; i++) {
-            if (listTarjetas.get(i) instanceof TarjetaPrestamoEstudiante) {
-                tarjetaEstudiante = (TarjetaPrestamoEstudiante) listTarjetas.get(i);
-                if (tarjetaEstudiante.getEstudiante().getId() == estudiante.getId()
-                        && event.getTarjetaPrestamo().getEstudiante().getId() == estudiante.getId()) {
-                    if (event.getTarjetaPrestamo().getId() == null && event.getTarjetaPrestamo().getLibro().getId() == tarjetaEstudiante.getLibro().getId()) {
-                        prestamos.add(tarjetaEstudiante);
+            if (listTarjetas.get(i) instanceof TarjetaPrestamoTrabajador) {
+                tarjetaTrabajador = (TarjetaPrestamoTrabajador) listTarjetas.get(i);
+                if (tarjetaTrabajador.getTrabajador().getId() == trabajador.getId()
+                        && event.getTarjetaPrestamo().getTrabajador().getId() == trabajador.getId()) {
+                    if (event.getTarjetaPrestamo().getId() == null && event.getTarjetaPrestamo().getLibro().getId() == tarjetaTrabajador.getLibro().getId()) {
+                        prestamos.add(tarjetaTrabajador);
                         band = true;
                     } else if (event.getTarjetaPrestamo().getId() != null
-                            && event.getTarjetaPrestamo().getLibro().getId() == tarjetaEstudiante.getLibro().getId()
-                            && event.getTarjetaPrestamo().getFechaPrestamo().equals(tarjetaEstudiante.getFechaPrestamo())) {
-                        prestamos.add(tarjetaEstudiante);
+                            && event.getTarjetaPrestamo().getLibro().getId() == tarjetaTrabajador.getLibro().getId()
+                            && event.getTarjetaPrestamo().getFechaPrestamo().equals(tarjetaTrabajador.getFechaPrestamo())) {
+                        prestamos.add(tarjetaTrabajador);
                         band = true;
                     }
                 }
@@ -422,7 +419,7 @@ public class TarjetaPrestamoEstudianteView extends Div {
                 try {
                     prestamoService.save(event.getTarjetaPrestamo());
                     senderService.sendSimpleEmail(
-                            /* enviado a: */estudiante.getEmail(),
+                            /* enviado a: */trabajador.getEmail(),
                             /* asunto: */ "Entrega de libros",
                             /* mensaje: */ "Sistema de Gestión Académica Genius \n"
                             + "Usted ha recibido el libro: "
@@ -431,7 +428,7 @@ public class TarjetaPrestamoEstudianteView extends Div {
                             + formatter.format(event.getTarjetaPrestamo().getFechaPrestamo()).toString());
                     if (event.getTarjetaPrestamo().getFechaDevolucion() != null) {
                         senderService.sendSimpleEmail(
-                                /* enviado a: */estudiante.getEmail(),
+                                /* enviado a: */trabajador.getEmail(),
                                 /* asunto: */ "Devolución de libros",
                                 /* mensaje: */ "Sistema de Gestión Académica Genius \n"
                                 + "Usted ha entregado el libro: "
@@ -445,6 +442,7 @@ public class TarjetaPrestamoEstudianteView extends Div {
                             Notification.Position.BOTTOM_START);
                     notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
                 } catch (Exception e) {
+                    // TODO: handle exception
                     Notification notification = Notification.show(
                             "Error al enviar correo electrónico a la dirección de correo seleccionada",
                             2000,
@@ -458,7 +456,7 @@ public class TarjetaPrestamoEstudianteView extends Div {
                     prestamoService.update(event.getTarjetaPrestamo());
                     if (event.getTarjetaPrestamo().getFechaDevolucion() != null) {
                         senderService.sendSimpleEmail(
-                                /* enviado a: */estudiante.getEmail(),
+                                /* enviado a: */trabajador.getEmail(),
                                 /* asunto: */ "Devolución de libros",
                                 /* mensaje: */ "Sistema de Gestión Académica Genius \n"
                                 + "Usted ha entregado el libro: "
@@ -472,6 +470,7 @@ public class TarjetaPrestamoEstudianteView extends Div {
                             Notification.Position.BOTTOM_START);
                     notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
                 } catch (Exception e) {
+                    // TODO: handle exception
                     Notification notification = Notification.show(
                             "Error al enviar correo electrónico a la dirección de correo seleccionada",
                             2000,
@@ -492,7 +491,7 @@ public class TarjetaPrestamoEstudianteView extends Div {
 
     }
 
-    public void editLibro(TarjetaPrestamoEstudiante tarjeta) {
+    public void editLibro(TarjetaPrestamoTrabajador tarjeta) {
         if (tarjeta == null) {
             closeEditor();
         } else {
@@ -505,7 +504,7 @@ public class TarjetaPrestamoEstudianteView extends Div {
 
     void addLibro() {
         grid.asMultiSelect().clear();
-        editLibro(new TarjetaPrestamoEstudiante());
+        editLibro(new TarjetaPrestamoTrabajador());
     }
 
     private void closeEditor() {
@@ -517,17 +516,14 @@ public class TarjetaPrestamoEstudianteView extends Div {
 
     private void updateList() {
         prestamos.clear();
-        List<TarjetaPrestamo> aux = prestamoService.findAll();
-        tarjetaEstudiante = new TarjetaPrestamoEstudiante();
-        TarjetaPrestamoEstudianteForm form;
-        for (int i = 0; i < aux.size(); i++) {
-            if (aux.get(i) instanceof TarjetaPrestamoEstudiante) {
-                tarjetaEstudiante = (TarjetaPrestamoEstudiante) aux.get(i);
-                if (tarjetaEstudiante.getEstudiante().getId() == estudiante.getId()) {
-                    prestamos.add(tarjetaEstudiante);
+        prestamoService.findAll().parallelStream().forEach((tarjeta) -> {
+            if (tarjeta instanceof TarjetaPrestamoTrabajador) {
+                tarjetaTrabajador = (TarjetaPrestamoTrabajador) tarjeta;
+                if (tarjetaTrabajador.getTrabajador().equals(trabajador)) {
+                    prestamos.add(tarjetaTrabajador);
                 }
             }
-        }
+        });
         grid.setItems(prestamos);
     }
     /* Fin-Barra de menu */

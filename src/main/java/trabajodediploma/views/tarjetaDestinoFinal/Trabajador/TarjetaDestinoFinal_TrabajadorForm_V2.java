@@ -1,4 +1,4 @@
-package trabajodediploma.views.tarjetaDestinoFinal;
+package trabajodediploma.views.tarjetaDestinoFinal.Trabajador;
 
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
@@ -28,19 +28,21 @@ import trabajodediploma.data.entity.Trabajador;
 import trabajodediploma.data.entity.Modulo;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
+import java.util.stream.Collectors;
+import org.vaadin.gatanaso.MultiselectComboBox;
+import trabajodediploma.data.entity.Area;
 
 /**
  *
  * @author leinier
  */
-public class TarjetaDestinoFinal_TrabajadorFrom extends FormLayout {
+public class TarjetaDestinoFinal_TrabajadorForm_V2 extends FormLayout {
 
     DestinoFinalTrabajador tarjeta;
-    ComboBox<Trabajador> trabajador = new ComboBox<>("Trabajador");
+    ComboBox<Area> area = new ComboBox<>("Área");
+    MultiselectComboBox<Trabajador> multiSelectTrabajador = new MultiselectComboBox<>("Trabajador");
     ComboBox<Modulo> modulo = new ComboBox<>("Modulo");
     DatePicker fecha = new DatePicker("Fecha Entrega");
 
@@ -49,16 +51,19 @@ public class TarjetaDestinoFinal_TrabajadorFrom extends FormLayout {
 
     BeanValidationBinder<DestinoFinal> binder = new BeanValidationBinder<>(DestinoFinal.class);
 
-    public TarjetaDestinoFinal_TrabajadorFrom(List<Trabajador> trabajadors, List<Modulo> modulos) {
+    public TarjetaDestinoFinal_TrabajadorForm_V2(List<Area> areas, List<Trabajador> trabajadors, List<Modulo> modulos) {
 
         addClassNames("tarjeta-trabajador-form");
         binder.bindInstanceFields(this);
 
         /*Config form*/
- /*Trabajador*/
-        trabajador.setItems(trabajadors);
-        trabajador.setItemLabelGenerator(est -> est.getUser().getName());
-        trabajador.setRenderer(new ComponentRenderer<>(event -> {
+        area.setItems(areas);
+        area.setItemLabelGenerator(Area::getNombre);
+
+        /*Trabajador*/
+        multiSelectTrabajador.setItems(trabajadors);
+        multiSelectTrabajador.setItemLabelGenerator(est -> est.getUser().getName());
+        multiSelectTrabajador.setRenderer(new ComponentRenderer<>(event -> {
             HorizontalLayout hl = new HorizontalLayout();
             hl.setAlignItems(FlexComponent.Alignment.CENTER);
             Avatar avatar = new Avatar(event.getUser().getName(), event.getUser().getProfilePictureUrl());
@@ -75,13 +80,34 @@ public class TarjetaDestinoFinal_TrabajadorFrom extends FormLayout {
             return hl;
         })
         );
+        multiSelectTrabajador.setReadOnly(true);
+
         /*Libros*/
         modulo.setItems(modulos);
         modulo.setItemLabelGenerator(Modulo::getNombre);
+        modulo.setReadOnly(true);
+
         /*fecha de entrega*/
         fecha.setMin(LocalDate.now(ZoneId.systemDefault()));
+        fecha.setReadOnly(true);
 
-        add(trabajador, modulo, fecha, createButtonsLayout());
+        area.addValueChangeListener(event -> {
+            if (areas.isEmpty()) {
+                multiSelectTrabajador.setReadOnly(true);
+                modulo.setReadOnly(true);
+                fecha.setReadOnly(true);
+            } else {
+                List<Trabajador> trabajadorsPorArea = trabajadors.stream().filter(e -> e.getArea().getId() == event.getValue().getId()).collect(Collectors.toList());
+                multiSelectTrabajador.setReadOnly(false);
+                multiSelectTrabajador.setValue(null);
+                multiSelectTrabajador.setItems(trabajadorsPorArea);
+                modulo.setReadOnly(false);
+                fecha.setReadOnly(false);
+            }
+
+        });
+
+        add(area, multiSelectTrabajador, modulo, fecha, createButtonsLayout());
 
     }
 
@@ -93,7 +119,7 @@ public class TarjetaDestinoFinal_TrabajadorFrom extends FormLayout {
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         save.addClickShortcut(Key.ENTER);
 
-        close.addClickListener(event -> fireEvent(new TarjetaDestinoFinal_TrabajadorFrom.CloseEvent(this)));
+        close.addClickListener(event -> fireEvent(new TarjetaDestinoFinal_TrabajadorForm_V2.CloseEvent(this)));
         close.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         close.addClickShortcut(Key.ESCAPE);
 
@@ -108,8 +134,9 @@ public class TarjetaDestinoFinal_TrabajadorFrom extends FormLayout {
         binder.readBean(tarjeta);
         if (tarjeta.getTrabajadores() != null) {
             List<Trabajador> list = new LinkedList<>(tarjeta.getTrabajadores());
-            if (list.size() >= 1) {
-                trabajador.setValue(list.get(0));
+            if (tarjeta.getTrabajadores().size() >= 1) {
+                area.setValue(list.get(0).getArea());
+                multiSelectTrabajador.setValue(tarjeta.getTrabajadores());
                 modulo.setValue(tarjeta.getModulo());
                 fecha.setValue(tarjeta.getFecha());
             }
@@ -119,17 +146,16 @@ public class TarjetaDestinoFinal_TrabajadorFrom extends FormLayout {
     private void validateAndSave() {
         try {
             binder.writeBean(tarjeta);
-            Set<Trabajador> est = new HashSet<Trabajador>();
-            est.add(trabajador.getValue());
-            this.tarjeta.setTrabajadores(est);
+            this.tarjeta.setTrabajadores(multiSelectTrabajador.getSelectedItems());
             this.tarjeta.setModulo(modulo.getValue());
             this.tarjeta.setFecha(fecha.getValue());
-            fireEvent(new TarjetaDestinoFinal_TrabajadorFrom.SaveEvent(this, tarjeta));
+            fireEvent(new TarjetaDestinoFinal_TrabajadorForm_V2.SaveEvent(this, tarjeta));
+
         } catch (ValidationException e) {
             e.printStackTrace();
             Notification notification = Notification.show(
                     "Ocurrió un problema al intentar almacenar La tarjeta",
-                    2000,
+                    5000,
                     Notification.Position.MIDDLE
             );
             notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
@@ -138,13 +164,13 @@ public class TarjetaDestinoFinal_TrabajadorFrom extends FormLayout {
     }
 
     // Events
-    public static abstract class DestinoFinalTrabajadorFormEvent extends ComponentEvent<TarjetaDestinoFinal_TrabajadorFrom> {
+    public static abstract class DestinoFinalTrabajadorFormEvent extends ComponentEvent<TarjetaDestinoFinal_TrabajadorForm_V2> {
 
         private DestinoFinalTrabajador destinoFinal;
 
-        protected DestinoFinalTrabajadorFormEvent(TarjetaDestinoFinal_TrabajadorFrom source, DestinoFinalTrabajador destinoFinal) {
+        protected DestinoFinalTrabajadorFormEvent(TarjetaDestinoFinal_TrabajadorForm_V2 source, DestinoFinalTrabajador DestinoFinal) {
             super(source, false);
-            this.destinoFinal = destinoFinal;
+            this.destinoFinal = DestinoFinal;
         }
 
         public DestinoFinalTrabajador getDestinoFinal() {
@@ -154,14 +180,14 @@ public class TarjetaDestinoFinal_TrabajadorFrom extends FormLayout {
 
     public static class SaveEvent extends DestinoFinalTrabajadorFormEvent {
 
-        SaveEvent(TarjetaDestinoFinal_TrabajadorFrom source, DestinoFinalTrabajador DestinoFinal) {
+        SaveEvent(TarjetaDestinoFinal_TrabajadorForm_V2 source, DestinoFinalTrabajador DestinoFinal) {
             super(source, DestinoFinal);
         }
     }
 
     public static class DeleteEvent extends DestinoFinalTrabajadorFormEvent {
 
-        DeleteEvent(TarjetaDestinoFinal_TrabajadorFrom source, DestinoFinalTrabajador DestinoFinal) {
+        DeleteEvent(TarjetaDestinoFinal_TrabajadorForm_V2 source, DestinoFinalTrabajador DestinoFinal) {
             super(source, DestinoFinal);
         }
 
@@ -169,7 +195,7 @@ public class TarjetaDestinoFinal_TrabajadorFrom extends FormLayout {
 
     public static class CloseEvent extends DestinoFinalTrabajadorFormEvent {
 
-        CloseEvent(TarjetaDestinoFinal_TrabajadorFrom source) {
+        CloseEvent(TarjetaDestinoFinal_TrabajadorForm_V2 source) {
             super(source, null);
         }
     }

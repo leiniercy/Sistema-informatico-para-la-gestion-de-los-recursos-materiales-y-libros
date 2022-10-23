@@ -5,6 +5,7 @@
  */
 package trabajodediploma.views.tarjetaprestamo;
 
+import trabajodediploma.views.tarjetaprestamo.trabajador.TarjetaPrestamoTrabajadorView;
 import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
