@@ -11,6 +11,7 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.HeaderRow;
@@ -134,9 +135,10 @@ public class TarjetaPrestamoTrabajadorView extends Div {
     }
 
     /* Tabla */
-    /* Configuracion de la tabla */
+ /* Configuracion de la tabla */
     private void configureGrid() {
         grid.setClassName("container__modelo__grid");
+        
         libroColumn = grid.addColumn(new ComponentRenderer<>(tarjeta -> {
             HorizontalLayout hl = new HorizontalLayout();
             hl.setAlignItems(Alignment.CENTER);
@@ -148,17 +150,52 @@ public class TarjetaPrestamoTrabajadorView extends Div {
             hl.add(img, span);
             return hl;
         })).setHeader("Libro").setAutoWidth(true).setSortable(true);
-
-        fechaEntregaColumn = grid
-                .addColumn(new LocalDateRenderer<>(tarjeta -> tarjeta.getFechaPrestamo(),
-                        DateTimeFormatter.ofPattern("dd/MM/yyyy")))
-                .setComparator(tarjeta -> tarjeta.getFechaPrestamo()).setHeader("Fecha de Prestamo").setAutoWidth(true)
+        
+        fechaEntregaColumn = grid.addColumn(new ComponentRenderer<>(tarjeta -> {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/YYYY");
+            String fecha = formatter.format(tarjeta.getFechaPrestamo()).toString();
+            HorizontalLayout layout = new HorizontalLayout();
+            Span span_fecha = new Span();
+            span_fecha.add(fecha);
+            span_fecha.getStyle()
+                    .set("width", "100%")
+                    .set("display", "flex")
+                    .set("justify-content", "center")
+                    .set("align-items", "end");
+            Icon icon = new Icon(VaadinIcon.CHECK_SQUARE_O);
+            icon.getStyle()
+                    .set("color", "var(--lumo-primary-color)")
+                    .set("margin-left", "10px");
+            span_fecha.add(icon);
+            layout.add(span_fecha);
+            layout.setAlignItems(FlexComponent.Alignment.CENTER);
+            return layout;
+        })).setComparator(tarjeta -> tarjeta.getFechaPrestamo()).setHeader("Fecha de Préstamo").setAutoWidth(true)
+                .setTextAlign(ColumnTextAlign.CENTER)
                 .setSortable(true);
-        fechaDevolucionColumn = grid
-                .addColumn(new LocalDateRenderer<>(tarjeta -> tarjeta.getFechaDevolucion(),
-                        DateTimeFormatter.ofPattern("dd/MM/yyyy")))
-                .setComparator(tarjeta -> tarjeta.getFechaDevolucion()).setHeader("Fecha de Devolución")
-                .setAutoWidth(true).setSortable(true);
+
+        fechaDevolucionColumn = grid.addColumn(new ComponentRenderer<>(tarjeta -> {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/YYYY");
+            String fecha = formatter.format(tarjeta.getFechaDevolucion()).toString();
+            HorizontalLayout layout = new HorizontalLayout();
+            Span span_fecha = new Span();
+            span_fecha.add(fecha);
+            span_fecha.getStyle()
+                    .set("width", "100%")
+                    .set("display", "flex")
+                    .set("justify-content", "center")
+                    .set("align-items", "end");
+            Icon icon = new Icon(VaadinIcon.CHECK_SQUARE_O);
+            icon.getStyle()
+                    .set("color", "var(--lumo-success-text-color)")
+                    .set("margin-left", "10px");
+            span_fecha.add(icon);
+            layout.add(span_fecha);
+            layout.setAlignItems(FlexComponent.Alignment.CENTER);
+            return layout;
+        })).setComparator(tarjeta -> tarjeta.getFechaDevolucion()).setHeader("Fecha de Devolución").setAutoWidth(true)
+                .setTextAlign(ColumnTextAlign.CENTER)
+                .setSortable(true);
         editColumn = grid.addComponentColumn(target -> {
             Button editButton = new Button(VaadinIcon.EDIT.create());
             editButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
@@ -256,9 +293,10 @@ public class TarjetaPrestamoTrabajadorView extends Div {
         }
         return true;
     }
+
     /* Fin-Filtros */
 
-    /* Barra de menu */
+ /* Barra de menu */
     private HorizontalLayout menuBar() {
         HorizontalLayout buttons = new HorizontalLayout();
         Button refreshButton = new Button(VaadinIcon.REFRESH.create(), click -> updateList());
@@ -347,7 +385,7 @@ public class TarjetaPrestamoTrabajadorView extends Div {
 
     private void saveLibro(TarjetaPrestamoTrabajadorForm.SaveEvent event) {
         prestamos.clear();
-       List<TarjetaPrestamo> listTarjetas = prestamoService.findAll();
+        List<TarjetaPrestamo> listTarjetas = prestamoService.findAll();
         boolean band = false;
         for (int i = 0; i < listTarjetas.size() && band == false; i++) {
             if (listTarjetas.get(i) instanceof TarjetaPrestamoTrabajador) {
@@ -380,22 +418,22 @@ public class TarjetaPrestamoTrabajadorView extends Div {
                 try {
                     prestamoService.save(event.getTarjetaPrestamo());
                     senderService.sendSimpleEmail(
-                            /* enviado a: */ trabajador.getEmail(),
+                            /* enviado a: */trabajador.getEmail(),
                             /* asunto: */ "Entrega de libros",
                             /* mensaje: */ "Sistema de Gestión Académica Genius \n"
-                                    + "Usted ha recibido el libro: "
-                                    + event.getTarjetaPrestamo().getLibro().getTitulo()
-                                    + " el día: "
-                                    + formatter.format(event.getTarjetaPrestamo().getFechaPrestamo()).toString());
+                            + "Usted ha recibido el libro: "
+                            + event.getTarjetaPrestamo().getLibro().getTitulo()
+                            + " el día: "
+                            + formatter.format(event.getTarjetaPrestamo().getFechaPrestamo()).toString());
                     if (event.getTarjetaPrestamo().getFechaDevolucion() != null) {
                         senderService.sendSimpleEmail(
-                                /* enviado a: */ trabajador.getEmail(),
+                                /* enviado a: */trabajador.getEmail(),
                                 /* asunto: */ "Devolución de libros",
                                 /* mensaje: */ "Sistema de Gestión Académica Genius \n"
-                                        + "Usted ha entregado el libro: "
-                                        + event.getTarjetaPrestamo().getLibro().getTitulo()
-                                        + " el día: "
-                                        + formatter.format(event.getTarjetaPrestamo().getFechaDevolucion()).toString());
+                                + "Usted ha entregado el libro: "
+                                + event.getTarjetaPrestamo().getLibro().getTitulo()
+                                + " el día: "
+                                + formatter.format(event.getTarjetaPrestamo().getFechaDevolucion()).toString());
                     }
                     Notification notification = Notification.show(
                             "Libro añadido",
@@ -417,13 +455,13 @@ public class TarjetaPrestamoTrabajadorView extends Div {
                     prestamoService.update(event.getTarjetaPrestamo());
                     if (event.getTarjetaPrestamo().getFechaDevolucion() != null) {
                         senderService.sendSimpleEmail(
-                                /* enviado a: */ trabajador.getEmail(),
+                                /* enviado a: */trabajador.getEmail(),
                                 /* asunto: */ "Devolución de libros",
                                 /* mensaje: */ "Sistema de Gestión Académica Genius \n"
-                                        + "Usted ha entregado el libro: "
-                                        + event.getTarjetaPrestamo().getLibro().getTitulo()
-                                        + " el día: "
-                                        + formatter.format(event.getTarjetaPrestamo().getFechaDevolucion()).toString());
+                                + "Usted ha entregado el libro: "
+                                + event.getTarjetaPrestamo().getLibro().getTitulo()
+                                + " el día: "
+                                + formatter.format(event.getTarjetaPrestamo().getFechaDevolucion()).toString());
                     }
                     Notification notification = Notification.show(
                             "Libro modificado",

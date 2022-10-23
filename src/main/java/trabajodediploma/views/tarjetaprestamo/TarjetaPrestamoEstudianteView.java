@@ -11,6 +11,7 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.HeaderRow;
@@ -153,16 +154,51 @@ public class TarjetaPrestamoEstudianteView extends Div {
             return hl;
         })).setHeader("Libro").setAutoWidth(true).setSortable(true);
 
-        fechaEntregaColumn = grid
-                .addColumn(new LocalDateRenderer<>(tarjeta -> tarjeta.getFechaPrestamo(),
-                        DateTimeFormatter.ofPattern("dd/MM/yyyy")))
-                .setComparator(tarjeta -> tarjeta.getFechaPrestamo()).setHeader("Fecha de Prestamo").setAutoWidth(true)
+        fechaEntregaColumn =  grid.addColumn(new ComponentRenderer<>(tarjeta -> {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/YYYY");
+            String fecha = formatter.format(tarjeta.getFechaPrestamo()).toString();
+            HorizontalLayout layout = new HorizontalLayout();
+            Span span_fecha = new Span();
+            span_fecha.add(fecha);
+            span_fecha.getStyle()
+                    .set("width","100%")
+                    .set("display","flex")
+                    .set("justify-content","center")
+                    .set("align-items","end");
+            Icon icon = new Icon(VaadinIcon.CHECK_SQUARE_O);
+            icon.getStyle()
+                    .set("color", "var(--lumo-primary-color)")
+                    .set("margin-left", "10px");
+            span_fecha.add(icon);
+            layout.add(span_fecha);
+            layout.setAlignItems(FlexComponent.Alignment.CENTER);
+            return layout;
+        })).setComparator(tarjeta -> tarjeta.getFechaPrestamo()).setHeader("Fecha de Préstamo").setAutoWidth(true)
+                .setTextAlign(ColumnTextAlign.CENTER)
                 .setSortable(true);
-
-        fechaDevolucionColumn = grid.addColumn(new LocalDateRenderer<>(tarjeta -> tarjeta.getFechaDevolucion(),
-                DateTimeFormatter.ofPattern("dd/MM/yyyy")))
-                .setComparator(tarjeta -> tarjeta.getFechaDevolucion()).setHeader("Fecha de Devolución")
-                .setAutoWidth(true).setSortable(true);
+        
+        fechaDevolucionColumn =  grid.addColumn(new ComponentRenderer<>(tarjeta -> {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/YYYY");
+            String fecha = formatter.format(tarjeta.getFechaDevolucion()).toString();
+            HorizontalLayout layout = new HorizontalLayout();
+            Span span_fecha = new Span();
+            span_fecha.add(fecha);
+            span_fecha.getStyle()
+                    .set("width","100%")
+                    .set("display","flex")
+                    .set("justify-content","center")
+                    .set("align-items","end");
+            Icon icon = new Icon(VaadinIcon.CHECK_SQUARE_O);
+            icon.getStyle()
+                    .set("color", "var(--lumo-success-text-color)")
+                    .set("margin-left", "10px");
+            span_fecha.add(icon);
+            layout.add(span_fecha);
+            layout.setAlignItems(FlexComponent.Alignment.CENTER);
+            return layout;
+        })).setComparator(tarjeta -> tarjeta.getFechaDevolucion()).setHeader("Fecha de Devolución").setAutoWidth(true)
+                .setTextAlign(ColumnTextAlign.CENTER)
+                .setSortable(true);
 
         editColumn = grid.addComponentColumn(target -> {
             Button editButton = new Button(VaadinIcon.EDIT.create());

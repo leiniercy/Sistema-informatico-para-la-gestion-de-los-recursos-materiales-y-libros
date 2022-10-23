@@ -189,7 +189,7 @@ public class TarjetaPersonalPrestamoView extends Div {
             layout.add(span_fecha);
             layout.setAlignItems(FlexComponent.Alignment.CENTER);
             return layout;
-        })).setComparator(tarjeta -> tarjeta.getFechaPrestamo()).setHeader("Fecha de Prestamo").setAutoWidth(true)
+        })).setComparator(tarjeta -> tarjeta.getFechaPrestamo()).setHeader("Fecha de Préstamo").setAutoWidth(true)
                 .setTextAlign(ColumnTextAlign.CENTER)
                 .setSortable(true);
         
