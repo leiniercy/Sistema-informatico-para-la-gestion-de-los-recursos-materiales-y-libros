@@ -77,7 +77,7 @@ public class Libro extends AbstractEntity {
 
     @NotNull(message = "Debe elegir un año")
     @Max(message = "Máximo 5", value = 5)
-    @Min(message = "Mínimo 0", value = 0)
+    @Min(message = "Mínimo 1", value = 1)
     @Column(nullable = false)
     private int anno_academico;
 

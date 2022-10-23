@@ -4,6 +4,7 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.contextmenu.ContextMenu;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
@@ -35,8 +36,10 @@ import javax.annotation.security.RolesAllowed;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import trabajodediploma.data.entity.Asignatura;
 
 import trabajodediploma.data.entity.Libro;
+import trabajodediploma.data.service.AsignaturaService;
 import trabajodediploma.data.service.GrupoService;
 import trabajodediploma.data.service.LibroService;
 import trabajodediploma.views.MainLayout;
@@ -50,7 +53,8 @@ import trabajodediploma.views.footer.MyFooter;
 public class LibroView extends Div {
 
     private Grid<Libro> grid = new Grid<>(Libro.class, false);
-    LibroService libroService;
+    private LibroService libroService;
+    private AsignaturaService asignaturaService;
     GridListDataView<Libro> gridListDataView;
     Grid.Column<Libro> imagenColumn;
     Grid.Column<Libro> tituloColumn;
@@ -60,6 +64,8 @@ public class LibroView extends Div {
     Grid.Column<Libro> parteColumn;
     Grid.Column<Libro> cantidadColumn;
     Grid.Column<Libro> precioColumn;
+    Grid.Column<Libro> annoAcademicoColumn;
+    Grid.Column<Libro> asignaturaColumn;
     Grid.Column<Libro> editColumn;
     MyFooter myFooter;
     LibroForm form;
@@ -72,14 +78,17 @@ public class LibroView extends Div {
     private IntegerField filterVolumen;
     private IntegerField filterTomo;
     private IntegerField filterParte;
+    private IntegerField filterAnnoAcademico;
     private IntegerField filterCantidad;
     private NumberField filterPrecio;
+    private ComboBox<Asignatura> filterAsignatura;
     private Div header;
 
     public LibroView(
-            @Autowired LibroService libroService, 
-            @Autowired GrupoService grupoService) {
+            @Autowired LibroService libroService,
+            @Autowired AsignaturaService asignaturaService) {
         this.libroService = libroService;
+        this.asignaturaService = asignaturaService;
         addClassNames("libros_view");
         setSizeFull();
         configureGrid();
@@ -133,6 +142,8 @@ public class LibroView extends Div {
         parteColumn = grid.addColumn(Libro::getParte).setHeader("Parte").setAutoWidth(true).setSortable(true);
         cantidadColumn = grid.addColumn(Libro::getCantidad).setHeader("Cantidad").setAutoWidth(true).setSortable(true);
         precioColumn = grid.addColumn(Libro::getPrecio).setHeader("Precio").setAutoWidth(true).setSortable(true);
+        annoAcademicoColumn = grid.addColumn(Libro::getAnno_academico).setHeader("Año Académico").setAutoWidth(true).setSortable(true);
+        asignaturaColumn = grid.addColumn(Libro::getAsignatura).setHeader("Asignatura").setAutoWidth(true).setSortable(true);
         editColumn = grid.addComponentColumn(libro -> {
             Button editButton = new Button(VaadinIcon.EDIT.create());
             editButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
@@ -140,6 +151,9 @@ public class LibroView extends Div {
             return editButton;
         }).setFlexGrow(0);
 
+        cantidadColumn.setVisible(false);
+        precioColumn.setVisible(false);
+        annoAcademicoColumn.setVisible(false);
         volumenColumn.setVisible(false);
         tomoColumn.setVisible(false);
         parteColumn.setVisible(false);
@@ -154,9 +168,10 @@ public class LibroView extends Div {
         headerRow.getCell(parteColumn).setComponent(filterParte);
         headerRow.getCell(cantidadColumn).setComponent(filterCantidad);
         headerRow.getCell(precioColumn).setComponent(filterPrecio);
+        headerRow.getCell(annoAcademicoColumn).setComponent(filterAnnoAcademico);
+        headerRow.getCell(asignaturaColumn).setComponent(filterAsignatura);
 
         gridListDataView = grid.setItems(libroService.findAll());
-        //grid.setAllRowsVisible(true);
         grid.setSizeFull();
         grid.setWidthFull();
         grid.setHeightFull();
@@ -255,6 +270,32 @@ public class LibroView extends Div {
                 event -> gridListDataView
                         .addFilter(libro -> StringUtils.containsIgnoreCase(Double.toString(libro.getPrecio()),
                         Double.toString(filterPrecio.getValue()))));
+        // Año Académico
+        filterAnnoAcademico = new IntegerField();
+        filterAnnoAcademico.setPlaceholder("Filtrar");
+        filterAnnoAcademico.setPrefixComponent(VaadinIcon.SEARCH.create());
+        filterAnnoAcademico.setClearButtonVisible(true);
+        filterAnnoAcademico.setWidth("100%");
+        filterAnnoAcademico.setValueChangeMode(ValueChangeMode.LAZY);
+        filterAnnoAcademico.addValueChangeListener(
+                event -> gridListDataView
+                        .addFilter(libro -> StringUtils.containsIgnoreCase(Integer.toString(libro.getAnno_academico()),
+                        Integer.toString(filterAnnoAcademico.getValue()))));
+        
+        filterAsignatura = new ComboBox<>();
+        filterAsignatura.setItems(asignaturaService.findAll());
+        filterAsignatura.setItemLabelGenerator(Asignatura::getNombre);
+        filterAsignatura.setPlaceholder("Filtrar");
+        filterAsignatura.setClearButtonVisible(true);
+        filterAsignatura.setWidth("100%");
+        filterAsignatura.addValueChangeListener(event -> {
+            if (filterAsignatura.getValue() == null) {
+                gridListDataView = grid.setItems(libroService.findAll());
+            } else {
+                gridListDataView.addFilter(asig -> StringUtils.containsIgnoreCase(asig.getAsignatura().getNombre(),
+                        filterAsignatura.getValue().getNombre()));
+            }
+        });
 
     }
 
@@ -288,7 +329,6 @@ public class LibroView extends Div {
     }
 
     /* Fin-Barra de menu */
-
     private void deleteLibro() {
 
         try {
@@ -340,6 +380,8 @@ public class LibroView extends Div {
         columnToggleContextMenu.addColumnToggleItem("Parte", parteColumn);
         columnToggleContextMenu.addColumnToggleItem("Cantidad", cantidadColumn);
         columnToggleContextMenu.addColumnToggleItem("Precio", precioColumn);
+        columnToggleContextMenu.addColumnToggleItem("Año académico", annoAcademicoColumn);
+        columnToggleContextMenu.addColumnToggleItem("Asignatura", asignaturaColumn);
 
         return menuButton;
     }
@@ -367,12 +409,13 @@ public class LibroView extends Div {
 
  /* Formulario */
     private void configureForm() {
-        form = new LibroForm();
+        form = new LibroForm(asignaturaService.findAll());
         form.setWidth("25em");
         form.addListener(LibroForm.SaveEvent.class, this::saveLibro);
         form.addListener(LibroForm.CloseEvent.class, e -> closeEditor());
     }
 
+    /* Salvar Libro en la BD*/
     private void saveLibro(LibroForm.SaveEvent event) {
 
         List<Libro> listLibros = libroService.findAll();
@@ -420,6 +463,7 @@ public class LibroView extends Div {
 
     }
 
+    /* Editar Libro */
     private void editLibro(Libro libro) {
         if (libro == null) {
             closeEditor();
@@ -431,20 +475,23 @@ public class LibroView extends Div {
         }
     }
 
+    /* Añadir Libro */
     private void addLibro() {
         grid.asMultiSelect().clear();
         Libro b = new Libro();
         b.setImagen("");
         editLibro(b);
     }
-
+    
+    /*Cerrar formularios Libro */
     private void closeEditor() {
         form.setLibro(null);
         form.setVisible(false);
         removeClassName("editing");
         dialog.close();
     }
-
+    
+    /* Actualizar lista de  Libro */
     private void updateList() {
         grid.setItems(libroService.findAll());
     }

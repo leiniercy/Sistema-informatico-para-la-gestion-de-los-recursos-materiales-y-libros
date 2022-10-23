@@ -11,6 +11,7 @@ import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Image;
@@ -30,7 +31,9 @@ import elemental.json.Json;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.List;
 import org.springframework.web.util.UriUtils;
+import trabajodediploma.data.entity.Asignatura;
 import trabajodediploma.data.tools.MyUploadI18n;
 
 /**
@@ -40,10 +43,11 @@ import trabajodediploma.data.tools.MyUploadI18n;
 public class LibroForm extends FormLayout {
 
     private Libro libro;
-
+    private List<Asignatura> asignaturas;
     private Image imagePreview;
     private Label imageSize;
     Upload imagen = new Upload();
+    Upload documento = new Upload();
     TextField titulo = new TextField();
     TextField autor = new TextField();
     IntegerField volumen = new IntegerField();
@@ -51,6 +55,9 @@ public class LibroForm extends FormLayout {
     IntegerField parte = new IntegerField();
     IntegerField cantidad = new IntegerField();
     NumberField precio = new NumberField();
+    IntegerField anno_academico = new IntegerField();
+    ComboBox<Asignatura>  asignatura = new ComboBox<>();
+    
 
     Button save = new Button("Añadir", VaadinIcon.PLUS.create());
     Button close = new Button("Cancelar", VaadinIcon.ERASER.create());
@@ -58,9 +65,9 @@ public class LibroForm extends FormLayout {
     BeanValidationBinder<Libro> binder = new BeanValidationBinder<>(Libro.class);
     
 
-    public LibroForm() {
+    public LibroForm(List<Asignatura> asignaturas) {
         addClassName("libro-form");
-
+        this.asignaturas = asignaturas;
         binder.bindInstanceFields(this);
         Configuration();
         add(
@@ -73,6 +80,8 @@ public class LibroForm extends FormLayout {
                 parte,
                 cantidad,
                 precio,
+                anno_academico,
+                asignatura,
                 createButtonsLayout());
     }
     
@@ -155,6 +164,18 @@ public class LibroForm extends FormLayout {
         precio.setValue(0.0);
         precio.setMin(0);
         precio.setStep(0.5);
+        //anno_academico
+        anno_academico.setLabel("Año Académico");
+        anno_academico.setValue(1);
+        anno_academico.setHasControls(true);
+        anno_academico.setMin(1);
+        anno_academico.setMax(5);
+        anno_academico.setHelperText("Máximo 5");
+        //Asignatura
+        asignatura.setLabel("Asignatura");
+        asignatura.setPlaceholder("Asignatura");
+        asignatura.setItemLabelGenerator(Asignatura::getNombre);
+        asignatura.setItems(asignaturas);
 
         attachImageUpload(imagen, imagePreview);
     }
