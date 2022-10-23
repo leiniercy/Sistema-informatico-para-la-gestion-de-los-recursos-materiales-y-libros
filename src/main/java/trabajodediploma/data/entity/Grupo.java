@@ -38,9 +38,8 @@ public class Grupo extends AbstractEntity {
 
     @NotEmpty
     @NotBlank(message = "no puede estar vacio")
-    @Pattern(regexp = "^[0-9]+$", message = "Solo numeros")
     @Column(name = "numero", unique = true)
-    @Size(message = "solo puede contener 4 numeros ", max = 4, min = 4)
+    @Size(message = "solo letras y números ", max = 7, min = 7)
     private String numero;
 
     @OneToMany(mappedBy = "grupo", cascade = CascadeType.ALL)

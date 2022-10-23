@@ -40,11 +40,14 @@ public class Libro extends AbstractEntity {
 
     @Lob
     private String imagen;
-    
+
+    @Lob
+    private String libroDigital;
+
     @NotBlank(message = "Campo requerido")
     @Pattern(regexp = "^[a-zA-ZÀ-ÿ\\u00f1\\u00d1]+(\\s*[ a-zA-Z0-9 À-ÿ\\u00f1\\u00d1 /#@$¿?!¡()-_,.]*)*[a-zA-Z0-9 À-ÿ\\u00f1\\u00d1 /#@$¿?!¡()-_,. ]+$", message = "El título es incorrecto, solo puede utlizar los siguientes caracteres especiales /#@$¿?!¡()-_,.")
     @Size(min = 2, max = 255, message = "Debe tener mínimo 2 caracteres")
-    @Column(nullable=false)
+    @Column(nullable = false)
     private String titulo;
 
     @NotBlank(message = "Campo requerido")
@@ -53,18 +56,12 @@ public class Libro extends AbstractEntity {
     @Column(nullable = false)
     private String autor;
 
-//    @Max(message = "Máximo 10", value = 10)
-//    @Min(message = "Mínimo 1", value = 1)
     @Column(nullable = true)
     private Integer volumen;
 
-//    @Max(message = "Máximo 10", value = 10)
-//    @Min(message = "Mínimo 1", value = 1)
     @Column(nullable = true)
     private Integer tomo;
 
-//    @Max(message = "Máximo 10", value = 10)
-//    @Min(message = "Mínimo 1", value = 1)
     @Column(nullable = true)
     private Integer parte;
 
@@ -77,8 +74,19 @@ public class Libro extends AbstractEntity {
     @Min(message = "Mínimo 0", value = 0)
     @Column(nullable = false)
     private Double precio;
-    
-    @OneToMany(mappedBy = "libro",cascade = CascadeType.ALL)
+
+    @NotNull(message = "Debe elegir un año")
+    @Max(message = "Máximo 5", value = 5)
+    @Min(message = "Mínimo 0", value = 0)
+    @Column(nullable = false)
+    private int anno_academico;
+
+    @NotNull(message = "El campo no debe estar vacío")
+    @JoinColumn(name = "asignatura_id", nullable = false, updatable = true, unique = true)
+    @ManyToOne(optional = false)
+    protected Asignatura asignatura;
+
+    @OneToMany(mappedBy = "libro", cascade = CascadeType.ALL)
     private List<TarjetaPrestamo> tarjetas;
 
     @ManyToMany(mappedBy = "libros", cascade = CascadeType.ALL)
