@@ -24,7 +24,7 @@ public class TarjetaPrestamoService {
         return repository.findAll();
     }
     
-    public TarjetaPrestamo findById(UUID id){
+    public TarjetaPrestamo findById(Integer id){
      return repository.findById(id).get();
     }
     

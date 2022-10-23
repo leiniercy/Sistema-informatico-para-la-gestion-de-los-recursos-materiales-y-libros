@@ -21,7 +21,7 @@ public class AreaService {
         return repository.findAll();
     }
     
-    public Area findById(UUID id){
+    public Area findById(Integer id){
      return repository.findById(id).get();
     }
     

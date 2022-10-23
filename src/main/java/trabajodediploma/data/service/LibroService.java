@@ -21,7 +21,7 @@ public class LibroService {
         return repository.findAll();
     }
     
-    public Libro findById(UUID id){
+    public Libro findById(Integer id){
      return repository.findById(id).get();
     }
     
@@ -42,9 +42,5 @@ public class LibroService {
     
     public long count(){
       return repository.count();
-    }
-
-    public  List<Libro> ordenarAlfabeticamente(){
-        return repository.ordenarAlfabeticamente();
     }
 }

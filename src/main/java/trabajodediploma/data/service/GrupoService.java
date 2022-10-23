@@ -24,7 +24,7 @@ public class GrupoService {
         return repository.findAll();
     }
     
-    public Grupo findById(UUID id){
+    public Grupo findById(Integer id){
      return repository.findById(id).get();
     }
     

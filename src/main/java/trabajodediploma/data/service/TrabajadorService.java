@@ -21,7 +21,7 @@ public class TrabajadorService {
         return repository.findAll();
     }
     
-    public Trabajador findById(UUID id){
+    public Trabajador findById(Integer id){
      return repository.findById(id).get();
     }
     

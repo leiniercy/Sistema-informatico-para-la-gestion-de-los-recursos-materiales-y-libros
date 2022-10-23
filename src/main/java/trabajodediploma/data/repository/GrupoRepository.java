@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 import trabajodediploma.data.entity.Grupo;
 
 @Repository
-public interface GrupoRepository extends JpaRepository<Grupo, UUID> {
+public interface GrupoRepository extends JpaRepository<Grupo, Integer> {
 
 }

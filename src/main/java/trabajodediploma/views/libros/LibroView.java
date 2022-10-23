@@ -37,6 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
 import trabajodediploma.data.entity.Libro;
+import trabajodediploma.data.service.GrupoService;
 import trabajodediploma.data.service.LibroService;
 import trabajodediploma.views.MainLayout;
 import trabajodediploma.views.footer.MyFooter;
@@ -75,7 +76,9 @@ public class LibroView extends Div {
     private NumberField filterPrecio;
     private Div header;
 
-    public LibroView(@Autowired LibroService libroService) {
+    public LibroView(
+            @Autowired LibroService libroService, 
+            @Autowired GrupoService grupoService) {
         this.libroService = libroService;
         addClassNames("libros_view");
         setSizeFull();

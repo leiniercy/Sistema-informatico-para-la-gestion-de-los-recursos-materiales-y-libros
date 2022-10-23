@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 import trabajodediploma.data.entity.Area;
 
 @Repository
-public interface AreaRepository extends JpaRepository<Area, UUID> {
+public interface AreaRepository extends JpaRepository<Area, Integer> {
 
 }

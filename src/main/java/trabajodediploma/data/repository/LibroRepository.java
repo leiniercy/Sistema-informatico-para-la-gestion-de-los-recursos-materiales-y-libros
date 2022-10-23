@@ -8,9 +8,6 @@ import org.springframework.stereotype.Repository;
 import trabajodediploma.data.entity.Libro;
 
 @Repository
-public interface LibroRepository extends JpaRepository<Libro, UUID> {
-
-     @Query("SELECT l FROM Libro l ORDER BY titulo")
-     List<Libro> ordenarAlfabeticamente();
+public interface LibroRepository extends JpaRepository<Libro, Integer> {
     
 }

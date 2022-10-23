@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 import trabajodediploma.data.entity.Estudiante;
 
 @Repository
-public interface EstudianteRepository extends JpaRepository<Estudiante, UUID> {
+public interface EstudianteRepository extends JpaRepository<Estudiante, Integer> {
 
 }

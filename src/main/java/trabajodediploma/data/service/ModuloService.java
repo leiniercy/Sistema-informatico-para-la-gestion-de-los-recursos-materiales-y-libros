@@ -22,7 +22,7 @@ public class ModuloService {
         return repository.findAll();
     }
 
-    public Modulo findById(UUID id) {
+    public Modulo findById(Integer id) {
         return repository.findById(id).get();
     }
 

@@ -25,7 +25,7 @@ public class DestinoFinalService {
         return repository.findAll();
     }
     
-    public DestinoFinal findById(UUID id){
+    public DestinoFinal findById(Integer id){
      return repository.findById(id).get();
     }
     

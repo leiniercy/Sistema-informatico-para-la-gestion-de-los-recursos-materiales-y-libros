@@ -23,7 +23,7 @@ public class ModeloPagoService {
         return repository.findAll();
     }
     
-    public ModeloPago findById(UUID id){
+    public ModeloPago findById(Integer id){
      return repository.findById(id).get();
     }
     

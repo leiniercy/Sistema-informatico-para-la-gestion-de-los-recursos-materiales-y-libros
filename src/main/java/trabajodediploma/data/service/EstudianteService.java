@@ -21,7 +21,7 @@ public class EstudianteService {
         return repository.findAll();
     }
     
-    public Estudiante findById(UUID id){
+    public Estudiante findById(Integer id){
      return repository.findById(id).get();
     }
     

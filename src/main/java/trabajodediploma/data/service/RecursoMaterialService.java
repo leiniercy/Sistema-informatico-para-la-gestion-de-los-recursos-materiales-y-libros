@@ -25,7 +25,7 @@ public class RecursoMaterialService {
         return repository.findAll();
     }
 
-    public RecursoMaterial findById(UUID id) {
+    public RecursoMaterial findById(Integer id) {
         return repository.findById(id).get();
     }
 

@@ -24,7 +24,7 @@ public class UserService {
         return repository.findAll();
     }
     
-    public User findById(UUID id){
+    public User findById(Integer id){
      return repository.findById(id).get();
     }
     
