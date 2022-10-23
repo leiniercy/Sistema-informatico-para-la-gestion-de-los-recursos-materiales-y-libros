@@ -59,7 +59,6 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
     Grid.Column<DestinoFinal> estudianteColumn;
     Grid.Column<DestinoFinal> moduloColumn;
     Grid.Column<DestinoFinal> fechaEntregaColumn;
-//    Grid.Column<DestinoFinal> editColumn;
     private List<DestinoFinal> tarjetas;
     private ModuloService moduloService;
     private EstudianteService estudianteService;
@@ -189,7 +188,6 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
                     .set("margin-left", "10px");
             span_fecha.add(icon);
             layout.add(span_fecha);
-//            layout.setDefaultVerticalComponentAlignment(Alignment.CENTER);
             layout.setAlignItems(FlexComponent.Alignment.CENTER);
             return layout;
         })).setComparator(tarjeta -> tarjeta.getFecha()).setHeader("Fecha de Entrega").setAutoWidth(true)

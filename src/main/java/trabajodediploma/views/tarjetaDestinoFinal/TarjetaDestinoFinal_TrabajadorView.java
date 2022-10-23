@@ -59,7 +59,6 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
     Grid.Column<DestinoFinal> trabajadorColumn;
     Grid.Column<DestinoFinal> moduloColumn;
     Grid.Column<DestinoFinal> fechaEntregaColumn;
-//    Grid.Column<DestinoFinal> editColumn;
     private List<DestinoFinal> tarjetas;
     private ModuloService moduloService;
     private TrabajadorService trabajadorService;
@@ -171,27 +170,30 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
             return layout;
         })).setHeader("Modulo").setAutoWidth(true);
 
-        fechaEntregaColumn = grid
-                .addColumn(new LocalDateRenderer<>(tarjeta -> tarjeta.getFecha(),
-                        DateTimeFormatter.ofPattern("dd/MM/yyyy")))
-                .setComparator(tarjeta -> tarjeta.getFecha()).setHeader("Fecha de Entrega").setAutoWidth(true)
+          fechaEntregaColumn = grid.addColumn(new ComponentRenderer<>(tarjeta -> {
+            tarjetaTrabajador = (DestinoFinalTrabajador) tarjeta;
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/YYYY");
+            String fecha = formatter.format(tarjetaTrabajador.getFecha()).toString();
+            HorizontalLayout layout = new HorizontalLayout();
+            Span span_fecha = new Span();
+            span_fecha.add(fecha);
+            span_fecha.getStyle()
+                    .set("width","100%")
+                    .set("display","flex")
+                    .set("justify-content","center")
+                    .set("align-items","end");
+            Icon icon = new Icon(VaadinIcon.CHECK_SQUARE_O);
+            icon.getStyle()
+                    .set("color", "var(--lumo-success-text-color)")
+                    .set("margin-left", "10px");
+            span_fecha.add(icon);
+            layout.add(span_fecha);
+            layout.setAlignItems(FlexComponent.Alignment.CENTER);
+            return layout;
+        })).setComparator(tarjeta -> tarjeta.getFecha()).setHeader("Fecha de Entrega").setAutoWidth(true)
                 .setTextAlign(ColumnTextAlign.CENTER)
                 .setSortable(true);
 
-//        editColumn = grid.addComponentColumn(tarjeta -> {
-//            tarjetaTrabajador = (DestinoFinalTrabajador) tarjeta;
-//            Button editButton = new Button(VaadinIcon.EDIT.create());
-//            if(tarjetaTrabajador.getTrabajadors().size() == 1){
-//                editButton.addClickListener(e ->{
-//                    System.out.println( grid.getSelectedItems() );
-//                    this.editTarjeta(tarjetaTrabajador);
-//                });
-//            }else if(tarjetaTrabajador.getTrabajadors().size() > 1){
-//                editButton.addClickListener(e -> this.editTarjeta_V2(tarjetaTrabajador));
-//            }
-//            editButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-//            return editButton;
-//        }).setTextAlign(ColumnTextAlign.CENTER).setFrozen(true).setFlexGrow(0);
         Filtros();
 
         HeaderRow headerRow = grid.appendHeaderRow();
