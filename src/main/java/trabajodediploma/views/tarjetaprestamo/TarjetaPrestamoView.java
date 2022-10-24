@@ -1,7 +1,9 @@
 package trabajodediploma.views.tarjetaprestamo;
 
 
-import trabajodediploma.views.tarjetaprestamo.estudiante.TarjetaPrestamoEstudianteForm;
+import trabajodediploma.views.tarjetaprestamo.trabajador.TrabajadorGrid;
+import trabajodediploma.views.tarjetaprestamo.estudiante.EstudianteGrid;
+import trabajodediploma.views.tarjetaprestamo.estudiantePrestamo.TarjetaPrestamoEstudianteForm;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;

@@ -143,7 +143,7 @@ public class LibroView extends Div {
         cantidadColumn = grid.addColumn(Libro::getCantidad).setHeader("Cantidad").setAutoWidth(true).setSortable(true);
         precioColumn = grid.addColumn(Libro::getPrecio).setHeader("Precio").setAutoWidth(true).setSortable(true);
         annoAcademicoColumn = grid.addColumn(Libro::getAnno_academico).setHeader("Año Académico").setAutoWidth(true).setSortable(true);
-        asignaturaColumn = grid.addColumn(Libro::getAsignatura).setHeader("Asignatura").setAutoWidth(true).setSortable(true);
+        asignaturaColumn = grid.addColumn(libro -> libro.getAsignatura().getNombre()).setHeader("Asignatura").setAutoWidth(true).setSortable(true);
         editColumn = grid.addComponentColumn(libro -> {
             Button editButton = new Button(VaadinIcon.EDIT.create());
             editButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);

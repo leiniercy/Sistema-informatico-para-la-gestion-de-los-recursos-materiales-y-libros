@@ -214,6 +214,7 @@ public class LibroForm extends FormLayout {
         try {
             binder.writeBean(libro);
             this.libro.setImagen(imagePreview.getSrc());
+            this.libro.setAsignatura(asignatura.getValue());
             fireEvent(new SaveEvent(this, libro));
         } catch (ValidationException e) {
             e.printStackTrace();

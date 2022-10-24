@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package trabajodediploma.views.tarjetaprestamo.estudiante;
+package trabajodediploma.views.tarjetaprestamo.estudiantePrestamo;
 
 import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.button.Button;
@@ -46,7 +46,7 @@ import trabajodediploma.data.service.GrupoService;
 import trabajodediploma.data.service.LibroService;
 import trabajodediploma.data.service.TarjetaPrestamoService;
 import trabajodediploma.data.tools.EmailSenderService;
-import trabajodediploma.views.tarjetaprestamo.EstudianteGrid;
+import trabajodediploma.views.tarjetaprestamo.estudiante.EstudianteGrid;
 
 /**
  *
@@ -159,17 +159,17 @@ public class TarjetaPrestamoEstudianteView extends Div {
             return hl;
         })).setHeader("Libro").setAutoWidth(true).setSortable(true);
 
-        fechaEntregaColumn =  grid.addColumn(new ComponentRenderer<>(tarjeta -> {
+        fechaEntregaColumn = grid.addColumn(new ComponentRenderer<>(tarjeta -> {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/YYYY");
             String fecha = formatter.format(tarjeta.getFechaPrestamo()).toString();
             HorizontalLayout layout = new HorizontalLayout();
             Span span_fecha = new Span();
             span_fecha.add(fecha);
             span_fecha.getStyle()
-                    .set("width","100%")
-                    .set("display","flex")
-                    .set("justify-content","center")
-                    .set("align-items","end");
+                    .set("width", "100%")
+                    .set("display", "flex")
+                    .set("justify-content", "center")
+                    .set("align-items", "end");
             Icon icon = new Icon(VaadinIcon.CHECK_SQUARE_O);
             icon.getStyle()
                     .set("color", "var(--lumo-primary-color)")
@@ -181,22 +181,31 @@ public class TarjetaPrestamoEstudianteView extends Div {
         })).setComparator(tarjeta -> tarjeta.getFechaPrestamo()).setHeader("Fecha de Préstamo").setAutoWidth(true)
                 .setTextAlign(ColumnTextAlign.CENTER)
                 .setSortable(true);
-        
-        fechaDevolucionColumn =  grid.addColumn(new ComponentRenderer<>(tarjeta -> {
+
+        fechaDevolucionColumn = grid.addColumn(new ComponentRenderer<>(tarjeta -> {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/YYYY");
-            String fecha = formatter.format(tarjeta.getFechaDevolucion()).toString();
+            String fecha = "";
+            Icon icon = new Icon(VaadinIcon.CHECK_SQUARE_O);
+            if (tarjeta.getFechaDevolucion() == null) {
+                fecha = "";
+                icon.getStyle()
+                        .set("color", "var(--lumo-error-color)")
+                        .set("margin-left", "10px");
+
+            } else {
+                fecha = formatter.format(tarjeta.getFechaDevolucion()).toString();
+                icon.getStyle()
+                        .set("color", "var(--lumo-success-text-color)")
+                        .set("margin-left", "10px");
+            }
             HorizontalLayout layout = new HorizontalLayout();
             Span span_fecha = new Span();
             span_fecha.add(fecha);
             span_fecha.getStyle()
-                    .set("width","100%")
-                    .set("display","flex")
-                    .set("justify-content","center")
-                    .set("align-items","end");
-            Icon icon = new Icon(VaadinIcon.CHECK_SQUARE_O);
-            icon.getStyle()
-                    .set("color", "var(--lumo-success-text-color)")
-                    .set("margin-left", "10px");
+                    .set("width", "100%")
+                    .set("display", "flex")
+                    .set("justify-content", "center")
+                    .set("align-items", "end");
             span_fecha.add(icon);
             layout.add(span_fecha);
             layout.setAlignItems(FlexComponent.Alignment.CENTER);
@@ -338,7 +347,7 @@ public class TarjetaPrestamoEstudianteView extends Div {
     }
 
     public void volverAtras() {
-        estudianteGrid = new EstudianteGrid(prestamoService, estudianteService, grupoService,libroService, senderService);
+        estudianteGrid = new EstudianteGrid(prestamoService, estudianteService, grupoService, libroService, senderService);
         content.removeAll();
         content.add(estudianteGrid);
     }
@@ -396,28 +405,44 @@ public class TarjetaPrestamoEstudianteView extends Div {
         prestamos.clear();
         List<TarjetaPrestamo> listTarjetas = prestamoService.findAll();
         boolean band = false;
+
         for (int i = 0; i < listTarjetas.size() && band == false; i++) {
             if (listTarjetas.get(i) instanceof TarjetaPrestamoEstudiante) {
                 tarjetaEstudiante = (TarjetaPrestamoEstudiante) listTarjetas.get(i);
                 if (tarjetaEstudiante.getEstudiante().getId() == estudiante.getId()
                         && event.getTarjetaPrestamo().getEstudiante().getId() == estudiante.getId()) {
-                    if (event.getTarjetaPrestamo().getId() == null && event.getTarjetaPrestamo().getLibro().getId() == tarjetaEstudiante.getLibro().getId()) {
-                        prestamos.add(tarjetaEstudiante);
-                        band = true;
-                    } else if (event.getTarjetaPrestamo().getId() != null
-                            && event.getTarjetaPrestamo().getLibro().getId() == tarjetaEstudiante.getLibro().getId()
-                            && event.getTarjetaPrestamo().getFechaPrestamo().equals(tarjetaEstudiante.getFechaPrestamo())) {
-                        prestamos.add(tarjetaEstudiante);
-                        band = true;
+                    //anadir
+                    if (event.getTarjetaPrestamo().getId() == null && event.getTarjetaPrestamo().getFechaDevolucion() == null) {
+                        if (event.getTarjetaPrestamo().getLibro().getId() == tarjetaEstudiante.getLibro().getId()
+                                && event.getTarjetaPrestamo().getFechaPrestamo().equals(tarjetaEstudiante.getFechaPrestamo())) {
+                            prestamos.add(tarjetaEstudiante);
+                            band = true;
+                        }
+                        //modificar
+                    } else if (event.getTarjetaPrestamo().getId() != null && event.getTarjetaPrestamo().getFechaDevolucion() == null) {
+                        if (event.getTarjetaPrestamo().getLibro().getId() == tarjetaEstudiante.getLibro().getId()
+                                && event.getTarjetaPrestamo().getFechaPrestamo().equals(tarjetaEstudiante.getFechaPrestamo())) {
+                            prestamos.add(tarjetaEstudiante);
+                            band = true;
+
+                        }
+                        //modificar
+                    } else if (event.getTarjetaPrestamo().getId() != null && event.getTarjetaPrestamo().getFechaDevolucion() != null) {
+                        if (event.getTarjetaPrestamo().getLibro().getId() == tarjetaEstudiante.getLibro().getId()
+                                && event.getTarjetaPrestamo().getFechaPrestamo().equals(tarjetaEstudiante.getFechaPrestamo())
+                                && event.getTarjetaPrestamo().getFechaDevolucion().equals(tarjetaEstudiante.getFechaDevolucion())) {
+                            prestamos.add(tarjetaEstudiante);
+                            band = true;
+                        }
                     }
                 }
             }
         }
 
-        if (prestamos.size() != 0) {
+        if (prestamos.size() > 0) {
             Notification notification = Notification.show(
                     "El libro ya existe",
-                    5000,
+                    2000,
                     Notification.Position.MIDDLE);
             notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
         } else {
@@ -524,7 +549,6 @@ public class TarjetaPrestamoEstudianteView extends Div {
         prestamos.clear();
         List<TarjetaPrestamo> aux = prestamoService.findAll();
         tarjetaEstudiante = new TarjetaPrestamoEstudiante();
-        TarjetaPrestamoEstudianteForm form;
         for (int i = 0; i < aux.size(); i++) {
             if (aux.get(i) instanceof TarjetaPrestamoEstudiante) {
                 tarjetaEstudiante = (TarjetaPrestamoEstudiante) aux.get(i);

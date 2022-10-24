@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package trabajodediploma.views.tarjetaprestamo.estudiante;
+package trabajodediploma.views.tarjetaprestamo.estudiantePrestamo;
 
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
@@ -17,6 +17,7 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.shared.Registration;
@@ -37,6 +38,7 @@ public class TarjetaPrestamoEstudianteForm extends FormLayout {
 
     private TarjetaPrestamoEstudiante tarjetaPrestamo;
     private Estudiante estudiante;
+    private VerticalLayout content = new VerticalLayout();
     ComboBox<Libro> libro = new ComboBox<>("Libro");
     DatePicker fechaPrestamo = new DatePicker("Fecha Prestamo");
     DatePicker fechaDevolucion = new DatePicker("Fecha Devolucion");
@@ -51,8 +53,7 @@ public class TarjetaPrestamoEstudianteForm extends FormLayout {
         this.estudiante = estudiante;
         binder.bindInstanceFields(this);
         /* Config form */
-        /* Estudiante */
-        /* Libros */
+         /* Libros */
         libro.setItems(listLibros);
         libro.setItemLabelGenerator(Libro::getTitulo);
         /* fecha de prestamo */
@@ -63,8 +64,7 @@ public class TarjetaPrestamoEstudianteForm extends FormLayout {
         fechaPrestamo.addValueChangeListener(e -> fechaDevolucion.setMin(e.getValue()));
         fechaDevolucion.addValueChangeListener(e -> fechaPrestamo.setMax(e.getValue()));
 
-        add(libro, fechaPrestamo, fechaDevolucion, createButtonsLayout());
-
+        add(libro, fechaPrestamo, createButtonsLayout());
     }
 
     private HorizontalLayout createButtonsLayout() {
@@ -88,6 +88,13 @@ public class TarjetaPrestamoEstudianteForm extends FormLayout {
     public void setTarjetaPrestamo(TarjetaPrestamoEstudiante tarjetaPrestamo) {
         this.tarjetaPrestamo = tarjetaPrestamo;
         binder.readBean(tarjetaPrestamo);
+        if (tarjetaPrestamo.getFechaPrestamo() != null) {
+            removeAll();
+            add(libro, fechaPrestamo, fechaDevolucion,createButtonsLayout());
+        } else {
+            remove(fechaDevolucion);
+        }
+
     }
 
     private void validateAndSave() {

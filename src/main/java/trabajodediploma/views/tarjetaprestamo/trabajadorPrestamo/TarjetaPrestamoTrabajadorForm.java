@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package trabajodediploma.views.tarjetaprestamo.trabajador;
+package trabajodediploma.views.tarjetaprestamo.trabajadorPrestamo;
 
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
@@ -51,8 +51,8 @@ public class TarjetaPrestamoTrabajadorForm extends FormLayout {
         this.trabajador = trabajador;
         binder.bindInstanceFields(this);
         /* Config form */
-        /* Trabajador */
-        /* Libros */
+ /* Trabajador */
+ /* Libros */
         libro.setItems(listLibros);
         libro.setItemLabelGenerator(Libro::getTitulo);
         /* fecha de prestamo */
@@ -63,7 +63,7 @@ public class TarjetaPrestamoTrabajadorForm extends FormLayout {
         fechaPrestamo.addValueChangeListener(e -> fechaDevolucion.setMin(e.getValue()));
         fechaDevolucion.addValueChangeListener(e -> fechaPrestamo.setMax(e.getValue()));
 
-        add(libro, fechaPrestamo, fechaDevolucion, createButtonsLayout());
+        add(libro, fechaPrestamo, createButtonsLayout());
 
     }
 
@@ -88,6 +88,12 @@ public class TarjetaPrestamoTrabajadorForm extends FormLayout {
     public void setTarjetaPrestamo(TarjetaPrestamoTrabajador tarjetaPrestamo) {
         this.tarjetaPrestamo = tarjetaPrestamo;
         binder.readBean(tarjetaPrestamo);
+        if (tarjetaPrestamo.getFechaPrestamo() != null) {
+            removeAll();
+            add(libro, fechaPrestamo, fechaDevolucion, createButtonsLayout());
+        } else {
+            remove(fechaDevolucion);
+        }
     }
 
     private void validateAndSave() {
@@ -99,7 +105,7 @@ public class TarjetaPrestamoTrabajadorForm extends FormLayout {
             e.printStackTrace();
             Notification notification = Notification.show(
                     "Ocurrió un problema al intentar almacenar La tarjeta",
-                    5000,
+                    2000,
                     Notification.Position.MIDDLE);
             notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
         }

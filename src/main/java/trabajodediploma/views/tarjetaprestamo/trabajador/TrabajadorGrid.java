@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package trabajodediploma.views.tarjetaprestamo;
+package trabajodediploma.views.tarjetaprestamo.trabajador;
 
-import trabajodediploma.views.tarjetaprestamo.trabajador.TarjetaPrestamoTrabajadorView;
+import trabajodediploma.views.tarjetaprestamo.trabajadorPrestamo.TarjetaPrestamoTrabajadorView;
 import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;

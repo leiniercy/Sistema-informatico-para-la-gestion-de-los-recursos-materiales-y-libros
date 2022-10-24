@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package trabajodediploma.views.tarjetaprestamo.trabajador;
+package trabajodediploma.views.tarjetaprestamo.trabajadorPrestamo;
 
 import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.button.Button;
@@ -43,7 +43,7 @@ import trabajodediploma.data.service.TrabajadorService;
 import trabajodediploma.data.tools.EmailSenderService;
 import trabajodediploma.data.service.LibroService;
 import trabajodediploma.data.service.TarjetaPrestamoService;
-import trabajodediploma.views.tarjetaprestamo.TrabajadorGrid;
+import trabajodediploma.views.tarjetaprestamo.trabajador.TrabajadorGrid;
 
 /**
  *
@@ -139,7 +139,7 @@ public class TarjetaPrestamoTrabajadorView extends Div {
  /* Configuracion de la tabla */
     private void configureGrid() {
         grid.setClassName("container__modelo__grid");
-        
+
         libroColumn = grid.addColumn(new ComponentRenderer<>(tarjeta -> {
             HorizontalLayout hl = new HorizontalLayout();
             hl.setAlignItems(Alignment.CENTER);
@@ -151,10 +151,23 @@ public class TarjetaPrestamoTrabajadorView extends Div {
             hl.add(img, span);
             return hl;
         })).setHeader("Libro").setAutoWidth(true).setSortable(true);
-        
+
         fechaEntregaColumn = grid.addColumn(new ComponentRenderer<>(tarjeta -> {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/YYYY");
-            String fecha = formatter.format(tarjeta.getFechaPrestamo()).toString();
+            String fecha = "";
+            Icon icon = new Icon(VaadinIcon.CHECK_SQUARE_O);
+            if (tarjeta.getFechaDevolucion() == null) {
+                fecha = "";
+                icon.getStyle()
+                        .set("color", "var(--lumo-error-color)")
+                        .set("margin-left", "10px");
+
+            } else {
+                fecha = formatter.format(tarjeta.getFechaDevolucion()).toString();
+                icon.getStyle()
+                        .set("color", "var(--lumo-success-text-color)")
+                        .set("margin-left", "10px");
+            }
             HorizontalLayout layout = new HorizontalLayout();
             Span span_fecha = new Span();
             span_fecha.add(fecha);
@@ -163,10 +176,6 @@ public class TarjetaPrestamoTrabajadorView extends Div {
                     .set("display", "flex")
                     .set("justify-content", "center")
                     .set("align-items", "end");
-            Icon icon = new Icon(VaadinIcon.CHECK_SQUARE_O);
-            icon.getStyle()
-                    .set("color", "var(--lumo-primary-color)")
-                    .set("margin-left", "10px");
             span_fecha.add(icon);
             layout.add(span_fecha);
             layout.setAlignItems(FlexComponent.Alignment.CENTER);
@@ -177,7 +186,20 @@ public class TarjetaPrestamoTrabajadorView extends Div {
 
         fechaDevolucionColumn = grid.addColumn(new ComponentRenderer<>(tarjeta -> {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/YYYY");
-            String fecha = formatter.format(tarjeta.getFechaDevolucion()).toString();
+            String fecha = "";
+            Icon icon = new Icon(VaadinIcon.CHECK_SQUARE_O);
+            if (tarjeta.getFechaDevolucion() == null) {
+                fecha = "";
+                icon.getStyle()
+                        .set("color", "var(--lumo-error-color)")
+                        .set("margin-left", "10px");
+
+            } else {
+                fecha = formatter.format(tarjeta.getFechaDevolucion()).toString();
+                icon.getStyle()
+                        .set("color", "var(--lumo-success-text-color)")
+                        .set("margin-left", "10px");
+            }
             HorizontalLayout layout = new HorizontalLayout();
             Span span_fecha = new Span();
             span_fecha.add(fecha);
@@ -186,10 +208,7 @@ public class TarjetaPrestamoTrabajadorView extends Div {
                     .set("display", "flex")
                     .set("justify-content", "center")
                     .set("align-items", "end");
-            Icon icon = new Icon(VaadinIcon.CHECK_SQUARE_O);
-            icon.getStyle()
-                    .set("color", "var(--lumo-success-text-color)")
-                    .set("margin-left", "10px");
+
             span_fecha.add(icon);
             layout.add(span_fecha);
             layout.setAlignItems(FlexComponent.Alignment.CENTER);
@@ -393,20 +412,35 @@ public class TarjetaPrestamoTrabajadorView extends Div {
                 tarjetaTrabajador = (TarjetaPrestamoTrabajador) listTarjetas.get(i);
                 if (tarjetaTrabajador.getTrabajador().getId() == trabajador.getId()
                         && event.getTarjetaPrestamo().getTrabajador().getId() == trabajador.getId()) {
-                    if (event.getTarjetaPrestamo().getId() == null && event.getTarjetaPrestamo().getLibro().getId() == tarjetaTrabajador.getLibro().getId()) {
-                        prestamos.add(tarjetaTrabajador);
-                        band = true;
-                    } else if (event.getTarjetaPrestamo().getId() != null
-                            && event.getTarjetaPrestamo().getLibro().getId() == tarjetaTrabajador.getLibro().getId()
-                            && event.getTarjetaPrestamo().getFechaPrestamo().equals(tarjetaTrabajador.getFechaPrestamo())) {
-                        prestamos.add(tarjetaTrabajador);
-                        band = true;
+                    //anadir
+                    if (event.getTarjetaPrestamo().getId() == null && event.getTarjetaPrestamo().getFechaDevolucion() == null) {
+                        if (event.getTarjetaPrestamo().getLibro().getId() == tarjetaTrabajador.getLibro().getId()
+                                && event.getTarjetaPrestamo().getFechaPrestamo().equals(tarjetaTrabajador.getFechaPrestamo())) {
+                            prestamos.add(tarjetaTrabajador);
+                            band = true;
+                        }
+                        //modificar
+                    } else if (event.getTarjetaPrestamo().getId() != null && event.getTarjetaPrestamo().getFechaDevolucion() == null) {
+                        if (event.getTarjetaPrestamo().getLibro().getId() == tarjetaTrabajador.getLibro().getId()
+                                && event.getTarjetaPrestamo().getFechaPrestamo().equals(tarjetaTrabajador.getFechaPrestamo())) {
+                            prestamos.add(tarjetaTrabajador);
+                            band = true;
+                            
+                        }
+                        //modificar
+                    } else if (event.getTarjetaPrestamo().getId() != null && event.getTarjetaPrestamo().getFechaDevolucion() != null) {
+                        if (event.getTarjetaPrestamo().getLibro().getId() == tarjetaTrabajador.getLibro().getId()
+                                && event.getTarjetaPrestamo().getFechaPrestamo().equals(tarjetaTrabajador.getFechaPrestamo())
+                                && event.getTarjetaPrestamo().getFechaDevolucion().equals(tarjetaTrabajador.getFechaDevolucion())) {
+                            prestamos.add(tarjetaTrabajador);
+                            band = true;
+                        }
                     }
                 }
             }
         }
 
-        if (prestamos.size() != 0) {
+        if (prestamos.size() > 0) {
             Notification notification = Notification.show(
                     "El libro ya existe",
                     5000,

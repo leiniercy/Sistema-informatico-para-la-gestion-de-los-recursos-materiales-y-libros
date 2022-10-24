@@ -9,6 +9,7 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -34,7 +35,7 @@ public class Asignatura extends AbstractEntity {
     @Column(nullable = false)
     private String nombre;
     
-    @OneToMany(mappedBy = "asignatura", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "asignatura", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Libro> libros;
 
 }

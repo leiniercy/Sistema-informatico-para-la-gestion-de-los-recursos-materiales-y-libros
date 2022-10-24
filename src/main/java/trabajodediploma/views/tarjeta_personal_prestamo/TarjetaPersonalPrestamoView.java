@@ -170,17 +170,17 @@ public class TarjetaPersonalPrestamoView extends Div {
             return hl;
         })).setHeader("Libro").setAutoWidth(true).setSortable(true);
 
-        fechaEntregaColumn =  grid.addColumn(new ComponentRenderer<>(tarjeta -> {
+        fechaEntregaColumn = grid.addColumn(new ComponentRenderer<>(tarjeta -> {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/YYYY");
             String fecha = formatter.format(tarjeta.getFechaPrestamo()).toString();
             HorizontalLayout layout = new HorizontalLayout();
             Span span_fecha = new Span();
             span_fecha.add(fecha);
             span_fecha.getStyle()
-                    .set("width","100%")
-                    .set("display","flex")
-                    .set("justify-content","center")
-                    .set("align-items","end");
+                    .set("width", "100%")
+                    .set("display", "flex")
+                    .set("justify-content", "center")
+                    .set("align-items", "end");
             Icon icon = new Icon(VaadinIcon.CHECK_SQUARE_O);
             icon.getStyle()
                     .set("color", "var(--lumo-primary-color)")
@@ -192,22 +192,31 @@ public class TarjetaPersonalPrestamoView extends Div {
         })).setComparator(tarjeta -> tarjeta.getFechaPrestamo()).setHeader("Fecha de Préstamo").setAutoWidth(true)
                 .setTextAlign(ColumnTextAlign.CENTER)
                 .setSortable(true);
-        
-        fechaDevolucionColumn =  grid.addColumn(new ComponentRenderer<>(tarjeta -> {
+
+        fechaDevolucionColumn = grid.addColumn(new ComponentRenderer<>(tarjeta -> {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/YYYY");
-            String fecha = formatter.format(tarjeta.getFechaDevolucion()).toString();
+            String fecha = "";
+            Icon icon = new Icon(VaadinIcon.CHECK_SQUARE_O);
+            if (tarjeta.getFechaDevolucion() == null) {
+                fecha = "";
+                icon.getStyle()
+                        .set("color", "var(--lumo-error-color)")
+                        .set("margin-left", "10px");
+
+            } else {
+                fecha = formatter.format(tarjeta.getFechaDevolucion()).toString();
+                icon.getStyle()
+                        .set("color", "var(--lumo-success-text-color)")
+                        .set("margin-left", "10px");
+            }
             HorizontalLayout layout = new HorizontalLayout();
             Span span_fecha = new Span();
             span_fecha.add(fecha);
             span_fecha.getStyle()
-                    .set("width","100%")
-                    .set("display","flex")
-                    .set("justify-content","center")
-                    .set("align-items","end");
-            Icon icon = new Icon(VaadinIcon.CHECK_SQUARE_O);
-            icon.getStyle()
-                    .set("color", "var(--lumo-success-text-color)")
-                    .set("margin-left", "10px");
+                    .set("width", "100%")
+                    .set("display", "flex")
+                    .set("justify-content", "center")
+                    .set("align-items", "end");
             span_fecha.add(icon);
             layout.add(span_fecha);
             layout.setAlignItems(FlexComponent.Alignment.CENTER);
@@ -320,7 +329,7 @@ public class TarjetaPersonalPrestamoView extends Div {
     }
 
     /* Fin -> Trabajador */
-    /* Estudiante */
+ /* Estudiante */
     private void updateListEstudiante() {
         prestamos.clear();
         prestamoService.findAll().parallelStream().forEach((tarjeta) -> {
