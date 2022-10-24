@@ -281,6 +281,7 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
         tarjetaEstudiante = (DestinoFinalEstudiante) tarjeta;
         if (estudianteFilterValue != null) {
             List<Estudiante> list = new LinkedList<>(tarjetaEstudiante.getEstudiantes());
+            list.sort(Comparator.comparing(Estudiante::getId));
             return busquedaBinariaEstudiante(list, estudianteFilterValue);
         }
         return true;

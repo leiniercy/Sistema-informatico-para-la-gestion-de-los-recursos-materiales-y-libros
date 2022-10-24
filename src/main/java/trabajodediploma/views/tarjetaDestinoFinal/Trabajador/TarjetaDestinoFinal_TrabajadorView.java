@@ -170,7 +170,7 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
             return layout;
         })).setHeader("Modulo").setAutoWidth(true);
 
-          fechaEntregaColumn = grid.addColumn(new ComponentRenderer<>(tarjeta -> {
+        fechaEntregaColumn = grid.addColumn(new ComponentRenderer<>(tarjeta -> {
             tarjetaTrabajador = (DestinoFinalTrabajador) tarjeta;
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/YYYY");
             String fecha = formatter.format(tarjetaTrabajador.getFecha()).toString();
@@ -178,10 +178,10 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
             Span span_fecha = new Span();
             span_fecha.add(fecha);
             span_fecha.getStyle()
-                    .set("width","100%")
-                    .set("display","flex")
-                    .set("justify-content","center")
-                    .set("align-items","end");
+                    .set("width", "100%")
+                    .set("display", "flex")
+                    .set("justify-content", "center")
+                    .set("align-items", "end");
             Icon icon = new Icon(VaadinIcon.CHECK_SQUARE_O);
             icon.getStyle()
                     .set("color", "var(--lumo-success-text-color)")
@@ -281,6 +281,7 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
         tarjetaTrabajador = (DestinoFinalTrabajador) tarjeta;
         if (trabajadorFilterValue != null) {
             List<Trabajador> list = new LinkedList<>(tarjetaTrabajador.getTrabajadores());
+            list.sort(Comparator.comparing(Trabajador::getId));
             return busquedaBinariaTrabajador(list, trabajadorFilterValue);
         }
         return true;
@@ -564,7 +565,7 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
 
         tarjetas.clear();
         boolean band = false;
-         for (int i = 0; i < destinoService.findAll().size() && band == false; i++) {
+        for (int i = 0; i < destinoService.findAll().size() && band == false; i++) {
             if (destinoService.findAll().get(i) instanceof DestinoFinalTrabajador) {
                 tarjetaTrabajador = (DestinoFinalTrabajador) destinoService.findAll().get(i);
                 if (tarjetaTrabajador.getTrabajadores() != null) {
