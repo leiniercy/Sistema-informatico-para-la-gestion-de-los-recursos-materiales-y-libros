@@ -539,7 +539,7 @@ public class TarjetaPrestamoEstudianteView extends Div {
     }
 
     private void closeEditor() {
-        form.setTarjetaPrestamo(null);
+        form.setTarjetaPrestamo(new TarjetaPrestamoEstudiante());
         form.setVisible(false);
         removeClassName("editing");
         dialog.close();

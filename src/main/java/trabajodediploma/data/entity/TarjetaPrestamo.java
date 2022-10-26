@@ -32,7 +32,7 @@ public class TarjetaPrestamo extends AbstractEntity {
     @ToString.Include
 
     @NotNull(message = "El campo no debe estar vacío")
-    @JoinColumn(name = "libro_id", nullable = false, updatable = true, unique = true)
+    @JoinColumn(name = "libro_id", nullable = false, updatable = true)
     @ManyToOne(optional = false)
     protected Libro libro;
 
