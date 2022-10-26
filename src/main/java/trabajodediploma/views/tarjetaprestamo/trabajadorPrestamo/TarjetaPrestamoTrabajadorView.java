@@ -39,6 +39,7 @@ import trabajodediploma.data.entity.Trabajador;
 import trabajodediploma.data.entity.Libro;
 import trabajodediploma.data.entity.TarjetaPrestamo;
 import trabajodediploma.data.entity.TarjetaPrestamoTrabajador;
+import trabajodediploma.data.service.AreaService;
 import trabajodediploma.data.service.TrabajadorService;
 import trabajodediploma.data.tools.EmailSenderService;
 import trabajodediploma.data.service.LibroService;
@@ -65,6 +66,7 @@ public class TarjetaPrestamoTrabajadorView extends Div {
     private TrabajadorService trabajadorService;
     private LibroService libroService;
     private EmailSenderService senderService;
+    private AreaService areaService;
     TarjetaPrestamoTrabajadorForm form;
     private ComboBox<Libro> libroFilter;
     private DatePicker entregaFilter;
@@ -80,6 +82,7 @@ public class TarjetaPrestamoTrabajadorView extends Div {
             Trabajador trabajador,
             TarjetaPrestamoService prestamoService,
             TrabajadorService trabajadorService,
+            AreaService areaService,
             LibroService libroService,
             EmailSenderService senderService) {
 
@@ -87,6 +90,7 @@ public class TarjetaPrestamoTrabajadorView extends Div {
         this.trabajador = trabajador;
         this.prestamoService = prestamoService;
         this.trabajadorService = trabajadorService;
+        this.areaService = areaService;
         this.libroService = libroService;
         this.senderService = senderService;
         this.libros = libroService.findAll();
@@ -349,7 +353,7 @@ public class TarjetaPrestamoTrabajadorView extends Div {
     }
 
     public void volverAtras() {
-        trabajadorGrid = new TrabajadorGrid(prestamoService, trabajadorService, libroService, senderService);
+        trabajadorGrid = new TrabajadorGrid(prestamoService, trabajadorService, areaService, libroService, senderService);
         content.removeAll();
         content.add(trabajadorGrid);
     }
@@ -425,7 +429,7 @@ public class TarjetaPrestamoTrabajadorView extends Div {
                                 && event.getTarjetaPrestamo().getFechaPrestamo().equals(tarjetaTrabajador.getFechaPrestamo())) {
                             prestamos.add(tarjetaTrabajador);
                             band = true;
-                            
+
                         }
                         //modificar
                     } else if (event.getTarjetaPrestamo().getId() != null && event.getTarjetaPrestamo().getFechaDevolucion() != null) {

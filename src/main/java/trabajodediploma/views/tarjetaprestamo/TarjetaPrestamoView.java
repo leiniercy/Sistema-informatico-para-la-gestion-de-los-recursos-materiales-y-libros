@@ -13,6 +13,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import javax.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
+import trabajodediploma.data.service.AreaService;
 import trabajodediploma.data.service.EstudianteService;
 import trabajodediploma.data.service.GrupoService;
 import trabajodediploma.data.service.LibroService;
@@ -42,12 +43,13 @@ public class TarjetaPrestamoView extends Div {
             @Autowired LibroService libroService,
             @Autowired TrabajadorService trabajadorService,
             @Autowired GrupoService grupoService,
+            @Autowired AreaService areaService,
             @Autowired  EmailSenderService senderService
     ) {
         addClassNames("tarjeta-prestamo-view");
         myFooter = new MyFooter();
         estudianteGrid = new EstudianteGrid(prestamoService, estudianteService, grupoService,libroService,senderService);
-        trabajadorGrid = new TrabajadorGrid(prestamoService, trabajadorService, libroService,senderService);
+        trabajadorGrid = new TrabajadorGrid(prestamoService, trabajadorService,areaService, libroService,senderService);
         container = new Div();
         container.addClassName("container");
         container.add(estudianteGrid);
