@@ -72,8 +72,8 @@ public class Estudiante extends AbstractEntity {
     @ManyToOne(optional = false)
     private Grupo grupo;
 
-    @ManyToMany(mappedBy = "estudiantes", cascade = CascadeType.ALL)
-    Set<DestinoFinalEstudiante> tarjetasDestinoFinal;
+    @OneToMany(mappedBy = "estudiante", cascade = CascadeType.ALL)
+    List<DestinoFinalEstudiante> destinoFinal;
 
     @OneToMany(mappedBy = "estudiante", cascade = CascadeType.ALL)
     List<TarjetaPrestamoEstudiante> tarjetaPrestamo;

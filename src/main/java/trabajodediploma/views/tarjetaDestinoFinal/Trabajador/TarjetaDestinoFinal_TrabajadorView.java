@@ -66,8 +66,8 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
     private AreaService areaService;
     private EmailSenderService senderService;
     private DestinoFinalTrabajador tarjetaTrabajador;
-    private TarjetaDestinoFinal_TrabajadorFrom form;
-    private TarjetaDestinoFinal_TrabajadorForm_V2 form_V2;
+    private TarjetaDestinoFinal_TrabajadorFrom_Individual form;
+    private TarjetaDestinoFinal_TrabajadorForm_Grupo form_V2;
     private ComboBox<Trabajador> trabajadorFilter;
     private ComboBox<Modulo> moduloFilter;
     private DatePicker entregaFilter;
@@ -430,20 +430,20 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
 
     // Configuracion del Formulario
     private void configureForm() {
-        form = new TarjetaDestinoFinal_TrabajadorFrom(trabajadorService.findAll(), moduloService.findAll());
+        form = new TarjetaDestinoFinal_TrabajadorFrom_Individual(trabajadorService.findAll(), moduloService.findAll());
         form.setWidth("25em");
-        form.addListener(TarjetaDestinoFinal_TrabajadorFrom.SaveEvent.class,
+        form.addListener(TarjetaDestinoFinal_TrabajadorFrom_Individual.SaveEvent.class,
                 this::saveTarjeta);
-        form.addListener(TarjetaDestinoFinal_TrabajadorFrom.CloseEvent.class, e -> closeEditor());
+        form.addListener(TarjetaDestinoFinal_TrabajadorFrom_Individual.CloseEvent.class, e -> closeEditor());
 
-        form_V2 = new TarjetaDestinoFinal_TrabajadorForm_V2(areaService.findAll(), trabajadorService.findAll(), moduloService.findAll());
+        form_V2 = new TarjetaDestinoFinal_TrabajadorForm_Grupo(areaService.findAll(), trabajadorService.findAll(), moduloService.findAll());
         form_V2.setWidth("25em");
-        form_V2.addListener(TarjetaDestinoFinal_TrabajadorForm_V2.SaveEvent.class,
+        form_V2.addListener(TarjetaDestinoFinal_TrabajadorForm_Grupo.SaveEvent.class,
                 this::saveTarjeta_V2);
-        form_V2.addListener(TarjetaDestinoFinal_TrabajadorForm_V2.CloseEvent.class, e -> closeEditor());
+        form_V2.addListener(TarjetaDestinoFinal_TrabajadorForm_Grupo.CloseEvent.class, e -> closeEditor());
     }
 
-    private void saveTarjeta(TarjetaDestinoFinal_TrabajadorFrom.SaveEvent event) {
+    private void saveTarjeta(TarjetaDestinoFinal_TrabajadorFrom_Individual.SaveEvent event) {
 
         tarjetas.clear();
         boolean band = false;
@@ -561,7 +561,7 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
         return false;
     }
 
-    private void saveTarjeta_V2(TarjetaDestinoFinal_TrabajadorForm_V2.SaveEvent event) {
+    private void saveTarjeta_V2(TarjetaDestinoFinal_TrabajadorForm_Grupo.SaveEvent event) {
 
         tarjetas.clear();
         boolean band = false;

@@ -28,23 +28,13 @@ public class DestinoFinalEstudiante extends DestinoFinal {
     @EqualsAndHashCode.Include
     @ToString.Include
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "tarjetaDestino_estudiantes", 
-    joinColumns = @JoinColumn(name = "tarjetaDestino_id", nullable = false), 
-    inverseJoinColumns = @JoinColumn(name = "estudiante_id", unique = false, nullable = false, updatable = true))
-    private Set<Estudiante> estudiantes;
+    @JoinColumn(name = "estudiante_id", updatable = true, unique = false)
+    @ManyToOne()
+    private Estudiante estudiante;
 
-    public void addMaterial(Estudiante estudiante){
-        if(this.estudiantes == null){
-            this.estudiantes = new HashSet<>();
-        }
-        
-        this.estudiantes.add(estudiante);
-    }
-
-    public DestinoFinalEstudiante(LocalDate fecha, Modulo modulo, Set<Estudiante> estudiantes) {
+    public DestinoFinalEstudiante(LocalDate fecha, Modulo modulo, Estudiante estudiante) {
         super(fecha, modulo);
-        this.estudiantes = estudiantes;
+        this.estudiante = estudiante;
     }
 
 }
