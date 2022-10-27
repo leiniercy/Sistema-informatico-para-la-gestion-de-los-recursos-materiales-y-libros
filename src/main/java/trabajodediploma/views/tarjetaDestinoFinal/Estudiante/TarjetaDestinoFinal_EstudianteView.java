@@ -177,7 +177,7 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
             layout.add(nombreModulo, span_materiales);
             layout.setWidth("100%");
             return layout;
-        })).setHeader("Modulo").setAutoWidth(true).setSortable(true);
+        })).setHeader("Módulo").setAutoWidth(true).setSortable(true);
 
         fechaEntregaColumn = gridDestinoFinal
                 .addColumn(new ComponentRenderer<>(tarjeta -> {
@@ -349,20 +349,6 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
         return item;
     }
 
-    private void refreshGrid() {
-        gridDestinoFinal.setVisible(true);
-        tarjetas.clear();
-        destinoService.findAll().parallelStream().forEach((target) -> {
-            if (target instanceof DestinoFinalEstudiante) {
-                tarjetaEstudiante = (DestinoFinalEstudiante) target;
-                if (tarjetaEstudiante.getEstudiante() != null) {
-                    tarjetas.add(target);
-                }
-            }
-        });
-        gridDestinoFinal.setItems(tarjetas);
-    }
-
     /* Filtros */
     private void FiltrosTarjetaDestino() {
 
@@ -514,7 +500,7 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
  /* Barra de menu */
     private HorizontalLayout menuBar() {
         buttons = new HorizontalLayout();
-        Button refreshButton = new Button(VaadinIcon.REFRESH.create(), click -> refreshGrid());
+        Button refreshButton = new Button(VaadinIcon.REFRESH.create(), click -> updateList());
         refreshButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         Button deleteButton = new Button(VaadinIcon.TRASH.create(), click -> deleteTarjeta());
         deleteButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
@@ -603,7 +589,7 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
                 notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
             } else {
                 deleteItems(gridDestinoFinal.getSelectedItems().size(), gridDestinoFinal.getSelectedItems());
-                refreshGrid();
+                updateList();
                 toolbar.remove(total);
                 total = new Html("<span>Total: <b>" + tarjetas.size() + "</b></span>");
                 toolbar.addComponentAtIndex(1, total);

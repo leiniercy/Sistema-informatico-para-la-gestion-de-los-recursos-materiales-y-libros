@@ -33,7 +33,7 @@ public class TarjetaDestinoFinal_EstudianteForm_Individual  extends FormLayout{
    
     DestinoFinalEstudiante tarjeta;
     ComboBox<Estudiante> estudiante = new ComboBox<>("Estudiante");
-    ComboBox<Modulo> modulo = new ComboBox<>("Modulo");
+    ComboBox<Modulo> modulo = new ComboBox<>("Módulo");
     DatePicker fecha = new DatePicker("Fecha Entrega");
    
     Button save = new Button("Añadir", VaadinIcon.PLUS.create());

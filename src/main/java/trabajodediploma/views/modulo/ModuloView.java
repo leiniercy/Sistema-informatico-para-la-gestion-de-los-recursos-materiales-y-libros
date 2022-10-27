@@ -94,7 +94,7 @@ public class ModuloView extends Div {
         /* Dialog Header */
         Button closeButton = new Button(new Icon("lumo", "cross"), (e) -> dialog.close());
         closeButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        Span title = new Span("Modulo");
+        Span title = new Span("Módulo");
         Div titleDiv = new Div(title);
         titleDiv.addClassName("div_dialog_title");
         Div buttonDiv = new Div(closeButton);
@@ -183,9 +183,9 @@ public class ModuloView extends Div {
         addButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         buttons.add(refreshButton, watchColumns(), deleteButton, addButton);
         if (moduloService.count() == 1) {
-            total = new Html("<span>Total: <b>" + moduloService.count() + "</b> modulo</span>");
+            total = new Html("<span>Total: <b>" + moduloService.count() + "</b> módulo</span>");
         } else if (moduloService.count() == 0 || moduloService.count() > 1) {
-            total = new Html("<span>Total: <b>" + moduloService.count() + "</b> modulos</span>");
+            total = new Html("<span>Total: <b>" + moduloService.count() + "</b> módulos</span>");
         }
         toolbar = new HorizontalLayout(buttons, total);
         toolbar.addClassName("toolbar");
@@ -211,9 +211,9 @@ public class ModuloView extends Div {
                 refreshGrid();
                 toolbar.remove(total);
                 if (moduloService.count() == 1) {
-                    total = new Html("<span>Total: <b>" + moduloService.count() + "</b> modulo</span>");
+                    total = new Html("<span>Total: <b>" + moduloService.count() + "</b> módulo</span>");
                 } else if (moduloService.count() == 0 || moduloService.count() > 1) {
-                    total = new Html("<span>Total: <b>" + moduloService.count() + "</b> modulos</span>");
+                    total = new Html("<span>Total: <b>" + moduloService.count() + "</b> módulos</span>");
                 }
                 toolbar.addComponentAtIndex(1, total);
                 toolbar.setFlexGrow(1, buttons);
@@ -236,7 +236,7 @@ public class ModuloView extends Div {
             notification = Notification.show("El modulo ha sido eliminado", 5000,
                     Notification.Position.BOTTOM_START);
         } else {
-            notification = Notification.show("Han sido eliminados" + cantidad + " modulos", 5000,
+            notification = Notification.show("Han sido eliminados" + cantidad + " módulos", 5000,
                     Notification.Position.BOTTOM_START);
         }
         notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
@@ -279,15 +279,15 @@ public class ModuloView extends Div {
     }
 
     private void saveModulo(ModuloForm.SaveEvent event) {
-        List<Modulo> modulos = moduloService.findAll();
+        List<Modulo> módulos = moduloService.findAll();
 
-        modulos = modulos.parallelStream().filter(
+        módulos = módulos.parallelStream().filter(
                 mat -> event.getModulo().getNombre().equals(mat.getNombre())
                 && event.getModulo().getRecursosMateriales().equals(mat.getRecursosMateriales())
                 )
                 .collect(Collectors.toList());
 
-        if (modulos.size() != 0) {
+        if (módulos.size() != 0) {
             Notification notification = Notification.show(
                     "El modulo ya existe",
                     5000,
@@ -311,9 +311,9 @@ public class ModuloView extends Div {
             }
             toolbar.remove(total);
             if (moduloService.count() == 1) {
-                total = new Html("<span>Total: <b>" + moduloService.count() + "</b> modulo</span>");
+                total = new Html("<span>Total: <b>" + moduloService.count() + "</b> módulo</span>");
             } else if (moduloService.count() == 0 || moduloService.count() > 1) {
-                total = new Html("<span>Total: <b>" + moduloService.count() + "</b> modulos</span>");
+                total = new Html("<span>Total: <b>" + moduloService.count() + "</b> módulos</span>");
             }
             toolbar.addComponentAtIndex(1, total);
             toolbar.setFlexGrow(1, buttons);

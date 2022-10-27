@@ -63,7 +63,7 @@ public class TarjetaDestinoFinalView extends Div {
         this.areaService = areaService;
         this.senderService = senderService;
         myFooter = new MyFooter();
-        trabajadorView = new TarjetaDestinoFinal_TrabajadorView(moduloService, trabajadorService, destinoService, areaService, senderService);
+        trabajadorView = new TarjetaDestinoFinal_TrabajadorView(moduloService, trabajadorService, areaService, destinoService, senderService);
         estudianteView = new TarjetaDestinoFinal_EstudianteView(moduloService, estudianteService, grupoService, destinoService, senderService);
         content = new Div();
         content.addClassName("tarjeta_destino_final_view__container");

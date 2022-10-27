@@ -65,8 +65,8 @@ public class Trabajador extends AbstractEntity {
     @ManyToOne()
     private Area area;
 
-    @ManyToMany(mappedBy = "trabajadores", cascade = CascadeType.ALL)
-    Set<DestinoFinalTrabajador> tarjetasDestinoFinal;
+   @OneToMany(mappedBy = "trabajador", cascade = CascadeType.ALL)
+    List<DestinoFinalTrabajador> destinoFinal;
 
     @OneToMany(mappedBy = "trabajador", cascade = CascadeType.ALL)
     List<TarjetaPrestamoTrabajador> tarjetaPrestamo;
