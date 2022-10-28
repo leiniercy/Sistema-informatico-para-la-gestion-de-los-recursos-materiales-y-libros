@@ -9,5 +9,5 @@ import trabajodediploma.data.entity.Libro;
 
 @Repository
 public interface LibroRepository extends JpaRepository<Libro, Integer> {
-    
+
 }

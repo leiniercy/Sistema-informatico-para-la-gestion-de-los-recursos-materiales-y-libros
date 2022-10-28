@@ -72,13 +72,13 @@ public class LibroForm extends FormLayout {
                 imagen,
                 titulo,
                 autor,
+                asignatura,
+                anno_academico,
+                cantidad,
+                precio,
                 volumen,
                 tomo,
                 parte,
-                cantidad,
-                precio,
-                anno_academico,
-                asignatura,
                 createButtonsLayout());
     }
 
@@ -163,16 +163,16 @@ public class LibroForm extends FormLayout {
         precio.setStep(0.5);
         //anno_academico
         anno_academico.setLabel("Año Académico");
-        anno_academico.setValue(1);
         anno_academico.setHasControls(true);
         anno_academico.setMin(1);
         anno_academico.setMax(5);
         anno_academico.setHelperText("Máximo 5");
+        anno_academico.setErrorMessage("Campo requerido");
         //Asignatura
         asignatura.setLabel("Asignatura");
-        asignatura.setPlaceholder("Asignatura");
         asignatura.setItemLabelGenerator(Asignatura::getNombre);
         asignatura.setItems(asignaturas);
+        asignatura.setErrorMessage("Campo requerido");
 
         attachImageUpload(imagen, imagePreview);
     }

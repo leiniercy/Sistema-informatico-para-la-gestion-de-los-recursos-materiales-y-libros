@@ -79,7 +79,7 @@ public class Libro extends AbstractEntity {
     private int anno_academico;
 
     @NotNull(message = "El campo no debe estar vacío")
-    @JoinColumn(name = "asignatura_id", nullable = false, updatable = true, unique = true)
+    @JoinColumn(name = "asignatura_id", nullable = false, updatable = true)
     @ManyToOne(optional = false)
     protected Asignatura asignatura;
 

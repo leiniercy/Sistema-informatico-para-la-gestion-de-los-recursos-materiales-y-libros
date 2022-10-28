@@ -20,16 +20,15 @@ public class LibroService {
     public List<Libro> findAll() {
         return repository.findAll();
     }
-    
-    public Libro findById(Integer id){
-     return repository.findById(id).get();
+
+    public Libro findById(Integer id) {
+        return repository.findById(id).get();
     }
-    
+
     public Libro save(Libro libro) {
         return repository.save(libro);
     }
 
-    
     public Libro update(Libro libro) {
         return repository.save(libro);
     }
@@ -38,9 +37,11 @@ public class LibroService {
         repository.delete(libro);
     }
 
-    public void deleteAll(Set<Libro>libros){repository.deleteAll(libros);}
-    
-    public long count(){
-      return repository.count();
+    public void deleteAll(Set<Libro> libros) {
+        repository.deleteAll(libros);
+    }
+
+    public long count() {
+        return repository.count();
     }
 }

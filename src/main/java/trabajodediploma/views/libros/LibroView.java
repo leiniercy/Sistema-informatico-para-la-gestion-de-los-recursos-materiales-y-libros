@@ -27,6 +27,7 @@ import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import java.util.LinkedList;
 
 import java.util.List;
 import java.util.Set;
@@ -281,7 +282,7 @@ public class LibroView extends Div {
                 event -> gridListDataView
                         .addFilter(libro -> StringUtils.containsIgnoreCase(Integer.toString(libro.getAnno_academico()),
                         Integer.toString(filterAnnoAcademico.getValue()))));
-        
+
         filterAsignatura = new ComboBox<>();
         filterAsignatura.setItems(asignaturaService.findAll());
         filterAsignatura.setItemLabelGenerator(Asignatura::getNombre);
@@ -418,20 +419,42 @@ public class LibroView extends Div {
     /* Salvar Libro en la BD*/
     private void saveLibro(LibroForm.SaveEvent event) {
 
-        List<Libro> listLibros = libroService.findAll();
+        List<Libro> listLibros = new LinkedList<>();
+        boolean band = false;
+        for (int i = 0; i < libroService.findAll().size() && band == false; i++) {
+            Libro lib = libroService.findAll().get(i);
+            if (event.getLibro().getId() == null) {
+                //añadir
+                if (event.getLibro().getTitulo().equals(lib.getTitulo())
+                        && event.getLibro().getAutor().equals(lib.getAutor())
+                        && event.getLibro().getCantidad().equals(lib.getCantidad())
+                        && event.getLibro().getPrecio().equals(lib.getPrecio())
+                        && event.getLibro().getAnno_academico() == lib.getAnno_academico()
+                        && event.getLibro().getAsignatura().getNombre().equals(lib.getAsignatura().getNombre())) {
+                    listLibros.add(lib);
+                    band = true;
+                }
+            } else {
+                if (event.getLibro().getTitulo().equals(lib.getTitulo())
+                        && event.getLibro().getAutor().equals(lib.getAutor())
+                        && event.getLibro().getCantidad().equals(lib.getCantidad())
+                        && event.getLibro().getPrecio().equals(lib.getPrecio())
+                        && event.getLibro().getAnno_academico() == lib.getAnno_academico()
+                        && event.getLibro().getAsignatura().getNombre().equals(lib.getAsignatura().getNombre())
+                        //no obligatorios que pueden ser nulos
+                        && event.getLibro().getImagen().equals(lib.getImagen())
+                        && event.getLibro().getTomo() == lib.getTomo()
+                        && event.getLibro().getVolumen() == lib.getVolumen()
+                        && event.getLibro().getParte() == lib.getParte()
+                        ) {
+                    listLibros.add(lib);
+                    band = true;
+                    
+                }
+            }
+        }
 
-        listLibros = listLibros.parallelStream()
-                .filter(lib -> event.getLibro().getImagen().equals(lib.getImagen())
-                && event.getLibro().getTitulo().equals(lib.getTitulo())
-                && event.getLibro().getAutor().equals(lib.getAutor())
-                && (event.getLibro().getVolumen() != null && event.getLibro().getVolumen().equals(lib.getVolumen()))
-                && (event.getLibro().getTomo() != null && event.getLibro().getTomo().equals(lib.getTomo()))
-                && (event.getLibro().getParte() != null && event.getLibro().getParte().equals(lib.getParte()))
-                && event.getLibro().getCantidad().equals(lib.getCantidad())
-                && event.getLibro().getPrecio().equals(lib.getPrecio()))
-                .collect(Collectors.toList());
-
-        if (listLibros.size() != 0) {
+        if (listLibros.size() > 0) {
             Notification notification = Notification.show(
                     "El libro ya existe",
                     2000,
@@ -482,18 +505,20 @@ public class LibroView extends Div {
         b.setImagen("");
         editLibro(b);
     }
-    
+
     /*Cerrar formularios Libro */
     private void closeEditor() {
         form.setLibro(null);
         form.setVisible(false);
+        grid.deselectAll();
         removeClassName("editing");
         dialog.close();
     }
-    
+
     /* Actualizar lista de  Libro */
     private void updateList() {
         grid.setItems(libroService.findAll());
+        grid.deselectAll();
     }
 
     /* Fin-Formulario */
