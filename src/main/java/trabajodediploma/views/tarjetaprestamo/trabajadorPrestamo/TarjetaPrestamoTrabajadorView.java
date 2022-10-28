@@ -459,7 +459,7 @@ public class TarjetaPrestamoTrabajadorView extends Div {
                     senderService.sendSimpleEmail(
                             /* enviado a: */trabajador.getEmail(),
                             /* asunto: */ "Entrega de libros",
-                            /* mensaje: */ "Sistema de Gestión Académica Genius \n"
+                            /* mensaje: */ "Sistema Informático para la gestión de la información de los recursos materiales y libros en la facultad 4.\n"
                             + "Usted ha recibido el libro: "
                             + event.getTarjetaPrestamo().getLibro().getTitulo()
                             + " el día: "
@@ -496,7 +496,7 @@ public class TarjetaPrestamoTrabajadorView extends Div {
                         senderService.sendSimpleEmail(
                                 /* enviado a: */trabajador.getEmail(),
                                 /* asunto: */ "Devolución de libros",
-                                /* mensaje: */ "Sistema de Gestión Académica Genius \n"
+                                /* mensaje: */ "Sistema Informático para la gestión de la información de los recursos materiales y libros en la facultad 4.\n"
                                 + "Usted ha entregado el libro: "
                                 + event.getTarjetaPrestamo().getLibro().getTitulo()
                                 + " el día: "

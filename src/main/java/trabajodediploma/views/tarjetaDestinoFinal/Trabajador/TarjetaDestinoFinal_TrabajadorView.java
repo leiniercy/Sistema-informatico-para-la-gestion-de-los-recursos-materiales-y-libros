@@ -62,14 +62,14 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
     Grid.Column<DestinoFinal> fechaEntregaColumn;
     Grid.Column<DestinoFinal> editColumn;
 
-    Grid<Trabajador> gridTrabajadors = new Grid<>(Trabajador.class, false);
+    Grid<Trabajador> gridTrabajadores = new Grid<>(Trabajador.class, false);
     GridListDataView<Trabajador> gridListDataViewTrabajador;
     Grid.Column<Trabajador> columnaTrabajador;
 
     private List<DestinoFinal> tarjetas;
     private ModuloService moduloService;
     private TrabajadorService trabajadorService;
-    private AreaService AreaService;
+    private AreaService areaService;
     private DestinoFinalService destinoService;
     private EmailSenderService senderService;
     private DestinoFinalTrabajador tarjetaTrabajador;
@@ -100,7 +100,7 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
         addClassName("tarjeta_trabajador");
         this.moduloService = moduloService;
         this.trabajadorService = trabajadorService;
-        this.AreaService = AreaService;
+        this.areaService = AreaService;
         this.destinoService = destinoService;
         this.senderService = senderService;
         tarjetas = new LinkedList<>();
@@ -137,7 +137,7 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
     }
 
     /* Tabla */
-    /* Configuracion de la tabla TarjetaDestino */
+ /* Configuracion de la tabla TarjetaDestino */
     private void configurarGridTarjetaDestino() {
         gridDestinoFinal.setClassName("tarjeta_trabajador__content__grid-content__table");
 
@@ -230,11 +230,11 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
         gridDestinoFinal.addThemeVariants(GridVariant.LUMO_WRAP_CELL_CONTENT);
 
     }
-    
+
     /* Configuracion de la tabla Trabajador */
     private void configurarGridTrabajador() {
 
-        gridTrabajadors.addColumn(new ComponentRenderer<>(est -> {
+        gridTrabajadores.addColumn(new ComponentRenderer<>(est -> {
             HorizontalLayout hl = new HorizontalLayout();
             hl.getStyle().set("align-items", "center");
             hl.setAlignItems(Alignment.CENTER);
@@ -254,18 +254,21 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
 
         FiltrosGridTrabajador();
 
-        gridTrabajadors.setItems(trabajadorService.findAll());
-        gridTrabajadors.setSelectionMode(Grid.SelectionMode.MULTI);
-        gridTrabajadors.getStyle().set("width", "500px").set("max-width", "100%");
+        gridTrabajadores.setItems(trabajadorService.findAll());
+        gridTrabajadores.setSelectionMode(Grid.SelectionMode.MULTI);
+        gridTrabajadores.getStyle().set("width", "500px").set("max-width", "100%");
     }
-    
-    /* Configuracion de la Dialog para Trabajadores */
+
+    /* Configuracion de la Dialog para seleccionar los Trabajadores por Area*/
     private void confiuracionDialogPorArea() {
         dialogPorArea = new Dialog();
         dialogPorArea.addThemeVariants(DialogVariant.LUMO_NO_PADDING);
         filtrosContainer = new VerticalLayout();
         /* Dialog Header */
-        Button closeButton = new Button(new Icon("lumo", "cross"), (e) -> dialogPorArea.close());
+        Button closeButton = new Button(new Icon("lumo", "cross"), (e) -> {
+            dialogPorArea.close();
+            gridTrabajadores.deselectAll();
+        });
         closeButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         /*Menu Filtros*/
         MenuBar barraMenu = new MenuBar();
@@ -303,7 +306,7 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
 
         Button addForm = new Button("Seleccionar", VaadinIcon.PLUS.create());
         addForm.addClickListener(click -> {
-            if (gridTrabajadors.getSelectedItems().size() > 0) {
+            if (gridTrabajadores.getSelectedItems().size() > 0) {
                 configureFormPorArea();
                 addTarjetaPorArea();
             } else {
@@ -322,7 +325,7 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
                 .set("width", "100%")
                 .set("align-items", "flex-end")
                 .set("justify-content", "end");
-        dialogPorArea.add(headerDialogTrabajador, filtrosContainer, gridTrabajadors, buttonsDialogEst);
+        dialogPorArea.add(headerDialogTrabajador, filtrosContainer, gridTrabajadores, buttonsDialogEst);
 
     }
 
@@ -425,7 +428,7 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
         filtrarTrabajador.setWidth("100%");
         filtrarTrabajador.addValueChangeListener(event -> {
             if (filtrarTrabajador.getValue() == null) {
-                gridListDataViewTrabajador = gridTrabajadors.setItems(trabajadorService.findAll());
+                gridListDataViewTrabajador = gridTrabajadores.setItems(trabajadorService.findAll());
             } else {
                 gridListDataViewTrabajador.addFilter(trabajador -> areTrabajadorEqual(trabajador, filtrarTrabajador));
             }
@@ -449,14 +452,14 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
         );
 
         filtrarArea = new ComboBox<>();
-        filtrarArea.setItems(AreaService.findAll());
+        filtrarArea.setItems(areaService.findAll());
         filtrarArea.setItemLabelGenerator(Area -> Area.getNombre());
         filtrarArea.setPlaceholder("Filtrar");
         filtrarArea.setClearButtonVisible(true);
         filtrarArea.setWidth("100%");
         filtrarArea.addValueChangeListener(event -> {
             if (filtrarArea.getValue() == null) {
-                gridListDataViewDestinoFinal = gridDestinoFinal.setItems(tarjetas);
+                gridListDataViewTrabajador = gridTrabajadores.setItems(trabajadorService.findAll());
             } else {
                 gridListDataViewTrabajador.addFilter(trabajador -> areAreaEqual(trabajador, filtrarArea));
             }
@@ -517,7 +520,7 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
         MenuItem porArea = createSubMenuIconItem(addButtonSubMenu, VaadinIcon.USERS, "Por Area", null, true);
         porArea.addClickListener(event -> {
             dialogPorArea.removeAll();
-            dialogPorArea.add(headerDialogTrabajador, filtrosContainer, gridTrabajadors, buttonsDialogEst);
+            dialogPorArea.add(headerDialogTrabajador, filtrosContainer, gridTrabajadores, buttonsDialogEst);
             dialogPorArea.open();
         });
         buttons.add(refreshButton, deleteButton/*, addButton*/, barraMenu);
@@ -632,7 +635,7 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
 
     private void configureFormPorArea() {
 
-        List<Trabajador> listTrabajadorSeleccionados = new LinkedList<>(gridTrabajadors.getSelectedItems());
+        List<Trabajador> listTrabajadorSeleccionados = new LinkedList<>(gridTrabajadores.getSelectedItems());
         listTrabajadorSeleccionados.sort(Comparator.comparing(Trabajador::getId));
 
         formPorArea = new TarjetaDestinoFinal_TrabajadorForm_Area(listTrabajadorSeleccionados, moduloService.findAll());
@@ -809,7 +812,7 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
 
     private void addTarjetaPorArea() {
         List<DestinoFinalTrabajador> tarjetasDestino = new LinkedList<>();
-        for (int i = 0; i < gridTrabajadors.getSelectedItems().size(); i++) {
+        for (int i = 0; i < gridTrabajadores.getSelectedItems().size(); i++) {
             DestinoFinalTrabajador destinoFinal = new DestinoFinalTrabajador();
             tarjetasDestino.add(destinoFinal);
         }
@@ -842,7 +845,7 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
         formPorArea.setDestinoFinal(new LinkedList<DestinoFinalTrabajador>());
         formIndividual.setVisible(false);
         removeClassName("editing");
-        gridTrabajadors.deselectAll();
+        gridTrabajadores.deselectAll();
         dialogPorArea.close();
     }
 

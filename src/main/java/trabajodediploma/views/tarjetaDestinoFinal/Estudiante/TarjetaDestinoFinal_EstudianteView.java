@@ -231,6 +231,7 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
 
     }
 
+    /* Configuracion de la tabla Estudiante */
     private void configurarGridEstudiante() {
 
         gridEstudiantes.addColumn(new ComponentRenderer<>(est -> {
@@ -258,12 +259,16 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
         gridEstudiantes.getStyle().set("width", "500px").set("max-width", "100%");
     }
 
+    /* Configuracion de la Dialog para seleccionar los estudiantes por grupo */
     private void confiuracionDialogPorGrupo() {
         dialogPorGrupo = new Dialog();
         dialogPorGrupo.addThemeVariants(DialogVariant.LUMO_NO_PADDING);
         filtrosContainer = new VerticalLayout();
         /* Dialog Header */
-        Button closeButton = new Button(new Icon("lumo", "cross"), (e) -> dialogPorGrupo.close());
+        Button closeButton = new Button(new Icon("lumo", "cross"), (e) -> {
+            dialogPorGrupo.close();
+            gridEstudiantes.deselectAll();
+        });
         closeButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         /*Menu Filtros*/
         MenuBar barraMenu = new MenuBar();
@@ -453,7 +458,7 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
         filtrarGrupo.setWidth("100%");
         filtrarGrupo.addValueChangeListener(event -> {
             if (filtrarGrupo.getValue() == null) {
-                gridListDataViewDestinoFinal = gridDestinoFinal.setItems(tarjetas);
+                gridListDataViewEstudiante = gridEstudiantes.setItems(estudianteService.findAll());
             } else {
                 gridListDataViewEstudiante.addFilter(estudiante -> areGrupoEqual(estudiante, filtrarGrupo));
             }

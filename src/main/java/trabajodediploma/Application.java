@@ -4,9 +4,16 @@ import com.vaadin.flow.component.dependency.NpmPackage;
 import com.vaadin.flow.component.page.AppShellConfigurator;
 import com.vaadin.flow.server.PWA;
 import com.vaadin.flow.theme.Theme;
+import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,7 +76,7 @@ public class Application extends SpringBootServletInitializer implements AppShel
         createUser("Leanet Alfonso Tirse", "leanetat", "1234");
         createUser("Sabrina Izquierdo Borrero", "sabrinadlcib", "1234");
         createUser("Sulennis Saray Jiménez Viltres", "sulennissjv", "1234");
-        
+
         //Trabajadores
         createUser("José Emilio Badia Valdés", "jebadia", "1234");
         createUser("Aranelys Lazo Campo", "amlazo", "1234");
@@ -90,7 +97,7 @@ public class Application extends SpringBootServletInitializer implements AppShel
         userRepository.saveAndFlush(user);
         return user;
     }
-    
+
     private User createUser1(String name, String username, String password) {
         User user = new User();
         user.setName(name);
@@ -102,12 +109,16 @@ public class Application extends SpringBootServletInitializer implements AppShel
         return user;
     }
 
-    // @Autowired
-    // private EmailSenderService senderService;
-    // @EventListener(ApplicationReadyEvent.class)
-    // public void triggerMail() {
-    // senderService.sendSimpleEmail("leiniercaraballo08@gmail.com",
-    // "This is email body",
-    // "This is email subject");
-    // }
+//    @Autowired
+//    private EmailSenderService senderService;
+
+//    @EventListener(ApplicationReadyEvent.class)
+//    public void triggerMail() {
+//       
+//        senderService.sendSimpleEmail("leiniercy@estudiantes.uci.cu",
+//                "This is email body",
+//                "This is email subject");
+//        
+//    }
+
 }
