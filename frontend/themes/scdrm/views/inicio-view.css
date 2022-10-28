@@ -127,6 +127,7 @@ flex-grow: 2;
 .seccion1-info-parrafo {
   color: #fff;
   text-align: justify;
+  font-size: var(--lumo-font-size-xl);
 }
 /* seccion 1 */
 /* seccion 2 */
