@@ -262,7 +262,7 @@ public class RecursosMaterialesView extends Div {
                 Button modelButton = new Button(VaadinIcon.FILE.create());
                 modelButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
                 modelButton.addClickListener(click -> formReporte());
-                buttons.add(refreshButton, watchColumns(), deleteButton, addButton, modelButton);
+                buttons.add(refreshButton, watchColumns(), deleteButton, addButton/*, modelButton*/);
                 if (materialService.count() == 1) {
                         total = new Html("<span>Total: <b>" + materialService.count() + "</b> material</span>");
 
