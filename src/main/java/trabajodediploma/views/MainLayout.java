@@ -224,7 +224,7 @@ public class MainLayout extends AppLayout {
 
                 new MenuItemInfo("Catálogo", "la la-th-list", CatalogoView.class), //
 
-                new MenuItemInfo("Tarjeta Personal", "la la-file", TarjetaPersonalPrestamoView.class), //
+                new MenuItemInfo("Tarjeta Personal", "la la-address-card", TarjetaPersonalPrestamoView.class), //
 
                 new MenuItemInfo("Usuario", "la la-user", UsuarioView.class), //
 
