@@ -11,6 +11,7 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 import trabajodediploma.data.entity.Estudiante;
@@ -42,11 +43,11 @@ public class CrearInformacionPerfilView extends VerticalLayout {
 
     public CrearInformacionPerfilView(
             User user,
-             EstudianteService estudianteService,
-             TrabajadorService trabajadorService,
-             AreaService areaService,
-             GrupoService grupoService,
-             EmailSenderService senderService,
+            EstudianteService estudianteService,
+            TrabajadorService trabajadorService,
+            AreaService areaService,
+            GrupoService grupoService,
+            EmailSenderService senderService,
             Dialog dialog
     ) {
         this.user = user;
@@ -95,22 +96,25 @@ public class CrearInformacionPerfilView extends VerticalLayout {
     //save
     private void saveEstudiante(CrearEstudianteForm.SaveEvent event) {
 
-        List<Estudiante> listEstudiante = estudianteService.findAll();
+        List<Estudiante> listEstudiante = new LinkedList<>();
+        boolean band = false;
+        for (int i = 0; i < estudianteService.findAll().size() && band == false; i++) {
+            Estudiante est = estudianteService.findAll().get(i);
+            if (event.getEstudiante().getEmail().equals(est.getEmail())
+                    && event.getEstudiante().getSolapin().equals(est.getSolapin())
+                    && event.getEstudiante().getAnno_academico().equals(est.getAnno_academico())
+                    && event.getEstudiante().getGrupo().equals(est.getGrupo())
+                    && event.getEstudiante().getFacultad().equals(est.getFacultad())
+                    && event.getEstudiante().getUser().equals(est.getUser())) {
+                listEstudiante.add(est);
+                band = true;
+            }
+        }
 
-        listEstudiante = listEstudiante.parallelStream()
-                .filter(est-> event.getEstudiante().getEmail().equals(est.getEmail())
-                && event.getEstudiante().getSolapin().equals(est.getSolapin())
-                && event.getEstudiante().getAnno_academico().equals(est.getAnno_academico())
-                && event.getEstudiante().getGrupo().equals(est.getGrupo())
-                && event.getEstudiante().getFacultad().equals(est.getFacultad())
-                && event.getEstudiante().getUser().equals(est.getUser())
-                )
-                .collect(Collectors.toList());
-
-        if (listEstudiante.size() != 0) {
+        if (listEstudiante.size() > 0) {
             Notification notification = Notification.show(
                     "El usuario ya existe",
-                    5000,
+                    2000,
                     Notification.Position.MIDDLE
             );
             notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
@@ -118,7 +122,7 @@ public class CrearInformacionPerfilView extends VerticalLayout {
             estudianteService.save(event.getEstudiante());
             Notification notification = Notification.show(
                     "registro exitoso",
-                    5000,
+                    2000,
                     Notification.Position.BOTTOM_START
             );
             notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
@@ -154,21 +158,24 @@ public class CrearInformacionPerfilView extends VerticalLayout {
     //save
     private void saveTrabajador(CrearTrabajadorForm.SaveEvent event) {
 
-        List<Trabajador> listTrabajadores = trabajadorService.findAll();
+        List<Trabajador> listTrabajadores = new LinkedList<>();
+        boolean band= false;
+        for (int i = 0; i < trabajadorService.findAll().size() && band == false; i++) {
+            Trabajador trab = trabajadorService.findAll().get(i);
+            if (event.getTrabajador().getEmail().equals(trab.getEmail())
+                    && event.getTrabajador().getSolapin().equals(trab.getSolapin())
+                    && event.getTrabajador().getCategoria().equals(trab.getCategoria())
+                    && event.getTrabajador().getArea().equals(trab.getArea())
+                    && event.getTrabajador().getUser().equals(trab.getUser())) {
+                    listTrabajadores.add(trab);
+                    band = true;
+            }
+        }
 
-        listTrabajadores = listTrabajadores.parallelStream()
-                .filter(trab -> event.getTrabajador().getEmail().equals(trab.getEmail())
-                && event.getTrabajador().getSolapin().equals(trab.getSolapin())
-                && event.getTrabajador().getCategoria().equals(trab.getCategoria())
-                && event.getTrabajador().getArea().equals(trab.getArea())
-                && event.getTrabajador().getUser().equals(trab.getUser())
-                )
-                .collect(Collectors.toList());
-
-        if (listTrabajadores.size() != 0) {
+        if (listTrabajadores.size() > 0) {
             Notification notification = Notification.show(
                     "El usuario ya existe",
-                    5000,
+                    2000,
                     Notification.Position.MIDDLE
             );
             notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
@@ -176,7 +183,7 @@ public class CrearInformacionPerfilView extends VerticalLayout {
             trabajadorService.save(event.getTrabajador());
             Notification notification = Notification.show(
                     "registro exitoso",
-                    5000,
+                    2000,
                     Notification.Position.BOTTOM_START
             );
             notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
