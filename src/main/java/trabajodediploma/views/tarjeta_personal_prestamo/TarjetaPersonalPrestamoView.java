@@ -261,7 +261,7 @@ public class TarjetaPersonalPrestamoView extends Div {
         });
 
         entregaFilter = new DatePicker();
-        entregaFilter.setPlaceholder("Filter");
+        entregaFilter.setPlaceholder("Filtrar");
         entregaFilter.setClearButtonVisible(true);
         entregaFilter.setWidth("100%");
         entregaFilter.addValueChangeListener(event -> {
@@ -274,7 +274,7 @@ public class TarjetaPersonalPrestamoView extends Div {
         });
 
         devolucionFilter = new DatePicker();
-        devolucionFilter.setPlaceholder("Filter");
+        devolucionFilter.setPlaceholder("Filtrar");
         devolucionFilter.setClearButtonVisible(true);
         devolucionFilter.setWidth("100%");
         devolucionFilter.addValueChangeListener(event -> {
