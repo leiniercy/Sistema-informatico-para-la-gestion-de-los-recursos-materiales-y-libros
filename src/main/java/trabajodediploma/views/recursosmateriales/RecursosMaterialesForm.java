@@ -23,8 +23,6 @@ public class RecursosMaterialesForm extends FormLayout {
     RecursoMaterial material;
     TextField codigo = new TextField();
     TextField descripcion = new TextField();
-    TextField unidadMedida = new TextField();
-    IntegerField cantidad = new IntegerField();
     Button save = new Button("Añadir", VaadinIcon.PLUS.create());
     Button close = new Button("Cancelar", VaadinIcon.ERASER.create());
     BeanValidationBinder<RecursoMaterial> binder = new BeanValidationBinder<>(RecursoMaterial.class);
@@ -32,7 +30,7 @@ public class RecursosMaterialesForm extends FormLayout {
     public RecursosMaterialesForm() {
         addClassName("recurso-material-form");
         // Config form
-       binder.bindInstanceFields(this);
+        binder.bindInstanceFields(this);
         // codigo
         codigo.setLabel("Código");
         codigo.setAutofocus(true);
@@ -51,20 +49,8 @@ public class RecursosMaterialesForm extends FormLayout {
         descripcion.addValueChangeListener(event -> {
             event.getSource().setHelperText(event.getValue().length() + "/" + 255);
         });
-
-        unidadMedida.setLabel("Unidad de Medida");
-        unidadMedida.setAutofocus(true);
-        unidadMedida.setRequired(true);
-        unidadMedida.setMaxLength(3);
-
-        cantidad.setLabel("Cantidad");
-        cantidad.setValue(1);
-        cantidad.setRequiredIndicatorVisible(true);
-        cantidad.setHasControls(true);
-        cantidad.setMin(1);
-        cantidad.setHelperText("Mínimo 1");
-
-        add(codigo, descripcion, unidadMedida, cantidad, createButtonsLayout());
+        
+        add(codigo, descripcion, createButtonsLayout());
 
     }
 
@@ -100,7 +86,7 @@ public class RecursosMaterialesForm extends FormLayout {
             e.printStackTrace();
             Notification notification = Notification.show(
                     "Ocurrió un problema al intentar almacenar el recurso",
-                    5000,
+                    2000,
                     Notification.Position.MIDDLE);
             notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
         }
@@ -120,12 +106,15 @@ public class RecursosMaterialesForm extends FormLayout {
             return material;
         }
     }
+
     //save-event
     public static class SaveEvent extends RecursoMaterialFormEvent {
+
         SaveEvent(RecursosMaterialesForm source, RecursoMaterial material) {
             super(source, material);
         }
     }
+
     //delete-event
     public static class DeleteEvent extends RecursoMaterialFormEvent {
 
@@ -134,6 +123,7 @@ public class RecursosMaterialesForm extends FormLayout {
         }
 
     }
+
     //close-event
     public static class CloseEvent extends RecursoMaterialFormEvent {
 

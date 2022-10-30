@@ -126,7 +126,7 @@ public class UsuarioView extends Div {
                 .withProperty("profilePictureUrl", User::getProfilePictureUrl)
                 .withProperty("name", User::getName);
 
-        profilePictureUrlColumn = grid.addColumn(imagenRenderer).setHeader("Imagen").setAutoWidth(true);
+        profilePictureUrlColumn = grid.addColumn(imagenRenderer).setHeader("Nombre").setAutoWidth(true);
 
         userNameColumn = grid.addColumn(User::getUsername).setHeader("Usuario").setAutoWidth(true);
 
