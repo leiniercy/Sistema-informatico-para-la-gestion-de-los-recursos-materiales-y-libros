@@ -7,6 +7,8 @@ package trabajodediploma.views.libros.estadisticas;
 
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Image;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 
@@ -35,18 +37,20 @@ public class GraficoPastel extends Div {
     protected void configuracionGraficoPastel() {
         DefaultPieDataset datos = new DefaultPieDataset();
         try {
+            DecimalFormat df = new DecimalFormat("#.##");
+            df.setRoundingMode(RoundingMode.CEILING);
             double prestados = 0;
             double almacenados = 0;
 
             if (cantRealLibros != 0) {
-                prestados =  (cantRealLibrosPrestados * 100 * 1.0) / cantRealLibros;
-                almacenados =  (cantRealLibrosAlmacen * 100 *1.0) / cantRealLibros;
+                prestados = (cantRealLibrosPrestados * 100 * 1.0) / cantRealLibros;
+                almacenados = (cantRealLibrosAlmacen * 100 * 1.0) / cantRealLibros;
             }
-            datos.setValue("Libros prestados " + prestados + "%", cantRealLibrosPrestados);
-            datos.setValue("Libros almacenados " + almacenados + "%", cantRealLibrosAlmacen);
+            datos.setValue("Libros prestados " + df.format(prestados) + "%", cantRealLibrosPrestados);
+            datos.setValue("Libros almacenados " + df.format(almacenados) + "%", cantRealLibrosAlmacen);
 
         } catch (ArithmeticException e) {
-            
+
         }
 
         JFreeChart grafico_circular = ChartFactory.createPieChart(
