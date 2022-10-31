@@ -455,37 +455,78 @@ public class ModuloView extends Div {
         barraMenu.addThemeVariants(MenuBarVariant.LUMO_PRIMARY);
         MenuItem filtros = createMenuIconItem(barraMenu, VaadinIcon.FILTER, "Filtros", null, false);
         SubMenu filtrosSubMenu = filtros.getSubMenu();
+        //Estudiante
         Checkbox estudianteCheckBox = new Checkbox();
         estudianteCheckBox.addClickListener(event -> {
-            if (estudianteCheckBox.getValue()) {
+            if (!estudianteCheckBox.getValue()) {
+                estudianteCheckBox.setValue(Boolean.TRUE);
                 filtrosEstudianteContainer.add(filtrarEstudiante);
             } else {
                 filtrosEstudianteContainer.remove(filtrarEstudiante);
                 filtrarEstudiante.setValue(null);
+                estudianteCheckBox.setValue(Boolean.FALSE);
             }
         });
         MenuItem estudiante = createSubMenuIconItem(filtrosSubMenu, estudianteCheckBox, VaadinIcon.USER, "Estudiante", null, true);
+        estudiante.addClickListener(event -> {
+            if (!estudianteCheckBox.getValue()) {
+                estudianteCheckBox.setValue(Boolean.TRUE);
+                filtrosEstudianteContainer.add(filtrarEstudiante);
+            } else {
+                filtrosEstudianteContainer.remove(filtrarEstudiante);
+                filtrarEstudiante.setValue(null);
+                estudianteCheckBox.setValue(Boolean.FALSE);
+            }
+        });
+        // FIN -> Estudiante
+        /*Grupo*/
         Checkbox grupoCheckBox = new Checkbox();
         grupoCheckBox.addClickListener(event -> {
-            if (grupoCheckBox.getValue()) {
+            if (!grupoCheckBox.getValue()) {
+                grupoCheckBox.setValue(Boolean.TRUE);
                 filtrosEstudianteContainer.add(filtrarGrupo);
             } else {
                 filtrosEstudianteContainer.remove(filtrarGrupo);
                 filtrarGrupo.setValue(null);
+                grupoCheckBox.setValue(Boolean.FALSE);
             }
         });
         MenuItem grupo = createSubMenuIconItem(filtrosSubMenu, grupoCheckBox, VaadinIcon.USERS, "Grupo", null, true);
+        grupo.addClickListener(event -> {
+            if (!grupoCheckBox.getValue()) {
+                grupoCheckBox.setValue(Boolean.TRUE);
+                filtrosEstudianteContainer.add(filtrarGrupo);
+            } else {
+                filtrosEstudianteContainer.remove(filtrarGrupo);
+                filtrarGrupo.setValue(null);
+                grupoCheckBox.setValue(Boolean.FALSE);
+            }
+        });
+        //FIN -> Grupo
+        /*Año*/
         Checkbox annoCheckBox = new Checkbox();
         annoCheckBox.addClickListener(event -> {
-            if (annoCheckBox.getValue()) {
+            if (!annoCheckBox.getValue()) {
+                annoCheckBox.setValue(Boolean.TRUE);
                 filtrosEstudianteContainer.add(filtrarAnno);
             } else {
                 filtrosEstudianteContainer.remove(filtrarAnno);
                 filtrarAnno.setValue(null);
+                annoCheckBox.setValue(Boolean.FALSE);
             }
         });
         MenuItem anno = createSubMenuIconItem(filtrosSubMenu, annoCheckBox, VaadinIcon.USERS, "Año Académico", null, true);
-
+        anno.addClickListener(event -> {
+            if (!annoCheckBox.getValue()) {
+                annoCheckBox.setValue(Boolean.TRUE);
+                filtrosEstudianteContainer.add(filtrarAnno);
+            } else {
+                filtrosEstudianteContainer.remove(filtrarAnno);
+                filtrarAnno.setValue(null);
+                annoCheckBox.setValue(Boolean.FALSE);
+            }
+        });
+        //FIN -> Año
         /*FIN -> Menu Filtros*/
         Div filter = new Div(barraMenu);
         filter.addClassName("div_dialog_title");
@@ -560,26 +601,54 @@ public class ModuloView extends Div {
         barraMenu.addThemeVariants(MenuBarVariant.LUMO_PRIMARY);
         MenuItem filtros = createMenuIconItem(barraMenu, VaadinIcon.FILTER, "Filtros", null, false);
         SubMenu filtrosSubMenu = filtros.getSubMenu();
+        /*Trabajador*/
         Checkbox trabajadorCheckBox = new Checkbox();
         trabajadorCheckBox.addClickListener(event -> {
-            if (trabajadorCheckBox.getValue()) {
+            if (!trabajadorCheckBox.getValue()) {
+                trabajadorCheckBox.setValue(Boolean.TRUE);
                 filtrosTrabajadorContainer.add(filtrarTrabajador);
             } else {
                 filtrosTrabajadorContainer.remove(filtrarTrabajador);
                 filtrarTrabajador.setValue(null);
+                trabajadorCheckBox.setValue(Boolean.FALSE);
             }
         });
         MenuItem trabajador = createSubMenuIconItem(filtrosSubMenu, trabajadorCheckBox, VaadinIcon.USER, "Trabajador", null, true);
-        Checkbox AreaCheckBox = new Checkbox();
-        AreaCheckBox.addClickListener(event -> {
-            if (AreaCheckBox.getValue()) {
+        trabajador.addClickListener(event -> {
+            if (!trabajadorCheckBox.getValue()) {
+                trabajadorCheckBox.setValue(Boolean.TRUE);
+                filtrosTrabajadorContainer.add(filtrarTrabajador);
+            } else {
+                filtrosTrabajadorContainer.remove(filtrarTrabajador);
+                filtrarTrabajador.setValue(null);
+                trabajadorCheckBox.setValue(Boolean.FALSE);
+            }
+        });
+        //Fin ->Trabajador
+        /*Area*/
+        Checkbox areaCheckBox = new Checkbox();
+        areaCheckBox.addClickListener(event -> {
+            if (!areaCheckBox.getValue()) {
+                areaCheckBox.setValue(Boolean.TRUE);
                 filtrosTrabajadorContainer.add(filtrarArea);
             } else {
                 filtrosTrabajadorContainer.remove(filtrarArea);
                 filtrarArea.setValue(null);
+                areaCheckBox.setValue(Boolean.FALSE);
             }
         });
-        MenuItem area = createSubMenuIconItem(filtrosSubMenu, AreaCheckBox, VaadinIcon.USERS, "Area", null, true);
+        MenuItem area = createSubMenuIconItem(filtrosSubMenu, areaCheckBox, VaadinIcon.USERS, "Area", null, true);
+        area.addClickListener(event -> {
+            if (!areaCheckBox.getValue()) {
+                areaCheckBox.setValue(Boolean.TRUE);
+                filtrosTrabajadorContainer.add(filtrarArea);
+            } else {
+                filtrosTrabajadorContainer.remove(filtrarArea);
+                filtrarArea.setValue(null);
+                areaCheckBox.setValue(Boolean.FALSE);
+            }
+        });
+        //FIN -> Area
         /*FIN -> Menu Filtros*/
         Div filter = new Div(barraMenu);
         filter.addClassName("div_dialog_title");
