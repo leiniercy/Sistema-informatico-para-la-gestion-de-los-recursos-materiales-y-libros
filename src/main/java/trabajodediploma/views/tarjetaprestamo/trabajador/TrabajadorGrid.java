@@ -188,26 +188,54 @@ public class TrabajadorGrid extends Div {
         barraMenu.addThemeVariants(MenuBarVariant.LUMO_PRIMARY);
         MenuItem filtros = createMenuIconItem(barraMenu, VaadinIcon.FILTER, "Filtros", null, false);
         SubMenu filtrosSubMenu = filtros.getSubMenu();
+        /*Trabajador*/
         Checkbox trabajadorCheckBox = new Checkbox();
         trabajadorCheckBox.addClickListener(event -> {
-            if (trabajadorCheckBox.getValue()) {
+          if (!trabajadorCheckBox.getValue()) {
+                trabajadorCheckBox.setValue(Boolean.TRUE);
                 div_filtros.add(trabajadorFilter);
             } else {
                 div_filtros.remove(trabajadorFilter);
                 trabajadorFilter.setValue(null);
+                trabajadorCheckBox.setValue(Boolean.FALSE);
             }
         });
         MenuItem trabajador = createSubMenuIconItem(filtrosSubMenu, trabajadorCheckBox, VaadinIcon.USER, "Trabajador", null, true);
+        trabajador.addClickListener(event -> {
+            if (!trabajadorCheckBox.getValue()) {
+                trabajadorCheckBox.setValue(Boolean.TRUE);
+                div_filtros.add(trabajadorFilter);
+            } else {
+                div_filtros.remove(trabajadorFilter);
+                trabajadorFilter.setValue(null);
+                trabajadorCheckBox.setValue(Boolean.FALSE);
+            }
+        });
+        //Fin ->Trabajador
+        /*Area*/
         Checkbox areaCheckBox = new Checkbox();
         areaCheckBox.addClickListener(event -> {
-            if (areaCheckBox.getValue()) {
+              if (!areaCheckBox.getValue()) {
+                areaCheckBox.setValue(Boolean.TRUE);
                 div_filtros.add(areaFilter);
             } else {
                 div_filtros.remove(areaFilter);
                 areaFilter.setValue(null);
+                areaCheckBox.setValue(Boolean.FALSE);
             }
         });
         MenuItem area = createSubMenuIconItem(filtrosSubMenu, areaCheckBox, VaadinIcon.USERS, "Area", null, true);
+        area.addClickListener(event -> {
+            if (!areaCheckBox.getValue()) {
+                areaCheckBox.setValue(Boolean.TRUE);
+                div_filtros.add(areaFilter);
+            } else {
+                div_filtros.remove(areaFilter);
+                areaFilter.setValue(null);
+                areaCheckBox.setValue(Boolean.FALSE);
+            }
+        });
+        //FIN -> Area
         /*FIN -> Menu Filtros*/
 
         barra_menu.add(barraMenu, anadirPor);
@@ -399,21 +427,21 @@ public class TrabajadorGrid extends Div {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/YYYY");
 
             try {
-                
+
                 for (int i = 0; i < event.getTarjetaPrestamo().size(); i++) {
-                   //salvar tarjeta
+                    //salvar tarjeta
                     prestamoService.save(event.getTarjetaPrestamo().get(i));
-                   //confirmar al correo 
+                    //confirmar al correo 
                     senderService.sendSimpleEmail(
-                        /* enviado a: */event.getTarjetaPrestamo().get(i).getTrabajador().getEmail(),
-                        /* asunto: */ "Entrega de libros",
-                        /* mensaje: */ "Sistema Informático para la gestión de la información de los recursos materiales y libros en la facultad 4.\n"
-                        + "Usted ha recibido el libro: "
-                        + event.getTarjetaPrestamo().get(i).getLibro().getTitulo()
-                        + " el día: "
-                        + formatter.format(event.getTarjetaPrestamo().get(i).getFechaPrestamo()).toString());
+                            /* enviado a: */event.getTarjetaPrestamo().get(i).getTrabajador().getEmail(),
+                            /* asunto: */ "Entrega de libros",
+                            /* mensaje: */ "Sistema Informático para la gestión de la información de los recursos materiales y libros en la facultad 4.\n"
+                            + "Usted ha recibido el libro: "
+                            + event.getTarjetaPrestamo().get(i).getLibro().getTitulo()
+                            + " el día: "
+                            + formatter.format(event.getTarjetaPrestamo().get(i).getFechaPrestamo()).toString());
                 }
-                
+
                 Notification notification = Notification.show(
                         "Libro añadido",
                         2000,
