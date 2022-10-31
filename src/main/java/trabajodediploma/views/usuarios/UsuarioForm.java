@@ -112,9 +112,10 @@ public class UsuarioForm extends FormLayout {
         });
         /* Fin->confirmacion */
         // Rol
-        rols.setItems(Rol.VD_ADIMN_ECONOMIA,
-                Rol.ASISTENTE_CONTROL,
-                Rol.RESP_ALMACEN);
+        rols.setItems(Rol.getVD_ADIMN_ECONOMIA(),
+                Rol.getASISTENTE_CONTROL(),
+                Rol.getRESP_ALMACEN());
+        rols.setItemLabelGenerator(Rol::getRolname);
 
         attachImageUpload(profilePictureUrl, imagePreview);
 

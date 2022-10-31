@@ -135,9 +135,9 @@ public class UsuarioView extends Div {
             List<Rol> rols = new LinkedList<>(rol.getRoles());
             String listRoles = new String();
             if (rols.size() != 0) {
-                listRoles += "" + rols.get(0);
+                listRoles += "" + rols.get(0).getRolname();
                 for (int i = 1; i < rols.size(); i++) {
-                    listRoles += ", " + rols.get(i);
+                    listRoles += ", " + rols.get(i).getRolname();
                 }
             }
             span.setText(listRoles);
