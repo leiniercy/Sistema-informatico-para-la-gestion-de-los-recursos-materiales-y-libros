@@ -1,5 +1,8 @@
 package trabajodediploma.data.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -25,18 +28,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-@Data
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@ToString(onlyExplicitlyIncluded = true)
 @Entity
 public class Libro extends AbstractEntity {
-
-    @EqualsAndHashCode.Include
-    @ToString.Include
 
     @Lob
     private String imagen;
@@ -79,14 +72,122 @@ public class Libro extends AbstractEntity {
     private int anno_academico;
 
     @NotNull(message = "El campo no debe estar vacío")
+    @JsonIgnoreProperties({"libros"})
     @JoinColumn(name = "asignatura_id", nullable = false, updatable = true)
     @ManyToOne(optional = false)
-    protected Asignatura asignatura;
+    private Asignatura asignatura;
 
     @OneToMany(mappedBy = "libro", cascade = CascadeType.ALL)
-    private List<TarjetaPrestamo> tarjetas;
+    private List<TarjetaPrestamo> tarjetas = new LinkedList<>();
 
-    @ManyToMany(mappedBy = "libros", cascade = CascadeType.ALL)
-    private Set<ModeloPago> modelos;
+    @ManyToMany(mappedBy = "libros", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Set<ModeloPago> modelos = new HashSet<>();
+
+    public Libro() {
+    }
+
+    public String getImagen() {
+        return imagen;
+    }
+
+    public void setImagen(String imagen) {
+        this.imagen = imagen;
+    }
+
+    public String getTitulo() {
+        return titulo;
+    }
+
+    public void setTitulo(String titulo) {
+        this.titulo = titulo;
+    }
+
+    public String getAutor() {
+        return autor;
+    }
+
+    public void setAutor(String autor) {
+        this.autor = autor;
+    }
+
+    public Integer getVolumen() {
+        return volumen;
+    }
+
+    public void setVolumen(Integer volumen) {
+        this.volumen = volumen;
+    }
+
+    public Integer getTomo() {
+        return tomo;
+    }
+
+    public void setTomo(Integer tomo) {
+        this.tomo = tomo;
+    }
+
+    public Integer getParte() {
+        return parte;
+    }
+
+    public void setParte(Integer parte) {
+        this.parte = parte;
+    }
+
+    public Integer getCantidad() {
+        return cantidad;
+    }
+
+    public void setCantidad(Integer cantidad) {
+        this.cantidad = cantidad;
+    }
+
+    public Double getPrecio() {
+        return precio;
+    }
+
+    public void setPrecio(Double precio) {
+        this.precio = precio;
+    }
+
+    public int getAnno_academico() {
+        return anno_academico;
+    }
+
+    public void setAnno_academico(int anno_academico) {
+        this.anno_academico = anno_academico;
+    }
+
+    public Asignatura getAsignatura() {
+        return asignatura;
+    }
+
+    public void setAsignatura(Asignatura asignatura) {
+        this.asignatura = asignatura;
+    }
+
+    public List<TarjetaPrestamo> getTarjetas() {
+        return tarjetas;
+    }
+
+    public void setTarjetas(List<TarjetaPrestamo> tarjetas) {
+        this.tarjetas = tarjetas;
+    }
+
+    public Set<ModeloPago> getModelos() {
+        return modelos;
+    }
+
+    public void setModelos(Set<ModeloPago> modelos) {
+        this.modelos = modelos;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
 }

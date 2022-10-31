@@ -1,7 +1,9 @@
 package trabajodediploma.data.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -27,18 +29,9 @@ import lombok.Setter;
 import lombok.ToString;
 import trabajodediploma.data.AbstractEntity;
 
-@Data
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@ToString(onlyExplicitlyIncluded = true)
 @Entity
 public class Modulo extends AbstractEntity {
 
-    @EqualsAndHashCode.Include
-    @ToString.Include
 
     @NotEmpty
     @NotBlank(message = "El campo no debe estar vacío")
@@ -51,7 +44,7 @@ public class Modulo extends AbstractEntity {
     @JoinTable(name = "modulo_recurosMateriales", 
     joinColumns = @JoinColumn(name = "modulo_id", nullable = false), 
     inverseJoinColumns = @JoinColumn(name = "material_id", unique = false, nullable = false, updatable = true))
-    private Set<RecursoMaterial> recursosMateriales;
+    private Set<RecursoMaterial> recursosMateriales = new HashSet<>();
 
     public void addMaterial(RecursoMaterial material){
         if(this.recursosMateriales == null){
@@ -63,5 +56,40 @@ public class Modulo extends AbstractEntity {
 
     @OneToMany(mappedBy = "modulo", cascade = CascadeType.ALL)
     List<DestinoFinal> destinosFinales;
+
+    public Modulo() {
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public Set<RecursoMaterial> getRecursosMateriales() {
+        return recursosMateriales;
+    }
+
+    public void setRecursosMateriales(Set<RecursoMaterial> recursosMateriales) {
+        this.recursosMateriales = recursosMateriales;
+    }
+
+    public List<DestinoFinal> getDestinosFinales() {
+        return destinosFinales;
+    }
+
+    public void setDestinosFinales(List<DestinoFinal> destinosFinales) {
+        this.destinosFinales = destinosFinales;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
 }

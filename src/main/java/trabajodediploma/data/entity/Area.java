@@ -1,6 +1,8 @@
 package trabajodediploma.data.entity;
 
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -17,23 +19,41 @@ import lombok.Setter;
 import lombok.ToString;
 import trabajodediploma.data.AbstractEntity;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@ToString(onlyExplicitlyIncluded = true)
+
 @Entity
 public class Area extends AbstractEntity {
-
-    
-    @EqualsAndHashCode.Include
-    @ToString.Include
-    
+        
     @Column
     private String nombre;
 
     @OneToMany(mappedBy = "area", cascade = CascadeType.ALL)
-    private List<Trabajador> trabajadores;
+    private List<Trabajador> trabajadores = new LinkedList<>();
+
+    public Area() {
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public List<Trabajador> getTrabajadores() {
+        return trabajadores;
+    }
+
+    public void setTrabajadores(List<Trabajador> trabajadores) {
+        this.trabajadores = trabajadores;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
 }

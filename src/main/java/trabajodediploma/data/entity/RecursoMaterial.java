@@ -1,6 +1,8 @@
 package trabajodediploma.data.entity;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -22,21 +24,11 @@ import lombok.Setter;
 import lombok.ToString;
 import trabajodediploma.data.AbstractEntity;
 
-@Data
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@ToString(onlyExplicitlyIncluded = true)
 @Entity
 public class RecursoMaterial extends AbstractEntity {
 
-    @EqualsAndHashCode.Include
-    @ToString.Include
-
     @NotBlank(message = "El campo no puede estar vacío")
-    @Pattern(regexp = "^[a-zA-ZÀ-ÿ\\u00f1\\u00d1]+(\\s*[a-zA-ZÀ-ÿ0-9\\u00f1\\u00d1]*)*[a-zA-ZÀ-ÿ0-9\\u00f1\\u00d1]+$", message = "El nombre del código es incorrecto, use solo letras y números")
+    @Pattern(regexp = "^[a-zA-ZÀ-ÿ0-9\\u00f1\\u00d1]+(\\s*[a-zA-ZÀ-ÿ0-9\\u00f1\\u00d1]*)*[a-zA-ZÀ-ÿ0-9\\u00f1\\u00d1]+$", message = "El nombre del código es incorrecto, use solo letras y números")
     @Column(nullable = false)
     private String codigo;
 
@@ -47,5 +39,41 @@ public class RecursoMaterial extends AbstractEntity {
     private String descripcion;
 
     @ManyToMany(mappedBy = "recursosMateriales", cascade = CascadeType.ALL)
-    Set<Modulo> modulos;
+    Set<Modulo> modulos = new HashSet<>();
+
+    public RecursoMaterial() {
+    }
+    
+    public String getCodigo() {
+        return codigo;
+    }
+
+    public void setCodigo(String codigo) {
+        this.codigo = codigo;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+
+    public Set<Modulo> getModulos() {
+        return modulos;
+    }
+
+    public void setModulos(Set<Modulo> modulos) {
+        this.modulos = modulos;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
 }

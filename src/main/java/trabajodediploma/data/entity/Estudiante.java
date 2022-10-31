@@ -1,6 +1,9 @@
 package trabajodediploma.data.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -28,18 +31,10 @@ import lombok.Setter;
 import lombok.ToString;
 import trabajodediploma.data.AbstractEntity;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@ToString(onlyExplicitlyIncluded = true)
 @Entity
 public class Estudiante extends AbstractEntity {
 
-    @EqualsAndHashCode.Include
-    @ToString.Include
-
+    @JsonIgnoreProperties({"estudiante"})
     @OneToOne(optional = false)
     @JoinColumn(name = "user_id", nullable = false, updatable = false)
     private User user;
@@ -68,21 +63,105 @@ public class Estudiante extends AbstractEntity {
     private String facultad;
 
     @NotNull(message = "debe elegir un campo")
+    @JsonIgnoreProperties({"estudiantes"})
     @JoinColumn(name = "grupo_id", nullable = false, updatable = false)
     @ManyToOne(optional = false)
     private Grupo grupo;
 
     @OneToMany(mappedBy = "estudiante", cascade = CascadeType.ALL)
-    List<DestinoFinalEstudiante> destinoFinal;
+    List<DestinoFinalEstudiante> destinoFinal = new LinkedList<>();
 
     @OneToMany(mappedBy = "estudiante", cascade = CascadeType.ALL)
-    List<TarjetaPrestamoEstudiante> tarjetaPrestamo;
+    List<TarjetaPrestamoEstudiante> tarjetaPrestamo = new LinkedList<>();
 
     @OneToMany(mappedBy = "estudiante", cascade = CascadeType.ALL)
-    List<ModeloPagoEstudiante> modeloPagos;
+    List<ModeloPagoEstudiante> modeloPagos = new LinkedList<>();
 
+    public Estudiante() {
+    }
+    
     public String getNombreApellidos() {
         return user.getName();
     }
 
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getSolapin() {
+        return solapin;
+    }
+
+    public void setSolapin(String solapin) {
+        this.solapin = solapin;
+    }
+
+    public Integer getAnno_academico() {
+        return anno_academico;
+    }
+
+    public void setAnno_academico(Integer anno_academico) {
+        this.anno_academico = anno_academico;
+    }
+
+    public String getFacultad() {
+        return facultad;
+    }
+
+    public void setFacultad(String facultad) {
+        this.facultad = facultad;
+    }
+
+    public Grupo getGrupo() {
+        return grupo;
+    }
+
+    public void setGrupo(Grupo grupo) {
+        this.grupo = grupo;
+    }
+
+    public List<DestinoFinalEstudiante> getDestinoFinal() {
+        return destinoFinal;
+    }
+
+    public void setDestinoFinal(List<DestinoFinalEstudiante> destinoFinal) {
+        this.destinoFinal = destinoFinal;
+    }
+
+    public List<TarjetaPrestamoEstudiante> getTarjetaPrestamo() {
+        return tarjetaPrestamo;
+    }
+
+    public void setTarjetaPrestamo(List<TarjetaPrestamoEstudiante> tarjetaPrestamo) {
+        this.tarjetaPrestamo = tarjetaPrestamo;
+    }
+
+    public List<ModeloPagoEstudiante> getModeloPagos() {
+        return modeloPagos;
+    }
+
+    public void setModeloPagos(List<ModeloPagoEstudiante> modeloPagos) {
+        this.modeloPagos = modeloPagos;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+    
 }

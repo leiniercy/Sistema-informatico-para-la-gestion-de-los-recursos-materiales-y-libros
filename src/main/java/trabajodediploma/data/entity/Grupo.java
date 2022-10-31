@@ -1,6 +1,8 @@
 package trabajodediploma.data.entity;
 
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -22,19 +24,9 @@ import lombok.Setter;
 import lombok.ToString;
 import trabajodediploma.data.AbstractEntity;
 
-@Data
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@ToString(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "Grupos")
 public class Grupo extends AbstractEntity {
-
-    @EqualsAndHashCode.Include
-    @ToString.Include
 
     @NotEmpty
     @NotBlank(message = "no puede estar vacio")
@@ -43,5 +35,33 @@ public class Grupo extends AbstractEntity {
     private String numero;
 
     @OneToMany(mappedBy = "grupo", cascade = CascadeType.ALL)
-    List<Estudiante> estudiantes;
+    List<Estudiante> estudiantes = new LinkedList<>();
+
+    public Grupo() {
+    }
+
+    public String getNumero() {
+        return numero;
+    }
+
+    public void setNumero(String numero) {
+        this.numero = numero;
+    }
+
+    public List<Estudiante> getEstudiantes() {
+        return estudiantes;
+    }
+
+    public void setEstudiantes(List<Estudiante> estudiantes) {
+        this.estudiantes = estudiantes;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
 }

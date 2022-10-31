@@ -1,6 +1,9 @@
 package trabajodediploma.data.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -25,18 +28,10 @@ import lombok.Setter;
 import lombok.ToString;
 import trabajodediploma.data.AbstractEntity;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@ToString(onlyExplicitlyIncluded = true)
 @Entity
 public class Trabajador extends AbstractEntity {
 
-    @EqualsAndHashCode.Include
-    @ToString.Include
-
+    @JsonIgnoreProperties({"trabajador"})
     @JoinColumn(name = "user_id", nullable = false, updatable = false)
     @OneToOne(optional = false)
     private User user;
@@ -61,17 +56,89 @@ public class Trabajador extends AbstractEntity {
     private String categoria;
 
     @NotNull(message = "debe elegir un campo de área")
+    @JsonIgnoreProperties({"trabajadores"})
     @JoinColumn(name = "area_id", nullable = false, updatable = false)
     @ManyToOne()
     private Area area;
 
-   @OneToMany(mappedBy = "trabajador", cascade = CascadeType.ALL)
-    List<DestinoFinalTrabajador> destinoFinal;
+    @OneToMany(mappedBy = "trabajador", cascade = CascadeType.ALL)
+    List<DestinoFinalTrabajador> destinoFinal = new LinkedList<>();
 
     @OneToMany(mappedBy = "trabajador", cascade = CascadeType.ALL)
-    List<TarjetaPrestamoTrabajador> tarjetaPrestamo;
+    List<TarjetaPrestamoTrabajador> tarjetaPrestamo = new LinkedList<>();
+
+    @OneToMany(mappedBy = "trabajador", cascade = CascadeType.ALL)
+    List<ModeloPagoTrabajador> modeloPagos = new LinkedList<>();
+
+    public Trabajador() {
+    }
 
     public String getNombreApellidos() {
         return user.getName();
     }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getSolapin() {
+        return solapin;
+    }
+
+    public void setSolapin(String solapin) {
+        this.solapin = solapin;
+    }
+
+    public String getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(String categoria) {
+        this.categoria = categoria;
+    }
+
+    public Area getArea() {
+        return area;
+    }
+
+    public void setArea(Area area) {
+        this.area = area;
+    }
+
+    public List<DestinoFinalTrabajador> getDestinoFinal() {
+        return destinoFinal;
+    }
+
+    public void setDestinoFinal(List<DestinoFinalTrabajador> destinoFinal) {
+        this.destinoFinal = destinoFinal;
+    }
+
+    public List<TarjetaPrestamoTrabajador> getTarjetaPrestamo() {
+        return tarjetaPrestamo;
+    }
+
+    public void setTarjetaPrestamo(List<TarjetaPrestamoTrabajador> tarjetaPrestamo) {
+        this.tarjetaPrestamo = tarjetaPrestamo;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
 }

@@ -1,7 +1,9 @@
 package trabajodediploma.data.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
@@ -19,20 +21,12 @@ import lombok.Setter;
 import lombok.ToString;
 import trabajodediploma.data.AbstractEntity;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@ToString(onlyExplicitlyIncluded = true)
 @Entity
 public class TarjetaPrestamo extends AbstractEntity {
 
-    @EqualsAndHashCode.Include
-    @ToString.Include
-
     @NotNull(message = "El campo no debe estar vacío")
     @JoinColumn(name = "libro_id", nullable = false, updatable = true)
+    @JsonIgnoreProperties({"tarjetas"})
     @ManyToOne(optional = false)
     protected Libro libro;
 
@@ -42,4 +36,45 @@ public class TarjetaPrestamo extends AbstractEntity {
     @Column(name = "fechaDevolucion")
     protected LocalDate fechaDevolucion;
 
+    public TarjetaPrestamo() {
+    }
+
+    public TarjetaPrestamo(Libro libro, LocalDate fechaPrestamo, LocalDate fechaDevolucion) {
+        this.libro = libro;
+        this.fechaPrestamo = fechaPrestamo;
+        this.fechaDevolucion = fechaDevolucion;
+    }
+
+    public Libro getLibro() {
+        return libro;
+    }
+
+    public void setLibro(Libro libro) {
+        this.libro = libro;
+    }
+
+    public LocalDate getFechaPrestamo() {
+        return fechaPrestamo;
+    }
+
+    public void setFechaPrestamo(LocalDate fechaPrestamo) {
+        this.fechaPrestamo = fechaPrestamo;
+    }
+
+    public LocalDate getFechaDevolucion() {
+        return fechaDevolucion;
+    }
+
+    public void setFechaDevolucion(LocalDate fechaDevolucion) {
+        this.fechaDevolucion = fechaDevolucion;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+    
 }

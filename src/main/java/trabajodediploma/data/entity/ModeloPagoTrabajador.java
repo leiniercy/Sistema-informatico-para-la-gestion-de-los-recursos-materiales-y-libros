@@ -1,5 +1,6 @@
 package trabajodediploma.data.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
@@ -18,28 +19,56 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@ToString(onlyExplicitlyIncluded = true)
+
 @Entity
 public class ModeloPagoTrabajador extends ModeloPago {
     
-    
-    @EqualsAndHashCode.Include
-    @ToString.Include
-    
     @NotNull(message = "El campo no debe estar vacío")
-    //@NotBlank(message = "Seleccione un trabajador")
+    @JsonIgnoreProperties({"modeloPagos"})
     @JoinColumn(name = "trabajador_id",  updatable = true, unique = false)
     @ManyToOne()
     private Trabajador trabajador;
 
     //Constructor
+
+    public ModeloPagoTrabajador() {
+    }
+ 
     public ModeloPagoTrabajador (String imagen, Set<Libro> libros,Trabajador trabajador){
         super(imagen, libros);
         this.trabajador = trabajador; 
     }
+
+    public Trabajador getTrabajador() {
+        return trabajador;
+    }
+
+    public void setTrabajador(Trabajador trabajador) {
+        this.trabajador = trabajador;
+    }
+
+    public String getImagen() {
+        return imagen;
+    }
+
+    public void setImagen(String imagen) {
+        this.imagen = imagen;
+    }
+
+    public Set<Libro> getLibros() {
+        return libros;
+    }
+
+    public void setLibros(Set<Libro> libros) {
+        this.libros = libros;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+    
 }
