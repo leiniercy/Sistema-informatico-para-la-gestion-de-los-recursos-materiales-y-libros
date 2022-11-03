@@ -51,8 +51,7 @@ public class TarjetaPrestamoTrabajadorForm extends FormLayout {
         this.trabajador = trabajador;
         binder.bindInstanceFields(this);
         /* Config form */
- /* Trabajador */
- /* Libros */
+        //Libros
         libro.setItems(listLibros);
         libro.setItemLabelGenerator(Libro::getTitulo);
         /* fecha de prestamo */
@@ -88,11 +87,13 @@ public class TarjetaPrestamoTrabajadorForm extends FormLayout {
     public void setTarjetaPrestamo(TarjetaPrestamoTrabajador tarjetaPrestamo) {
         this.tarjetaPrestamo = tarjetaPrestamo;
         binder.readBean(tarjetaPrestamo);
-        if (tarjetaPrestamo.getFechaPrestamo() != null) {
-            removeAll();
-            add(libro, fechaPrestamo, fechaDevolucion, createButtonsLayout());
-        } else {
-            remove(fechaDevolucion);
+        if (this.tarjetaPrestamo != null) {
+            if (this.tarjetaPrestamo.getFechaPrestamo() != null) {
+                fechaPrestamo.setMin(this.tarjetaPrestamo.getFechaPrestamo());
+                addComponentAtIndex(2, fechaDevolucion);
+            } else {
+                remove(fechaDevolucion);
+            }
         }
     }
 
@@ -100,6 +101,9 @@ public class TarjetaPrestamoTrabajadorForm extends FormLayout {
         try {
             binder.writeBean(tarjetaPrestamo);
             this.tarjetaPrestamo.setTrabajador(trabajador);
+            this.tarjetaPrestamo.setLibro(libro.getValue());
+            this.tarjetaPrestamo.setFechaPrestamo(fechaPrestamo.getValue());
+            this.tarjetaPrestamo.setFechaDevolucion(fechaDevolucion.getValue());
             fireEvent(new TarjetaPrestamoTrabajadorForm.SaveEvent(this, tarjetaPrestamo));
         } catch (ValidationException e) {
             e.printStackTrace();

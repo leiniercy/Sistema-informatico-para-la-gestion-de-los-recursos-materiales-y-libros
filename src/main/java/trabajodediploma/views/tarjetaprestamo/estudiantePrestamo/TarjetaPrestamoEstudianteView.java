@@ -259,7 +259,7 @@ public class TarjetaPrestamoEstudianteView extends Div {
         });
 
         entregaFilter = new DatePicker();
-        entregaFilter.setPlaceholder("Filter");
+        entregaFilter.setPlaceholder("Filtrar");
         entregaFilter.setClearButtonVisible(true);
         entregaFilter.setWidth("100%");
         entregaFilter.addValueChangeListener(event -> {
@@ -272,7 +272,7 @@ public class TarjetaPrestamoEstudianteView extends Div {
         });
 
         devolucionFilter = new DatePicker();
-        devolucionFilter.setPlaceholder("Filter");
+        devolucionFilter.setPlaceholder("Filtrar");
         devolucionFilter.setClearButtonVisible(true);
         devolucionFilter.setWidth("100%");
         devolucionFilter.addValueChangeListener(event -> {
@@ -445,6 +445,7 @@ public class TarjetaPrestamoEstudianteView extends Div {
                     2000,
                     Notification.Position.MIDDLE);
             notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+//            closeEditor();
         } else {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/YYYY");
             if (event.getTarjetaPrestamo().getId() == null) {
@@ -502,6 +503,7 @@ public class TarjetaPrestamoEstudianteView extends Div {
                             2000,
                             Notification.Position.BOTTOM_START);
                     notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+                    form.remove(form.fechaDevolucion);
                 } catch (Exception e) {
                     Notification notification = Notification.show(
                             "Error al enviar correo electrónico a la dirección de correo seleccionada",

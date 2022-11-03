@@ -31,9 +31,9 @@ public class TarjetaPrestamo extends AbstractEntity {
     protected Libro libro;
 
     @NotNull(message = "El campo no debe estar vacío")
-    @Column(name = "fechaPrestamo")
+    @Column(name = "fechaPrestamo",nullable = false)
     protected LocalDate fechaPrestamo;
-    @Column(name = "fechaDevolucion")
+    @Column(name = "fechaDevolucion" ,nullable = true)
     protected LocalDate fechaDevolucion;
 
     public TarjetaPrestamo() {

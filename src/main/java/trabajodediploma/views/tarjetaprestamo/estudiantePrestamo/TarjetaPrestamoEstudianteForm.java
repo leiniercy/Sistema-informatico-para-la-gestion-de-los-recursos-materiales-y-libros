@@ -24,6 +24,7 @@ import com.vaadin.flow.shared.Registration;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.stream.Collectors;
 import trabajodediploma.data.entity.Libro;
 import trabajodediploma.data.entity.TarjetaPrestamo;
 import trabajodediploma.data.entity.TarjetaPrestamoEstudiante;
@@ -53,7 +54,8 @@ public class TarjetaPrestamoEstudianteForm extends FormLayout {
         this.estudiante = estudiante;
         binder.bindInstanceFields(this);
         /* Config form */
-         /* Libros */
+        //Libros 
+        listLibros = listLibros.stream().filter(lib -> lib.getAnno_academico() == estudiante.getAnno_academico()).collect(Collectors.toList());
         libro.setItems(listLibros);
         libro.setItemLabelGenerator(Libro::getTitulo);
         /* fecha de prestamo */
@@ -65,6 +67,7 @@ public class TarjetaPrestamoEstudianteForm extends FormLayout {
         fechaDevolucion.addValueChangeListener(e -> fechaPrestamo.setMax(e.getValue()));
 
         add(libro, fechaPrestamo, createButtonsLayout());
+
     }
 
     private HorizontalLayout createButtonsLayout() {
@@ -88,19 +91,23 @@ public class TarjetaPrestamoEstudianteForm extends FormLayout {
     public void setTarjetaPrestamo(TarjetaPrestamoEstudiante tarjetaPrestamo) {
         this.tarjetaPrestamo = tarjetaPrestamo;
         binder.readBean(tarjetaPrestamo);
-        if (tarjetaPrestamo.getFechaPrestamo() != null) {
-            removeAll();
-            add(libro, fechaPrestamo, fechaDevolucion,createButtonsLayout());
-        } else {
-            remove(fechaDevolucion);
+        if (this.tarjetaPrestamo != null) {
+            if (this.tarjetaPrestamo.getFechaPrestamo() != null) {
+                fechaPrestamo.setMin(this.tarjetaPrestamo.getFechaPrestamo());
+                addComponentAtIndex(2, fechaDevolucion);
+            }else{
+                remove(fechaDevolucion);
+            }
         }
-
     }
 
     private void validateAndSave() {
         try {
             binder.writeBean(tarjetaPrestamo);
             this.tarjetaPrestamo.setEstudiante(estudiante);
+            this.tarjetaPrestamo.setLibro(libro.getValue());
+            this.tarjetaPrestamo.setFechaPrestamo(fechaPrestamo.getValue());
+            this.tarjetaPrestamo.setFechaDevolucion(fechaDevolucion.getValue());
             fireEvent(new TarjetaPrestamoEstudianteForm.SaveEvent(this, tarjetaPrestamo));
         } catch (ValidationException e) {
             e.printStackTrace();

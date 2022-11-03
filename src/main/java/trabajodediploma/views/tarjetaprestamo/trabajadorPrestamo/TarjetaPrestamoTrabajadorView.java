@@ -265,7 +265,7 @@ public class TarjetaPrestamoTrabajadorView extends Div {
         });
 
         entregaFilter = new DatePicker();
-        entregaFilter.setPlaceholder("Filter");
+        entregaFilter.setPlaceholder("Filtrar");
         entregaFilter.setClearButtonVisible(true);
         entregaFilter.setWidth("100%");
         entregaFilter.addValueChangeListener(event -> {
@@ -278,7 +278,7 @@ public class TarjetaPrestamoTrabajadorView extends Div {
         });
 
         devolucionFilter = new DatePicker();
-        devolucionFilter.setPlaceholder("Filter");
+        devolucionFilter.setPlaceholder("Filtrar");
         devolucionFilter.setClearButtonVisible(true);
         devolucionFilter.setWidth("100%");
         devolucionFilter.addValueChangeListener(event -> {
@@ -507,6 +507,7 @@ public class TarjetaPrestamoTrabajadorView extends Div {
                             2000,
                             Notification.Position.BOTTOM_START);
                     notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+                    form.remove(form.fechaDevolucion);
                 } catch (Exception e) {
                     // TODO: handle exception
                     Notification notification = Notification.show(
