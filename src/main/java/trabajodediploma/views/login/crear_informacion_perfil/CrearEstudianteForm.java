@@ -49,6 +49,7 @@ public class CrearEstudianteForm extends FormLayout {
     private Div div_codigo;
     private EmailSenderService senderService;
     private StringBuffer codigo_buffer;
+    private String codigoConfirmacion = "";
 
     EmailField email = new EmailField();
     TextField solapin = new TextField();
@@ -110,23 +111,7 @@ public class CrearEstudianteForm extends FormLayout {
         grupo.setPlaceholder("Grupo");
         grupo.setItems(listGrupos);
         grupo.setItemLabelGenerator(Grupo::getNumero);
-
         /* Codigo */
-
-        // Los caracteres de interés en un array de char.
-        char[] chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
-        // Longitud del array de char.
-        int charsLength = chars.length;
-        // Instanciamos la clase Random
-        Random random = new Random();
-        // Un StringBuffer para componer la cadena aleatoria de forma eficiente
-        codigo_buffer = new StringBuffer();
-        // Bucle para elegir una cadena de 6 caracteres al azar
-        for (int i = 0; i < 6; i++) {
-            // Añadimos al buffer un caracter al azar del array
-            codigo_buffer.append(chars[random.nextInt(charsLength)]);
-        }
-
         div_codigo = new Div();
         div_codigo.addClassName("div_codigo");
 
@@ -141,12 +126,26 @@ public class CrearEstudianteForm extends FormLayout {
 
         btn_codigo.addClickListener(click -> {
             try {
+                // Los caracteres de interés en un array de char.
+                char[] chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
+                // Longitud del array de char.
+                int charsLength = chars.length;
+                // Instanciamos la clase Random
+                Random random = new Random();
+                // Un StringBuffer para componer la cadena aleatoria de forma eficiente
+                codigo_buffer = new StringBuffer();
+                // Bucle para elegir una cadena de 6 caracteres al azar
+                for (int i = 0; i < 6; i++) {
+                    // Añadimos al buffer un caracter al azar del array
+                    codigo_buffer.append(chars[random.nextInt(charsLength)]);
+                }
+                codigoConfirmacion = codigo_buffer.toString();
                 senderService.sendSimpleEmail(
-                        /* enviado a: */ email.getValue(),
+                        /* enviado a: */email.getValue(),
                         /* asunto: */ "Código de identificación",
                         /* mensaje: */ "Bienvenido a Genius \n"
-                                + "Su código de identificación es: "
-                                + codigo_buffer.toString());
+                        + "Su código de identificación es: "
+                        + codigo_buffer.toString());
                 Notification notification = Notification.show(
                         "El código de identificación ha enviado a su correo electrónico",
                         2000,
@@ -185,18 +184,12 @@ public class CrearEstudianteForm extends FormLayout {
     public void setEstudiante(Estudiante estudiante) {
         this.estudiante = estudiante;
         binder.readBean(estudiante);
-        if (user == null) {
-            this.estudiante.setUser(null);
-        } else {
-            this.estudiante.setUser(user);
-            ;
-        }
     }
 
     // Validate and Save
     private void validateAndSave() {
         try {
-            if (codigo.isEnabled() && codigo.getValue() == codigo_buffer.toString()) {
+            if (codigo.getValue().equals(codigoConfirmacion)) {
                 binder.writeBean(estudiante);
                 this.estudiante.setAnno_academico(anno_academico.getValue());
                 this.estudiante.setEmail(email.getValue());
@@ -205,7 +198,7 @@ public class CrearEstudianteForm extends FormLayout {
                 this.estudiante.setSolapin(solapin.getValue());
                 this.estudiante.setUser(user);
                 fireEvent(new SaveEvent(this, estudiante));
-            }  else if( !codigo.isEnabled() || codigo.getValue() == codigo_buffer.toString() ){
+            } else {
                 Notification notification = Notification.show(
                         "Código de identificación incorrecto",
                         2000,

@@ -105,9 +105,9 @@ public class InicioView extends Div {
             if (estudiantes.size() == 0 && trabajadores.size() == 0) {
                 /* crear perfil */
                 dialog = new Dialog();
-                dialog.open();
                 crearPerfil = new CrearInformacionPerfilView(user, estudianteService, trabajadorService, areaService,
                         grupoService, senderService, dialog);
+                dialog.open();
                 /*
                  * Fin -> crear perfil
                  * Header crear perfil usuario
@@ -165,7 +165,7 @@ public class InicioView extends Div {
         img_container.add(image1);
         seccion1_image.add(img_container);
         /* Logo libro */
-        /* Enlace */
+ /* Enlace */
         Div seccion1_info = new Div();
         seccion1_info.addClassName("seccion1-info");
         Anchor enlace = new Anchor("catalogo-libros", "Ver Cátalogo");
@@ -271,7 +271,7 @@ public class InicioView extends Div {
                 internos);
         /* SITIOS DE INTERÉS */
 
-        /* OTROS SITIOS */
+ /* OTROS SITIOS */
         H2 otroSitios = new H2("OTROS SITIOS");
 
         Anchor portalUCI = new Anchor("https://www.uci.cu/");
@@ -295,7 +295,7 @@ public class InicioView extends Div {
         VerticalLayout otrosSitios = new VerticalLayout(otroSitios, portalUCI, intranet, periodicoMella);
         /* OTROS SITIOS */
 
-        /* COMUNIDADES UCI */
+ /* COMUNIDADES UCI */
         H2 comunidadessUCI = new H2("COMUNIDADES UCI");
 
         Anchor humanos = new Anchor("https://humanos.uci.cu/");

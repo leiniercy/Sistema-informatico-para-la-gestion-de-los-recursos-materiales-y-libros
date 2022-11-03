@@ -42,6 +42,7 @@ public class CrearTrabajadorForm extends FormLayout {
     private EmailSenderService senderService;
     private StringBuffer codigo_buffer;
     private List<Area> listArea;
+    private String codigoConfirmacion = "";
     EmailField email = new EmailField();
     TextField solapin = new TextField();
     ComboBox<String> categoria = new ComboBox<>();
@@ -87,28 +88,12 @@ public class CrearTrabajadorForm extends FormLayout {
         });
         // categoria
         categoria.setPlaceholder("Categoría");
-        categoria.setItems("Instructor", "Asistente","Profesor Auxiliar","Profesor Titular");
+        categoria.setItems("Instructor", "Asistente", "Profesor Auxiliar", "Profesor Titular");
         // area
         area.setPlaceholder("Área");
         area.setItems(listArea);
         area.setItemLabelGenerator(Area::getNombre);
-
         /* Codigo */
-
-        // Los caracteres de interés en un array de char.
-        char[] chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
-        // Longitud del array de char.
-        int charsLength = chars.length;
-        // Instanciamos la clase Random
-        Random random = new Random();
-        // Un StringBuffer para componer la cadena aleatoria de forma eficiente
-        codigo_buffer = new StringBuffer();
-        // Bucle para elegir una cadena de 6 caracteres al azar
-        for (int i = 0; i < 6; i++) {
-            // Añadimos al buffer un caracter al azar del array
-            codigo_buffer.append(chars[random.nextInt(charsLength)]);
-        }
-
         div_codigo = new Div();
         div_codigo.addClassName("div_codigo");
 
@@ -122,12 +107,27 @@ public class CrearTrabajadorForm extends FormLayout {
         btn_codigo.addClassName("div_codigo__btn");
         btn_codigo.addClickListener(click -> {
             try {
+                //Creando código de confirmación
+                // Los caracteres de interés en un array de char.
+                char[] chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
+                // Longitud del array de char.
+                int charsLength = chars.length;
+                // Instanciamos la clase Random
+                Random random = new Random();
+                // Un StringBuffer para componer la cadena aleatoria de forma eficiente
+                codigo_buffer = new StringBuffer();
+                // Bucle para elegir una cadena de 6 caracteres al azar
+                for (int i = 0; i < 6; i++) {
+                    // Añadimos al buffer un caracter al azar del array
+                    codigo_buffer.append(chars[random.nextInt(charsLength)]);
+                }
+                codigoConfirmacion = codigo_buffer.toString();
                 senderService.sendSimpleEmail(
-                        /* enviado a: */ email.getValue(),
+                        /* enviado a: */email.getValue(),
                         /* asunto: */ "Código de identificación",
                         /* mensaje: */ "Bienvenido a Genius \n"
-                                + "Su código de identificación es: "
-                                + codigo_buffer.toString());
+                        + "Su código de identificación es: "
+                        + codigo_buffer.toString());
                 Notification notification = Notification.show(
                         "El código de identificación ha enviado a su correo electrónico",
                         2000,
@@ -167,32 +167,31 @@ public class CrearTrabajadorForm extends FormLayout {
     public void setTrabajador(Trabajador trabajador) {
         this.trabajador = trabajador;
         binder.readBean(trabajador);
-        if (user == null) {
+         if (user == null) {
             this.trabajador.setUser(null);
         } else {
             this.trabajador.setUser(user);
-            ;
         }
     }
 
     // Validate and Save
     private void validateAndSave() {
         try {
-            if (codigo.isEnabled() && codigo.getValue() == codigo_buffer.toString()) {
-            binder.writeBean(trabajador);
-            this.trabajador.setUser(user);
-            this.trabajador.setSolapin(solapin.getValue());
-            this.trabajador.setEmail(email.getValue());
-            this.trabajador.setCategoria(categoria.getValue());
-            this.trabajador.setArea(area.getValue());
-            fireEvent(new CrearTrabajadorForm.SaveEvent(this, trabajador));
-        }  else if( !codigo.isEnabled() || codigo.getValue() == codigo_buffer.toString() ){
-            Notification notification = Notification.show(
-                    "Código de identificación incorrecto",
-                    2000,
-                    Notification.Position.MIDDLE);
-            notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
-        }
+            if (codigo.getValue().equals(codigoConfirmacion)) {
+                binder.writeBean(trabajador);
+                this.trabajador.setUser(user);
+                this.trabajador.setSolapin(solapin.getValue());
+                this.trabajador.setEmail(email.getValue());
+                this.trabajador.setCategoria(categoria.getValue());
+                this.trabajador.setArea(area.getValue());
+                fireEvent(new CrearTrabajadorForm.SaveEvent(this, trabajador));
+            } else {
+                Notification notification = Notification.show(
+                        "Código de identificación incorrecto",
+                        2000,
+                        Notification.Position.MIDDLE);
+                notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+            }
         } catch (ValidationException e) {
             e.printStackTrace();
             Notification notification = Notification.show(

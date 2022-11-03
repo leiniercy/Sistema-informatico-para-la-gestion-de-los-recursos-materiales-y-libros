@@ -60,15 +60,15 @@ public class CrearInformacionPerfilView extends VerticalLayout {
 
         Configuracion();
         selection.addValueChangeListener(event -> {
-            if (event.getValue() == "Estudiante") {
+            if (event.getValue().equals("Estudiante")) {
                 container.removeAll();
                 addEstudiante();
                 container.add(form_estudiante);
                 add(container);
-            } else if (event.getValue() == "Trabajador") {
+            } else if (event.getValue().equals("Trabajador")) {
                 container.removeAll();
-                addTrabajador();
                 container.add(form_trabajador);
+                addTrabajador();
                 add(container);
             }
         });
@@ -159,7 +159,7 @@ public class CrearInformacionPerfilView extends VerticalLayout {
     private void saveTrabajador(CrearTrabajadorForm.SaveEvent event) {
 
         List<Trabajador> listTrabajadores = new LinkedList<>();
-        boolean band= false;
+        boolean band = false;
         for (int i = 0; i < trabajadorService.findAll().size() && band == false; i++) {
             Trabajador trab = trabajadorService.findAll().get(i);
             if (event.getTrabajador().getEmail().equals(trab.getEmail())
@@ -167,8 +167,8 @@ public class CrearInformacionPerfilView extends VerticalLayout {
                     && event.getTrabajador().getCategoria().equals(trab.getCategoria())
                     && event.getTrabajador().getArea().equals(trab.getArea())
                     && event.getTrabajador().getUser().equals(trab.getUser())) {
-                    listTrabajadores.add(trab);
-                    band = true;
+                listTrabajadores.add(trab);
+                band = true;
             }
         }
 
@@ -191,20 +191,11 @@ public class CrearInformacionPerfilView extends VerticalLayout {
         }
     }
 
-    //edit
-    public void editTrabajador(Trabajador trabajador) {
-        if (trabajador == null) {
-            closeTrabajadorEditor();
-        } else {
-            form_trabajador.setTrabajador(trabajador);
-            form_trabajador.setVisible(true);
-            addClassName("editing");
-        }
-    }
-
     //add
     void addTrabajador() {
-        editTrabajador(new Trabajador());
+        form_trabajador.setTrabajador(new Trabajador());
+        form_trabajador.setVisible(true);
+        addClassName("editing");
     }
 
     //close
