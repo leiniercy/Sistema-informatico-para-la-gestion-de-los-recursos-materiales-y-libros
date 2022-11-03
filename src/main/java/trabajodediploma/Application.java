@@ -87,6 +87,7 @@ public class Application extends SpringBootServletInitializer implements AppShel
         createUser("Yadira Ramírez Rodríguez", "yramirezr", "1234");
         createUser("Yordankis Matos López", "yluguen", "1234");
         createUser("Yasirys Terry González", "yterry", "1234");
+        createUser("Mayra Texidor Ferral", "mtexidor", "Elsecreto");
     }
 
     private User createUser(String name, String username, String password) {

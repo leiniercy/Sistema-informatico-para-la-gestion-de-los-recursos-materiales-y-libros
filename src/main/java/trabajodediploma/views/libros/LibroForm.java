@@ -47,6 +47,7 @@ public class LibroForm extends FormLayout {
     private Label imageSize;
     private Image imagePreview;
     Upload imagen = new Upload();
+    TextField codigo = new TextField();
     TextField titulo = new TextField();
     TextField autor = new TextField();
     IntegerField volumen = new IntegerField();
@@ -70,6 +71,7 @@ public class LibroForm extends FormLayout {
         add(
                 imageSize,
                 imagen,
+                codigo,
                 titulo,
                 autor,
                 asignatura,
@@ -97,6 +99,16 @@ public class LibroForm extends FormLayout {
         Button uploadButton = new Button("Seleccionar imagen...");
         uploadButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         imagen.setUploadButton(uploadButton);
+       
+        //codigo
+        codigo.setLabel("Código");
+        codigo.setAutofocus(true);
+        codigo.setRequired(true);
+        codigo.setMaxLength(10);
+        codigo.setErrorMessage("Campo requerido, solo numeros");
+        codigo.addValueChangeListener(event -> {
+            event.getSource().setHelperText(event.getValue().length() + "/" + 10);
+        });
 
         //titulo
         titulo.setLabel("Título");
@@ -164,6 +176,7 @@ public class LibroForm extends FormLayout {
         //anno_academico
         anno_academico.setLabel("Año Académico");
         anno_academico.setHasControls(true);
+        anno_academico.setValue(1);
         anno_academico.setMin(1);
         anno_academico.setMax(5);
         anno_academico.setHelperText("Máximo 5");

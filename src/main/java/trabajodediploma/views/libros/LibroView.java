@@ -58,6 +58,7 @@ public class LibroView extends Div {
     private AsignaturaService asignaturaService;
     GridListDataView<Libro> gridListDataView;
     Grid.Column<Libro> imagenColumn;
+    Grid.Column<Libro> codigoColumn;
     Grid.Column<Libro> tituloColumn;
     Grid.Column<Libro> autorColumn;
     Grid.Column<Libro> volumenColumn;
@@ -84,6 +85,7 @@ public class LibroView extends Div {
     private NumberField filterPrecio;
     private ComboBox<Asignatura> filterAsignatura;
     private Div header;
+    private TextField filterCodigo;
 
     public LibroView(
             @Autowired LibroService libroService,
@@ -136,9 +138,10 @@ public class LibroView extends Div {
         LitRenderer<Libro> imagenRenderer = LitRenderer.<Libro>of("<img style='height: 64px' src=${item.imagen} />")
                 .withProperty("imagen", Libro::getImagen);
         imagenColumn = grid.addColumn(imagenRenderer).setHeader("Imagen").setAutoWidth(true);
+        codigoColumn = grid.addColumn(Libro::getCodigo).setHeader("Código").setAutoWidth(true).setSortable(true);
         tituloColumn = grid.addColumn(Libro::getTitulo).setHeader("Título").setAutoWidth(true).setSortable(true);
         autorColumn = grid.addColumn(Libro::getAutor).setHeader("Autor").setAutoWidth(true).setSortable(true);
-        volumenColumn = grid.addColumn(Libro::getVolumen).setHeader("Vólumen").setAutoWidth(true).setSortable(true);
+        volumenColumn = grid.addColumn(Libro::getVolumen).setHeader("Volumen").setAutoWidth(true).setSortable(true);
         tomoColumn = grid.addColumn(Libro::getTomo).setHeader("Tomo").setAutoWidth(true).setSortable(true);
         parteColumn = grid.addColumn(Libro::getParte).setHeader("Parte").setAutoWidth(true).setSortable(true);
         cantidadColumn = grid.addColumn(Libro::getCantidad).setHeader("Cantidad").setAutoWidth(true).setSortable(true);
@@ -152,6 +155,7 @@ public class LibroView extends Div {
             return editButton;
         }).setFlexGrow(0);
 
+        codigoColumn.setVisible(false);
         cantidadColumn.setVisible(false);
         precioColumn.setVisible(false);
         annoAcademicoColumn.setVisible(false);
@@ -163,6 +167,7 @@ public class LibroView extends Div {
 
         HeaderRow headerRow = grid.appendHeaderRow();
         headerRow.getCell(tituloColumn).setComponent(filterTitle);
+        headerRow.getCell(codigoColumn).setComponent(filterCodigo);
         headerRow.getCell(autorColumn).setComponent(filterAuthor);
         headerRow.getCell(volumenColumn).setComponent(filterVolumen);
         headerRow.getCell(tomoColumn).setComponent(filterTomo);
@@ -212,6 +217,17 @@ public class LibroView extends Div {
         filterTitle.addValueChangeListener(
                 event -> gridListDataView
                         .addFilter(book -> StringUtils.containsIgnoreCase(book.getTitulo(), filterTitle.getValue())));
+
+        // codigo
+        filterCodigo = new TextField();
+        filterCodigo.setPlaceholder("Filtrar");
+        filterCodigo.setPrefixComponent(VaadinIcon.SEARCH.create());
+        filterCodigo.setClearButtonVisible(true);
+        filterCodigo.setWidth("100%");
+        filterCodigo.setValueChangeMode(ValueChangeMode.EAGER);
+        filterCodigo.addValueChangeListener(
+                event -> gridListDataView
+                        .addFilter(book -> StringUtils.containsIgnoreCase(book.getCodigo(), filterCodigo.getValue())));
 
         // voulmen
         filterVolumen = new IntegerField();
@@ -374,15 +390,16 @@ public class LibroView extends Div {
         menuButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         ColumnToggleContextMenu columnToggleContextMenu = new ColumnToggleContextMenu(
                 menuButton);
-        columnToggleContextMenu.addColumnToggleItem("Autor", autorColumn);
+        columnToggleContextMenu.addColumnToggleItem("Código", codigoColumn);
         columnToggleContextMenu.addColumnToggleItem("Título", tituloColumn);
-        columnToggleContextMenu.addColumnToggleItem("Vólumen", volumenColumn);
-        columnToggleContextMenu.addColumnToggleItem("Tomo", tomoColumn);
-        columnToggleContextMenu.addColumnToggleItem("Parte", parteColumn);
-        columnToggleContextMenu.addColumnToggleItem("Cantidad", cantidadColumn);
-        columnToggleContextMenu.addColumnToggleItem("Precio", precioColumn);
+        columnToggleContextMenu.addColumnToggleItem("Autor", autorColumn);
         columnToggleContextMenu.addColumnToggleItem("Año académico", annoAcademicoColumn);
         columnToggleContextMenu.addColumnToggleItem("Asignatura", asignaturaColumn);
+        columnToggleContextMenu.addColumnToggleItem("Cantidad", cantidadColumn);
+        columnToggleContextMenu.addColumnToggleItem("Precio", precioColumn);
+        columnToggleContextMenu.addColumnToggleItem("Volumen", volumenColumn);
+        columnToggleContextMenu.addColumnToggleItem("Tomo", tomoColumn);
+        columnToggleContextMenu.addColumnToggleItem("Parte", parteColumn);
 
         return menuButton;
     }
@@ -426,6 +443,7 @@ public class LibroView extends Div {
             if (event.getLibro().getId() == null) {
                 //añadir
                 if (event.getLibro().getTitulo().equals(lib.getTitulo())
+                        && event.getLibro().getCodigo().equals(lib.getCodigo())
                         && event.getLibro().getAutor().equals(lib.getAutor())
                         && event.getLibro().getCantidad().equals(lib.getCantidad())
                         && event.getLibro().getPrecio().equals(lib.getPrecio())
@@ -436,6 +454,7 @@ public class LibroView extends Div {
                 }
             } else {
                 if (event.getLibro().getTitulo().equals(lib.getTitulo())
+                        && event.getLibro().getCodigo().equals(lib.getCodigo())
                         && event.getLibro().getAutor().equals(lib.getAutor())
                         && event.getLibro().getCantidad().equals(lib.getCantidad())
                         && event.getLibro().getPrecio().equals(lib.getPrecio())
@@ -445,11 +464,10 @@ public class LibroView extends Div {
                         && event.getLibro().getImagen().equals(lib.getImagen())
                         && event.getLibro().getTomo() == lib.getTomo()
                         && event.getLibro().getVolumen() == lib.getVolumen()
-                        && event.getLibro().getParte() == lib.getParte()
-                        ) {
+                        && event.getLibro().getParte() == lib.getParte()) {
                     listLibros.add(lib);
                     band = true;
-                    
+
                 }
             }
         }

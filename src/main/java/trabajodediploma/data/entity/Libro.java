@@ -33,6 +33,12 @@ public class Libro extends AbstractEntity {
 
     @Lob
     private String imagen;
+    
+    @NotBlank(message = "Campo requerido")
+    @Pattern(regexp = "^[0-9]+$", message = "El código es incorrecto, solo puede utlizar números.")
+    @Size( max = 10, message = "Debe tener máximo 10 caracteres")
+    @Column(nullable = false)
+    private String codigo;
 
     @NotBlank(message = "Campo requerido")
     @Pattern(regexp = "^[a-zA-ZÀ-ÿ\\u00f1\\u00d1]+(\\s*[ a-zA-Z0-9 À-ÿ\\u00f1\\u00d1 /#@$¿?!¡()-_,.]*)*[a-zA-Z0-9 À-ÿ\\u00f1\\u00d1 /#@$¿?!¡()-_,. ]+$", message = "El título es incorrecto, solo puede utlizar los siguientes caracteres especiales /#@$¿?!¡()-_,.")
@@ -55,23 +61,23 @@ public class Libro extends AbstractEntity {
     @Column(nullable = true)
     private Integer parte;
 
-    @NotNull(message = "Debe elegir una cantidad")
+    @NotNull(message = "Campo requerido")
     @Min(message = "Mínimo 1", value = 1)
     @Column(nullable = false)
     private Integer cantidad;
 
-    @NotNull(message = "Debe elegir un precio")
+    @NotNull(message = "Campo requerido")
     @Min(message = "Mínimo 0", value = 0)
     @Column(nullable = false)
     private Double precio;
 
-    @NotNull(message = "Debe elegir un año")
+    @NotNull(message = "Campo requerido")
     @Max(message = "Máximo 5", value = 5)
     @Min(message = "Mínimo 1", value = 1)
     @Column(nullable = false)
     private int anno_academico;
 
-    @NotNull(message = "El campo no debe estar vacío")
+    @NotNull(message = "Campo requerido")
     @JsonIgnoreProperties({"libros"})
     @JoinColumn(name = "asignatura_id", nullable = false, updatable = true)
     @ManyToOne(optional = false)
@@ -190,4 +196,12 @@ public class Libro extends AbstractEntity {
         this.id = id;
     }
 
+    public String getCodigo() {
+        return codigo;
+    }
+
+    public void setCodigo(String codigo) {
+        this.codigo = codigo;
+    }
+    
 }
