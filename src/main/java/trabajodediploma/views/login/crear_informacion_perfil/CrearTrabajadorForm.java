@@ -167,11 +167,6 @@ public class CrearTrabajadorForm extends FormLayout {
     public void setTrabajador(Trabajador trabajador) {
         this.trabajador = trabajador;
         binder.readBean(trabajador);
-         if (user == null) {
-            this.trabajador.setUser(null);
-        } else {
-            this.trabajador.setUser(user);
-        }
     }
 
     // Validate and Save
