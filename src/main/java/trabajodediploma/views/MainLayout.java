@@ -236,7 +236,7 @@ public class MainLayout extends AppLayout {
 
                 new MenuItemInfo("Tarjeta Préstamo", "la la-file-invoice", TarjetaPrestamoView.class), //
 
-                new MenuItemInfo("Modelo de Pago", "la la-file-contract", ModeloPagoView.class), //
+//                new MenuItemInfo("Modelo de Pago", "la la-file-contract", ModeloPagoView.class), //
                 
                 new MenuItemInfo("Módulo", "la la-gift", ModuloView.class), //
 
