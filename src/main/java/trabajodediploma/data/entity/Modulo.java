@@ -35,7 +35,7 @@ public class Modulo extends AbstractEntity {
 
     @NotEmpty
     @NotBlank(message = "El campo no debe estar vacío")
-    @Pattern(regexp = "^[a-zA-ZÀ-ÿ0-9\\u00f1\\u00d1]+(\\s*[a-zA-ZÀ-ÿ0-9\\u00f1\\u00d1]*)*[a-zA-ZÀ-ÿ0-9\\u00f1\\u00d1]+$", message = "Datos incorrectos, solo letras y números") // 0
+    @Pattern(regexp = "^[a-zA-ZÀ-ÿ0-9\\u00f1\\u00d1]+(\\s*[a-zA-ZÀ-ÿ0-9\\u00f1\\u00d1,.]*)*[a-zA-ZÀ-ÿ0-9\\u00f1\\u00d1,.]+$", message = "Datos incorrectos, solo letras,números, y los caracteres punto o coma") // 0
     @Size(message = "Mínimo 1 caracteres y máximo 100", min = 1, max = 100)
     @Column(name = "nombre", nullable = false)
     private String nombre;
