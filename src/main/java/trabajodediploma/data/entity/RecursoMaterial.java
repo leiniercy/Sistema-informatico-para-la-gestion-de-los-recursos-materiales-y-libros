@@ -32,18 +32,24 @@ public class RecursoMaterial extends AbstractEntity {
     @Column(nullable = false)
     private String codigo;
 
-    @Pattern(regexp = "^[a-zA-ZÀ-ÿ\\u00f1\\u00d1]+(\\s*[a-zA-ZÀ-ÿ\\u00f1\\u00d1]*)*[a-zA-ZÀ-ÿ\\u00f1\\u00d1]+$", message = "El nombre del material es incorrecto, use solo letras")
+    @Pattern(regexp = "^[a-zA-ZÀ-ÿ\\u00f1\\u00d1]+(\\s*[a-zA-ZÀ-ÿ0-9\\u00f1\\u00d1]*)*[a-zA-ZÀ-ÿ0-9\\u00f1\\u00d1]+$", message = "El nombre del material es incorrecto, use solo letras y numeros")
     @NotBlank(message = "El campo no puede estar vacío")
     @Size(min = 2, max = 255, message = "Debe tener mínimo 2 caracteres")
     @Column(nullable = false)
     private String descripcion;
+
+    @Pattern(regexp = "^[a-zA-ZÀ-ÿ\\u00f1\\u00d1]+(\\s*[a-zA-ZÀ-ÿ\\u00f1\\u00d1]*)*[a-zA-ZÀ-ÿ\\u00f1\\u00d1]+$", message = "El tipo del material es incorrecto, use solo letras")
+    @NotBlank(message = "El campo no puede estar vacío")
+    @Size(min = 2, max = 255, message = "Debe tener mínimo 2 caracteres")
+    @Column(nullable = false)
+    private String tipo;
 
     @ManyToMany(mappedBy = "recursosMateriales", cascade = CascadeType.ALL)
     Set<Modulo> modulos = new HashSet<>();
 
     public RecursoMaterial() {
     }
-    
+
     public String getCodigo() {
         return codigo;
     }
@@ -75,5 +81,15 @@ public class RecursoMaterial extends AbstractEntity {
     public void setId(Integer id) {
         this.id = id;
     }
+
+    public String getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
+    }
+    
+    
 
 }

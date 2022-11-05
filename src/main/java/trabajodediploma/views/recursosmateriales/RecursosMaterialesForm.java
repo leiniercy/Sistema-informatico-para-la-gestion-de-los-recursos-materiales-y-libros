@@ -23,6 +23,7 @@ public class RecursosMaterialesForm extends FormLayout {
     RecursoMaterial material;
     TextField codigo = new TextField();
     TextField descripcion = new TextField();
+    TextField tipo = new TextField();
     Button save = new Button("Añadir", VaadinIcon.PLUS.create());
     Button close = new Button("Cancelar", VaadinIcon.ERASER.create());
     BeanValidationBinder<RecursoMaterial> binder = new BeanValidationBinder<>(RecursoMaterial.class);
@@ -41,7 +42,7 @@ public class RecursosMaterialesForm extends FormLayout {
             event.getSource().setHelperText(event.getValue().length() + "/" + 255);
         });
 
-        descripcion.setLabel("Descripción");
+        descripcion.setLabel("Nombre");
         descripcion.setAutofocus(true);
         descripcion.setRequired(true);
         descripcion.setMaxLength(255);
@@ -49,8 +50,16 @@ public class RecursosMaterialesForm extends FormLayout {
         descripcion.addValueChangeListener(event -> {
             event.getSource().setHelperText(event.getValue().length() + "/" + 255);
         });
-        
-        add(codigo, descripcion, createButtonsLayout());
+
+        tipo.setLabel("Tipo de material");
+        tipo.setAutofocus(true);
+        tipo.setRequired(true);
+        tipo.setMaxLength(255);
+        tipo.setErrorMessage("Solo letras y numeros, máximo 255 caracteres");
+        tipo.addValueChangeListener(event -> {
+            event.getSource().setHelperText(event.getValue().length() + "/" + 255);
+        });
+        add(codigo, descripcion,tipo, createButtonsLayout());
 
     }
 

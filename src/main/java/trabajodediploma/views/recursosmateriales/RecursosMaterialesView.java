@@ -72,12 +72,14 @@ public class RecursosMaterialesView extends Div {
     GridListDataView<RecursoMaterial> gridListDataView;
     Grid.Column<RecursoMaterial> codigoColumn;
     Grid.Column<RecursoMaterial> descripcionColumn;
+    Grid.Column<RecursoMaterial> tipoColumn;
     Grid.Column<RecursoMaterial> editColumn;
 
     MyFooter myFooter;
     RecursosMaterialesForm form;
     private TextField filterCodigo;
     private TextField filterDescripcion;
+    private TextField filterTipo;
 
     private Dialog dialog;
     private Html total;
@@ -149,7 +151,11 @@ public class RecursosMaterialesView extends Div {
         codigoColumn = grid.addColumn(RecursoMaterial::getCodigo).setHeader("Código").setAutoWidth(true)
                 .setSortable(true);
 
-        descripcionColumn = grid.addColumn(RecursoMaterial::getDescripcion).setHeader("Descripción")
+        descripcionColumn = grid.addColumn(RecursoMaterial::getDescripcion).setHeader("Nombre")
+                .setAutoWidth(true)
+                .setSortable(true);
+
+        tipoColumn = grid.addColumn(RecursoMaterial::getTipo).setHeader("Tipo de material")
                 .setAutoWidth(true)
                 .setSortable(true);
 
@@ -163,6 +169,7 @@ public class RecursosMaterialesView extends Div {
         HeaderRow headerRow = grid.appendHeaderRow();
         headerRow.getCell(codigoColumn).setComponent(filterCodigo);
         headerRow.getCell(descripcionColumn).setComponent(filterDescripcion);
+        headerRow.getCell(tipoColumn).setComponent(filterTipo);
 
         gridListDataView = grid.setItems(materialService.findAll());
         grid.setAllRowsVisible(true);
@@ -197,11 +204,15 @@ public class RecursosMaterialesView extends Div {
         filterDescripcion.setClearButtonVisible(true);
         filterDescripcion.setWidth("100%");
         filterDescripcion.setValueChangeMode(ValueChangeMode.EAGER);
-        filterDescripcion.addValueChangeListener(
-                event -> gridListDataView
-                        .addFilter(material -> StringUtils.containsIgnoreCase(
-                        material.getDescripcion(),
-                        filterDescripcion.getValue())));
+        filterDescripcion.addValueChangeListener( event -> gridListDataView.addFilter(material -> StringUtils.containsIgnoreCase(material.getDescripcion(),filterDescripcion.getValue())));
+
+        filterTipo = new TextField();
+        filterTipo.setPlaceholder("Filtrar");
+        filterTipo.setPrefixComponent(VaadinIcon.SEARCH.create());
+        filterTipo.setClearButtonVisible(true);
+        filterTipo.setWidth("100%");
+        filterTipo.setValueChangeMode(ValueChangeMode.EAGER);
+        filterTipo.addValueChangeListener(event -> gridListDataView.addFilter(material -> StringUtils.containsIgnoreCase(material.getTipo(),filterTipo.getValue())));
 
     }
 
@@ -292,7 +303,8 @@ public class RecursosMaterialesView extends Div {
         ColumnToggleContextMenu columnToggleContextMenu = new ColumnToggleContextMenu(
                 menuButton);
         columnToggleContextMenu.addColumnToggleItem("Código", codigoColumn);
-        columnToggleContextMenu.addColumnToggleItem("Descripción", descripcionColumn);
+        columnToggleContextMenu.addColumnToggleItem("Nombre", descripcionColumn);
+        columnToggleContextMenu.addColumnToggleItem("Tipo", tipoColumn);
         return menuButton;
     }
 
@@ -331,8 +343,9 @@ public class RecursosMaterialesView extends Div {
         for (int i = 0; i < materialService.findAll().size() && band == false; i++) {
             RecursoMaterial mat = materialService.findAll().get(i);
             if (event.getRecursoMaterial().getCodigo().equals(mat.getCodigo())
-                    && event.getRecursoMaterial().getDescripcion()
-                            .equals(mat.getDescripcion())) {
+                    && event.getRecursoMaterial().getDescripcion().equals(mat.getDescripcion())
+                    && event.getRecursoMaterial().getTipo().equals(mat.getTipo())
+                    ) {
                 materiales.add(mat);
                 band = true;
             }
