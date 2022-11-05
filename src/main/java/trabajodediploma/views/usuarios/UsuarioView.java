@@ -9,6 +9,7 @@ import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
@@ -69,7 +70,7 @@ public class UsuarioView extends Div {
     private Dialog dialog;
     private TextField filterName;
     private TextField filterUserName;
-    private TextField filterRol;
+    private ComboBox<Rol> filterRol;
     private HorizontalLayout toolbar;
     private HorizontalLayout buttons;
     private Html total;
@@ -80,7 +81,6 @@ public class UsuarioView extends Div {
         this.userService = userService;
         configureGrid();
         configureForm();
-        Filtros();
         myFooter = new MyFooter();
         add(menuBar(), getContent(), myFooter);
     }
@@ -112,17 +112,17 @@ public class UsuarioView extends Div {
     }
 
     /* Tabla */
-    /* Configuracion de la tabla */
+ /* Configuracion de la tabla */
     private void configureGrid() {
 
         grid.setClassName("usuario_view__container__div_grid");
         LitRenderer<User> imagenRenderer = LitRenderer.<User>of(
                 "<vaadin-horizontal-layout style=\"align-items: center;\" theme=\"spacing\">"
-                        + "<vaadin-avatar img=\"${item.profilePictureUrl}\" name=\"${item.name}\" alt=\"User avatar\"></vaadin-avatar>"
-                        + "  <vaadin-vertical-layout style=\"line-height: var(--lumo-line-height-m);\">"
-                        + "    <span> ${item.name} </span>"
-                        + "  </vaadin-vertical-layout>"
-                        + "</vaadin-horizontal-layout>")
+                + "<vaadin-avatar img=\"${item.profilePictureUrl}\" name=\"${item.name}\" alt=\"User avatar\"></vaadin-avatar>"
+                + "  <vaadin-vertical-layout style=\"line-height: var(--lumo-line-height-m);\">"
+                + "    <span> ${item.name} </span>"
+                + "  </vaadin-vertical-layout>"
+                + "</vaadin-horizontal-layout>")
                 .withProperty("profilePictureUrl", User::getProfilePictureUrl)
                 .withProperty("name", User::getName);
 
@@ -150,8 +150,11 @@ public class UsuarioView extends Div {
             return editButton;
         }).setFlexGrow(0);
 
+        Filtros();
         HeaderRow headerRow = grid.appendHeaderRow();
         headerRow.getCell(userNameColumn).setComponent(filterUserName);
+        headerRow.getCell(profilePictureUrlColumn).setComponent(filterName);
+        headerRow.getCell(rolColumn).setComponent(filterRol);
 
         gridListDataView = grid.setItems(userService.findAll());
         grid.setAllRowsVisible(true);
@@ -174,9 +177,13 @@ public class UsuarioView extends Div {
         filterName.setClearButtonVisible(true);
         filterName.setWidth("100%");
         filterName.setValueChangeMode(ValueChangeMode.EAGER);
-        filterName.addValueChangeListener(
-                event -> gridListDataView
-                        .addFilter(user -> StringUtils.containsIgnoreCase(user.getName(), filterName.getValue())));
+        filterName.addValueChangeListener(event -> {
+            if (filterName.getValue() == null) {
+                gridListDataView = grid.setItems(userService.findAll());
+            } else {
+                gridListDataView.addFilter(user -> StringUtils.containsIgnoreCase(user.getName(), filterName.getValue()));
+            }
+        });
 
         // usuario
         filterUserName = new TextField();
@@ -190,19 +197,39 @@ public class UsuarioView extends Div {
                         .addFilter(
                                 user -> StringUtils.containsIgnoreCase(user.getUsername(), filterUserName.getValue())));
 
-        filterRol = new TextField();
+        filterRol = new ComboBox<>();
         filterRol.setPlaceholder("Filtrar");
-        filterRol.setPrefixComponent(VaadinIcon.SEARCH.create());
+        filterRol.setItems(Rol.getVD_ADIMN_ECONOMIA(),
+                Rol.getASISTENTE_CONTROL(),
+                Rol.getRESP_ALMACEN());
+        filterRol.setItemLabelGenerator(Rol::getRolname);
         filterRol.setClearButtonVisible(true);
         filterRol.setWidth("100%");
-        filterRol.setValueChangeMode(ValueChangeMode.EAGER);
-        filterRol.addValueChangeListener(
-                event -> gridListDataView
-                        .addFilter(user -> StringUtils.containsIgnoreCase(user.getName(), filterRol.getValue())));
+        filterRol.addValueChangeListener(event -> {
+            if (filterRol.getValue() == null) {
+                gridListDataView = grid.setItems(userService.findAll());
+            } else {
+                gridListDataView.addFilter(user -> areRolEqual(user.getRoles(), filterRol));
+            }
+        });
     }
+
+    private boolean areRolEqual(Set<Rol> roles, ComboBox<Rol> rolFilter) {
+        String rolFilterValue = rolFilter.getValue().getRolname();
+        if (rolFilterValue != null) {
+            List<Rol> list = new LinkedList<>(roles);
+            for (int i = 0; i < list.size(); i++) {
+                if (list.get(i).getRolname().equals(rolFilterValue)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     /* Fin-Filtros */
 
-    /* Barra de menu */
+ /* Barra de menu */
     private HorizontalLayout menuBar() {
 
         buttons = new HorizontalLayout();
@@ -226,8 +253,8 @@ public class UsuarioView extends Div {
                 .set("padding", "var(--lumo-space-wide-m)");
         return toolbar;
     }
-    /* Barra de menu */
 
+    /* Barra de menu */
     private void refreshGrid() {
         grid.setVisible(true);
         grid.setItems(userService.findAll());
