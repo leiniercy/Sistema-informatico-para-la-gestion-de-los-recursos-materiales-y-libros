@@ -81,7 +81,7 @@ public class ModuloView extends Div {
     private RecursoMaterialService materialService;
     private EstudianteService estudianteService;
     private TrabajadorService trabajadorService;
-    private EmailSenderService emailSenderService;
+    private EmailSenderService senderService;
     private GrupoService grupoService;
     private AreaService areaService;
     private Dialog dialog;
@@ -129,7 +129,7 @@ public class ModuloView extends Div {
         this.materialService = materialService;
         this.estudianteService = estudianteService;
         this.trabajadorService = trabajadorService;
-        this.emailSenderService = emailSenderService;
+        this.senderService = senderService;
         this.grupoService = grupoService;
         this.areaService = areaService;
         listEstudiantes = new LinkedList<>();
@@ -543,14 +543,15 @@ public class ModuloView extends Div {
                 List<Modulo> listModulo = new LinkedList<>(grid.getSelectedItems());
                 List<RecursoMaterial> listMateriales = new LinkedList<>(listModulo.get(0).getRecursosMateriales());
                 String materiales = listMateriales.get(0).getDescripcion();
-                for (int i = 0; i < listMateriales.size(); i++) {
+                for (int i = 1; i < listMateriales.size(); i++) {
                     materiales += ("," + listMateriales.get(i).getDescripcion());
                 }
                 for (int i = 0; i < listEstudiantes.size(); i++) {
-                    emailSenderService.sendSimpleEmail(
+                    senderService.sendSimpleEmail(
                             /* enviado a: */listEstudiantes.get(i).getEmail(),
                             /* asunto: */ "Entrega de módulo",
-                            /* mensaje: */ "Sistema Informático para la gestión de la información de los recursos materiales y libros en la facultad 4. \n"
+                            /* mensaje: */ "Genius\n"
+                            + "Sistema Informático para la gestión de la información de los recursos materiales y libros en la facultad 4. \n"
                             + "Buenas, el módulo "
                             + listModulo.get(0).getNombre()
                             + "(" + materiales + ")"
@@ -665,14 +666,15 @@ public class ModuloView extends Div {
                 List<Modulo> listModulo = new LinkedList<>(grid.getSelectedItems());
                 List<RecursoMaterial> listMateriales = new LinkedList<>(listModulo.get(0).getRecursosMateriales());
                 String materiales = listMateriales.get(0).getDescripcion();
-                for (int i = 0; i < listMateriales.size(); i++) {
+                for (int i = 1; i < listMateriales.size(); i++) {
                     materiales += ("," + listMateriales.get(i).getDescripcion());
                 }
                 for (int i = 0; i < listTrabajadores.size(); i++) {
-                    emailSenderService.sendSimpleEmail(
+                    senderService.sendSimpleEmail(
                             /* enviado a: */listTrabajadores.get(i).getEmail(),
                             /* asunto: */ "Entrega de módulo",
-                            /* mensaje: */ "Sistema Informático para la gestión de la información de los recursos materiales y libros en la facultad 4. \n"
+                            /* mensaje: */ "Genius\n"
+                            + "Sistema Informático para la gestión de la información de los recursos materiales y libros en la facultad 4.\n"
                             + "Buenas, el módulo "
                             + listModulo.get(0).getNombre()
                             + "(" + materiales + ")"
