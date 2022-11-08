@@ -51,9 +51,11 @@ public class TarjetaDestinoFinal_EstudianteForm_Individual  extends FormLayout{
         /*Estudiante*/
         estudiante.setItems(estudiantes);
         estudiante.setItemLabelGenerator(est->est.getUser().getName());
+        estudiante.setClearButtonVisible(true);
         /*Libros*/
         modulo.setItems(modulos);
         modulo.setItemLabelGenerator(Modulo::getNombre);
+        modulo.setClearButtonVisible(true);
         /*fecha de entrega*/
         fecha.setMin(LocalDate.now(ZoneId.systemDefault()));
         

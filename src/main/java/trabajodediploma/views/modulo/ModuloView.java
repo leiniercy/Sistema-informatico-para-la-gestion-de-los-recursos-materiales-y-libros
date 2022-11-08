@@ -943,10 +943,10 @@ public class ModuloView extends Div {
                 notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
             }
             toolbar.remove(total);
-            if (moduloService.count() == 1) {
-                total = new Html("<span>Total: <b>" + moduloService.count() + "</b> módulo</span>");
-            } else if (moduloService.count() == 0 || moduloService.count() > 1) {
-                total = new Html("<span>Total: <b>" + moduloService.count() + "</b> módulos</span>");
+            if (moduloService.findAll().size() == 1) {
+                total = new Html("<span>Total: <b>" + moduloService.findAll().size() + "</b> módulo</span>");
+            } else if (moduloService.findAll().size() == 0 || moduloService.findAll().size() > 1) {
+                total = new Html("<span>Total: <b>" + moduloService.findAll().size() + "</b> módulos</span>");
             }
             toolbar.addComponentAtIndex(1, total);
             toolbar.setFlexGrow(1, buttons);

@@ -51,9 +51,11 @@ public class TarjetaDestinoFinal_TrabajadorFrom_Individual  extends FormLayout{
         /*Trabajador*/
         trabajador.setItems(trabajadors);
         trabajador.setItemLabelGenerator(est->est.getUser().getName());
+        trabajador.setClearButtonVisible(true);
         /*Libros*/
         modulo.setItems(modulos);
         modulo.setItemLabelGenerator(Modulo::getNombre);
+        modulo.setClearButtonVisible(true);
         /*fecha de entrega*/
         fecha.setMin(LocalDate.now(ZoneId.systemDefault()));
         
