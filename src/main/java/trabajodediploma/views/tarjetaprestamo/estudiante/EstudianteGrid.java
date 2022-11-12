@@ -436,7 +436,7 @@ public class EstudianteGrid extends Div {
                             /* enviado a: */event.getTarjetaPrestamo().get(i).getEstudiante().getEmail(),
                             /* asunto: */ "Entrega de libros",
                             /* mensaje: */ "Genius\n"
-                            + "Sistema Informático para la gestión de la información de los recursos materiales y libros en la facultad 4.  \n"
+                            + "Sistema Informático para la gestión de información de los recursos materiales y libros en la facultad 4.  \n"
                             + "Usted ha recibido el libro: "
                             + event.getTarjetaPrestamo().get(i).getLibro().getTitulo()
                             + " el día: "

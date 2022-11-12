@@ -42,7 +42,7 @@ public class LoginView extends Div implements BeforeEnterObserver {
 
         i18n.setHeader(new LoginI18n.Header());
         i18n.getHeader().setTitle("GENIUS");
-        i18n.getHeader().setDescription("Sistema Informático para la gestión de la información de los recursos materiales y libros en la facultad 4.");
+        i18n.getHeader().setDescription("Sistema Informático para la gestión de información de los recursos materiales y libros en la facultad 4.");
 
         i18n.setAdditionalInformation(null);
 

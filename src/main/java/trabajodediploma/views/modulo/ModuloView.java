@@ -551,7 +551,7 @@ public class ModuloView extends Div {
                             /* enviado a: */listEstudiantes.get(i).getEmail(),
                             /* asunto: */ "Entrega de módulo",
                             /* mensaje: */ "Genius\n"
-                            + "Sistema Informático para la gestión de la información de los recursos materiales y libros en la facultad 4. \n"
+                            + "Sistema Informático para la gestión de información de los recursos materiales y libros en la facultad 4. \n"
                             + "Buenas, el módulo "
                             + listModulo.get(0).getNombre()
                             + "(" + materiales + ")"
@@ -674,7 +674,7 @@ public class ModuloView extends Div {
                             /* enviado a: */listTrabajadores.get(i).getEmail(),
                             /* asunto: */ "Entrega de módulo",
                             /* mensaje: */ "Genius\n"
-                            + "Sistema Informático para la gestión de la información de los recursos materiales y libros en la facultad 4.\n"
+                            + "Sistema Informático para la gestión de información de los recursos materiales y libros en la facultad 4.\n"
                             + "Buenas, el módulo "
                             + listModulo.get(0).getNombre()
                             + "(" + materiales + ")"

@@ -685,7 +685,7 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
                             /* enviado a: */event.getDestinoFinal().getEstudiante().getEmail(),
                             /* asunto: */ "Entrega de Módulo",
                             /* mensaje: */ "Genius \n"
-                            + "Sistema Informático para la gestión de la información de los recursos materiales y libros en la facultad 4. \n"
+                            + "Sistema Informático para la gestión de información de los recursos materiales y libros en la facultad 4. \n"
                             + "Usted ha recibido el Módulo: "
                             + event.getDestinoFinal().getModulo().getNombre()
                             + " el día: "
@@ -765,7 +765,7 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
                             /* enviado a: */event.getDestinoFinal().get(i).getEstudiante().getEmail(),
                             /* asunto: */ "Entrega de Módulo",
                             /* mensaje: */ "Genius \n"
-                            + "Sistema Informático para la gestión de la información de los recursos materiales y libros en la facultad 4. \n"
+                            + "Sistema Informático para la gestión de información de los recursos materiales y libros en la facultad 4. \n"
                             + "Usted ha recibido el Módulo: "
                             + event.getDestinoFinal().get(i).getModulo().getNombre()
                             + " el día: "
