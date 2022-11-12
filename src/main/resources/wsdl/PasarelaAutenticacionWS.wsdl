@@ -1,0 +1,445 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="https://autenticacion2.uci.cu/v7/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="PasarelaAutenticacionWS" targetNamespace="https://autenticacion2.uci.cu/v7/">
+  <wsdl:types>
+    <xsd:schema targetNamespace="https://autenticacion2.uci.cu/v7/">
+    	<xsd:element name="ObtenerPersonaDadoIdExpediente">
+    		<xsd:complexType>
+    			<xsd:all>
+    				<xsd:element name="IdExpediente" type="xsd:string"/>
+    			</xsd:all>
+    		</xsd:complexType>
+    	</xsd:element>
+    	<xsd:element name="ObtenerPersonaDadoIdExpedienteResponse">
+    		<xsd:complexType>
+    			<xsd:all>
+    				<xsd:element name="Persona" type="tns:Persona"/>
+    			</xsd:all>
+    		</xsd:complexType>
+    	</xsd:element>
+    	<xsd:element name="ObtenerPersonaDadoCredencial">
+    		<xsd:complexType>
+    			<xsd:all>
+
+    				<xsd:element name="Credencial" type="xsd:string"/>
+    			</xsd:all>
+    		</xsd:complexType>
+    	</xsd:element>
+    	<xsd:element name="ObtenerPersonaDadoCredencialResponse">
+    		<xsd:complexType>
+    			<xsd:all>
+
+    				<xsd:element name="Persona" type="tns:Persona"/>
+    			</xsd:all>
+    		</xsd:complexType>
+    	</xsd:element>
+    	<xsd:element name="AutenticarUsuario">
+    		<xsd:complexType>
+    			<xsd:all>
+
+    				<xsd:element name="Usuario" type="xsd:string"/>
+    				<xsd:element name="Clave" type="xsd:string">
+    				</xsd:element>
+    			</xsd:all>
+
+    		</xsd:complexType>
+    	</xsd:element>
+    	<xsd:element name="AutenticarUsuarioResponse">
+    		<xsd:complexType>
+    			<xsd:all>
+
+    				<xsd:element name="Persona" type="tns:Persona"/>
+    			</xsd:all>
+    		</xsd:complexType>
+    	</xsd:element>
+    	<xsd:element name="ObtenerPersonaDadoUsuario">
+    		<xsd:complexType>
+    			<xsd:all>
+
+    				<xsd:element name="Usuario" type="xsd:string"/>
+    			</xsd:all>
+    		</xsd:complexType>
+    	</xsd:element>
+    	<xsd:element name="ObtenerPersonaDadoUsuarioResponse">
+    		<xsd:complexType>
+    			<xsd:all>
+
+    				<xsd:element name="Persona" type="tns:Persona"/>
+    			</xsd:all>
+    		</xsd:complexType>
+    	</xsd:element>
+
+    	<xsd:element name="ObtenerEstructurasResponse">
+    		<xsd:complexType>
+    			<xsd:all>
+
+    				<xsd:element name="Estructuras" type="tns:EstructuraArray">
+    				</xsd:element>
+    			</xsd:all>
+    		</xsd:complexType>
+    	</xsd:element>
+    	<xsd:element name="ObtenerCredencialDadoCodigoBarras">
+    		<xsd:complexType>
+    			<xsd:all>
+
+    				<xsd:element name="CodigoBarras" type="xsd:string">
+    				</xsd:element>
+    			</xsd:all>
+    		</xsd:complexType>
+    	</xsd:element>
+    	<xsd:element name="ObtenerCredencialDadoCodigoBarrasResponse">
+    		<xsd:complexType>
+    			<xsd:all>
+
+    				<xsd:element name="Credencial" type="tns:Credencial">
+    				</xsd:element>
+    			</xsd:all>
+    		</xsd:complexType>
+    	</xsd:element>
+
+    	<xsd:element name="ObtenerRutaBaseFotosResponse">
+    		<xsd:complexType>
+    			<xsd:all>
+
+    				<xsd:element name="UrlBase" type="xsd:string"/>
+    			</xsd:all>
+    		</xsd:complexType>
+    	</xsd:element>
+    	<xsd:element name="ObtenerPersonaDadoCodigoBarras">
+    		<xsd:complexType>
+    			<xsd:all>
+
+    				<xsd:element name="CodigoBarras" type="xsd:string">
+    				</xsd:element>
+    			</xsd:all>
+    		</xsd:complexType>
+    	</xsd:element>
+    	<xsd:element name="ObtenerPersonaDadoCodigoBarrasResponse">
+    		<xsd:complexType>
+    			<xsd:all>
+
+    				<xsd:element name="Persona" type="tns:Persona"/>
+    			</xsd:all>
+    		</xsd:complexType>
+    	</xsd:element>
+    	<xsd:complexType name="Void">
+    		<xsd:sequence/>
+    	</xsd:complexType>
+    	<xsd:complexType name="Persona">
+    		<xsd:all>
+    			<xsd:element name="IdExpediente" type="xsd:string"/>
+    			<xsd:element name="Nombres" type="xsd:string"/>
+    			<xsd:element name="Apellidos" type="xsd:string"/>
+    			<xsd:element name="Credencial" type="xsd:string"/>
+    			<xsd:element name="Municipio" type="tns:Municipio"/>
+    			<xsd:element name="CI" type="xsd:string"/>
+    			<xsd:element name="Categoria" type="xsd:string"/>
+    			<xsd:element name="Cargo" type="tns:Cargo"/>
+    			<xsd:element name="Sexo" type="tns:Sexo"/>
+    			<xsd:element name="Usuario" type="xsd:string"/>
+    			<xsd:element name="Correo" type="xsd:string"/>
+    			<xsd:element name="Residencia" type="tns:Residencia"/>
+    			<xsd:element name="Area" type="tns:Area"/>
+    			<xsd:element name="Foto" type="tns:Foto"/>
+    			<xsd:element name="Fuente" type="xsd:string"/>
+    			<xsd:element name="Autenticado" type="xsd:boolean"/>
+    			<xsd:element name="Activo" type="xsd:boolean"/>
+    		</xsd:all>
+    	</xsd:complexType>
+    	<xsd:complexType name="Municipio">
+    		<xsd:all>
+    			<xsd:element name="IdMunicipio" type="xsd:string"/>
+    			<xsd:element name="NombreMunicipio" type="xsd:string">
+    			</xsd:element>
+    			<xsd:element name="Provincia" type="tns:Provincia"/>
+    		</xsd:all>
+    	</xsd:complexType>
+    	<xsd:complexType name="Provincia">
+    		<xsd:all>
+    			<xsd:element name="IdProvincia" type="xsd:string"/>
+    			<xsd:element name="NombreProvincia" type="xsd:string"/>
+    		</xsd:all>
+    	</xsd:complexType>
+    	<xsd:complexType name="Cargo">
+    		<xsd:all>
+    			<xsd:element name="IdCargo" type="xsd:string"/>
+    			<xsd:element name="NombreCargo" type="xsd:string"/>
+    		</xsd:all>
+    	</xsd:complexType>
+    	<xsd:complexType name="Sexo">
+    		<xsd:all>
+    			<xsd:element name="IdSexo" type="xsd:string"/>
+    			<xsd:element name="NombreSexo" type="xsd:string"/>
+    		</xsd:all>
+    	</xsd:complexType>
+    	<xsd:complexType name="Residencia">
+    		<xsd:all>
+    			<xsd:element name="Edificio" type="xsd:string"/>
+    			<xsd:element name="Apartamento" type="xsd:string"/>
+    			<xsd:element name="Telefono" type="xsd:string"/>
+    		</xsd:all>
+    	</xsd:complexType>
+    	<xsd:complexType name="Area">
+    		<xsd:all>
+    			<xsd:element name="IdArea" type="xsd:string"/>
+    			<xsd:element name="NombreArea" type="xsd:string"/>
+    		</xsd:all>
+    	</xsd:complexType>
+    	<xsd:complexType name="EstructuraArray">
+    		<xsd:sequence>
+    			<xsd:element name="x" type="tns:Estructura" minOccurs="0" maxOccurs="unbounded"/>
+    		</xsd:sequence>
+    	</xsd:complexType>
+    	<xsd:complexType name="Estructura">
+    		<xsd:sequence>
+    			<xsd:element name="CodigoAsset" type="xsd:string"/>
+    			<xsd:element name="IdEstructura" type="xsd:string"/>
+    			<xsd:element name="NombreEstructura" type="xsd:string">
+    			</xsd:element>
+    			<xsd:element name="IdEstructuraPadre" type="xsd:string">
+    			</xsd:element>
+    			<xsd:element name="CodigoEstructura" type="xsd:string">
+    			</xsd:element>
+    			<xsd:element name="NombreEstructuraCredencial" type="xsd:string">
+    			</xsd:element>
+    		</xsd:sequence>
+    	</xsd:complexType>
+    	<xsd:complexType name="Credencial">
+
+    		<xsd:all>
+    			<xsd:element name="NumeroSolapin" type="xsd:string">
+    			</xsd:element>
+    			<xsd:element name="IdExpediente" type="xsd:string">
+    			</xsd:element>
+    			<xsd:element name="Foto" type="tns:Foto"/>
+    			<xsd:element name="NombreCompleto" type="xsd:string">
+    			</xsd:element>
+    			<xsd:element name="Area" type="tns:Area"/>
+    			<xsd:element name="Categoria" type="xsd:string"/>
+    			<xsd:element name="EsResidente" type="xsd:boolean"/>
+    		</xsd:all>
+    	</xsd:complexType>
+
+    	<xsd:complexType name="Foto">
+    		<xsd:all>
+    			<xsd:element name="IdFoto" type="xsd:string"/>
+    			<xsd:element name="UrlFoto" type="xsd:string"/>
+    		</xsd:all>
+    	</xsd:complexType>
+    	<xsd:element name="ObtenerEstructuras">
+    		<xsd:complexType>
+    			<xsd:all>
+
+    				<xsd:element name="in" type="tns:Void"/>
+    			</xsd:all>
+    		</xsd:complexType>
+    	</xsd:element>
+    	<xsd:element name="ObtenerRutaBaseFotos">
+    		<xsd:complexType>
+                    <xsd:all>
+
+    				<xsd:element name="in" type="tns:Void"/>
+    			</xsd:all>
+    		</xsd:complexType>
+    	</xsd:element>
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="ObtenerPersonaDadoIdExpedienteRequest">
+    <wsdl:part element="tns:ObtenerPersonaDadoIdExpediente" name="parameters"/>
+  </wsdl:message>
+  <wsdl:message name="ObtenerPersonaDadoIdExpedienteResponse">
+    <wsdl:part element="tns:ObtenerPersonaDadoIdExpedienteResponse" name="parameters"/>
+  </wsdl:message>
+  <wsdl:message name="ObtenerPersonaDadoCredencialRequest">
+  	<wsdl:part name="parameters" element="tns:ObtenerPersonaDadoCredencial"/>
+  </wsdl:message>
+  <wsdl:message name="ObtenerPersonaDadoCredencialResponse">
+  	<wsdl:part name="parameters" element="tns:ObtenerPersonaDadoCredencialResponse"/>
+  </wsdl:message>
+  <wsdl:message name="AutenticarUsuarioRequest">
+  	<wsdl:part name="parameters" element="tns:AutenticarUsuario"/>
+  </wsdl:message>
+  <wsdl:message name="AutenticarUsuarioResponse">
+  	<wsdl:part name="parameters" element="tns:AutenticarUsuarioResponse"/>
+  </wsdl:message>
+  <wsdl:message name="ObtenerPersonaDadoUsuarioRequest">
+  	<wsdl:part name="parameters" element="tns:ObtenerPersonaDadoUsuario"/>
+  </wsdl:message>
+  <wsdl:message name="ObtenerPersonaDadoUsuarioResponse">
+  	<wsdl:part name="parameters" element="tns:ObtenerPersonaDadoUsuarioResponse"/>
+  </wsdl:message>  
+  <wsdl:message name="ObtenerEstructurasResponse">
+  	<wsdl:part name="parameters" element="tns:ObtenerEstructurasResponse"/>
+  </wsdl:message>
+  <wsdl:message name="ObtenerCredencialDadoCodigoBarrasRequest">
+  	<wsdl:part name="parameters" element="tns:ObtenerCredencialDadoCodigoBarras"/>
+  </wsdl:message>
+  <wsdl:message name="ObtenerCredencialDadoCodigoBarrasResponse">
+  	<wsdl:part name="parameters" element="tns:ObtenerCredencialDadoCodigoBarrasResponse"/>
+  </wsdl:message>
+  <wsdl:message name="ObtenerRutaBaseFotosRequest">
+
+        <wsdl:part name="parameters" type="tns:Void"/>
+  </wsdl:message>
+  <wsdl:message name="ObtenerRutaBaseFotosResponse">
+  	<wsdl:part name="parameters" element="tns:ObtenerRutaBaseFotosResponse"/>
+  </wsdl:message>
+  <wsdl:message name="ObtenerPersonaDadoCodigoBarrasRequest">
+  	<wsdl:part name="parameters" element="tns:ObtenerPersonaDadoCodigoBarras"/>
+  </wsdl:message>
+  <wsdl:message name="ObtenerPersonaDadoCodigoBarrasResponse">
+  	<wsdl:part name="parameters" element="tns:ObtenerPersonaDadoCodigoBarrasResponse"/>
+  </wsdl:message>
+  <wsdl:message name="ObtenerEstructurasRequest1">
+  	<wsdl:part name="parameters" type="tns:Void"/>
+  </wsdl:message>
+  <wsdl:message name="ObtenerEstructurasRequest">
+  	<wsdl:part name="parameters" element="tns:ObtenerEstructuras"/>
+  </wsdl:message>
+  <wsdl:message name="ObtenerRutaBaseFotosRequest1">
+  	<wsdl:part name="parameters" element="tns:ObtenerRutaBaseFotos"/>
+  </wsdl:message>
+  <wsdl:portType name="PasarelaAutenticacionWS">
+    <wsdl:operation name="ObtenerPersonaDadoIdExpediente">
+      <wsdl:input message="tns:ObtenerPersonaDadoIdExpedienteRequest"/>
+      <wsdl:output message="tns:ObtenerPersonaDadoIdExpedienteResponse"/>
+    </wsdl:operation>
+    <wsdl:operation name="ObtenerPersonaDadoCredencial">
+    	<wsdl:input message="tns:ObtenerPersonaDadoCredencialRequest"/>
+    	<wsdl:output message="tns:ObtenerPersonaDadoCredencialResponse"/>
+    </wsdl:operation>
+    <wsdl:operation name="AutenticarUsuario">
+    	<wsdl:input message="tns:AutenticarUsuarioRequest"/>
+    	<wsdl:output message="tns:AutenticarUsuarioResponse"/>
+    </wsdl:operation>
+    <wsdl:operation name="ObtenerPersonaDadoUsuario">
+    	<wsdl:input message="tns:ObtenerPersonaDadoUsuarioRequest"/>
+    	<wsdl:output message="tns:ObtenerPersonaDadoUsuarioResponse"/>
+    </wsdl:operation>
+    <wsdl:operation name="ObtenerEstructuras">
+
+
+            <wsdl:input message="tns:ObtenerEstructurasRequest"/>
+            <wsdl:output message="tns:ObtenerEstructurasResponse"/>
+    </wsdl:operation>
+    <wsdl:operation name="ObtenerCredencialDadoCodigoBarras">
+    	<wsdl:input message="tns:ObtenerCredencialDadoCodigoBarrasRequest"/>
+    	<wsdl:output message="tns:ObtenerCredencialDadoCodigoBarrasResponse"/>
+    </wsdl:operation>
+    <wsdl:operation name="ObtenerRutaBaseFotos">
+
+            <wsdl:input message="tns:ObtenerRutaBaseFotosRequest1"/>
+            <wsdl:output message="tns:ObtenerRutaBaseFotosResponse"/>
+    </wsdl:operation>
+    <wsdl:operation name="ObtenerPersonaDadoCodigoBarras">
+    	<wsdl:input message="tns:ObtenerPersonaDadoCodigoBarrasRequest"/>
+    	<wsdl:output message="tns:ObtenerPersonaDadoCodigoBarrasResponse"/>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="PasarelaAutenticacionWSSOAP" type="tns:PasarelaAutenticacionWS">
+  	<wsdl:documentation>Binding of the servic</wsdl:documentation>
+
+  	<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+  	<wsdl:operation name="ObtenerPersonaDadoIdExpediente">
+
+  		<soap:operation soapAction="https://autenticacion2.uci.cu/v7/ObtenerPersonaDadoIdExpediente"/>
+  		<wsdl:input>
+
+  			<soap:body use="literal"/>
+  		</wsdl:input>
+  		<wsdl:output>
+
+  			<soap:body use="literal"/>
+  		</wsdl:output>
+  	</wsdl:operation>
+  	<wsdl:operation name="ObtenerPersonaDadoCredencial">
+
+  		<soap:operation soapAction="https://autenticacion2.uci.cu/v7/ObtenerPersonaDadoCredencial"/>
+  		<wsdl:input>
+
+  			<soap:body use="literal"/>
+  		</wsdl:input>
+  		<wsdl:output>
+
+  			<soap:body use="literal"/>
+  		</wsdl:output>
+  	</wsdl:operation>
+  	<wsdl:operation name="AutenticarUsuario">
+
+  		<soap:operation soapAction="https://autenticacion2.uci.cu/v7/AutenticarUsuario"/>
+  		<wsdl:input>
+
+  			<soap:body use="literal"/>
+  		</wsdl:input>
+  		<wsdl:output>
+
+  			<soap:body use="literal"/>
+  		</wsdl:output>
+  	</wsdl:operation>
+  	<wsdl:operation name="ObtenerPersonaDadoUsuario">
+
+  		<soap:operation soapAction="https://autenticacion2.uci.cu/v7/ObtenerPersonaDadoUsuario"/>
+  		<wsdl:input>
+
+  			<soap:body use="literal"/>
+  		</wsdl:input>
+  		<wsdl:output>
+
+  			<soap:body use="literal"/>
+  		</wsdl:output>
+  	</wsdl:operation>
+  	<wsdl:operation name="ObtenerEstructuras">
+
+  		<soap:operation soapAction="https://autenticacion2.uci.cu/v7/ObtenerEstructuras"/>
+  		<wsdl:input>
+
+  			<soap:body use="literal"/>
+  		</wsdl:input>
+  		<wsdl:output>
+
+  			<soap:body use="literal"/>
+  		</wsdl:output>
+  	</wsdl:operation>
+  	<wsdl:operation name="ObtenerCredencialDadoCodigoBarras">
+
+  		<soap:operation soapAction="https://autenticacion2.uci.cu/v7/ObtenerCredencialDadoCodigoBarras"/>
+  		<wsdl:input>
+
+  			<soap:body use="literal"/>
+  		</wsdl:input>
+  		<wsdl:output>
+
+  			<soap:body use="literal"/>
+  		</wsdl:output>
+  	</wsdl:operation>
+  	<wsdl:operation name="ObtenerRutaBaseFotos">
+
+  		<soap:operation soapAction="https://autenticacion2.uci.cu/v7/ObtenerRutaBaseFotos"/>
+  		<wsdl:input>
+
+  			<soap:body use="literal"/>
+  		</wsdl:input>
+  		<wsdl:output>
+
+  			<soap:body use="literal"/>
+  		</wsdl:output>
+  	</wsdl:operation>
+  	<wsdl:operation name="ObtenerPersonaDadoCodigoBarras">
+
+  		<soap:operation soapAction="https://autenticacion2.uci.cu/v7/ObtenerPersonaDadoCodigoBarras"/>
+  		<wsdl:input>
+
+  			<soap:body use="literal"/>
+  		</wsdl:input>
+  		<wsdl:output>
+
+  			<soap:body use="literal"/>
+  		</wsdl:output>
+  	</wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="PasarelaAutenticacionWS">
+    <wsdl:documentation>Servicio Pasarela </wsdl:documentation>
+    <wsdl:port binding="tns:PasarelaAutenticacionWSSOAP" name="PasarelaAutenticacionWSSOAP">
+      <soap:address location="https://autenticacion2.uci.cu/v7/"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

@@ -1,0 +1,448 @@
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:ns="http://Services" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ax247="http://domain/xsd" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://Services">
+    <wsp:Policy xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" wsu:Id="WSO2CachingPolicy">
+        <wsp:ExactlyOne>
+            <wsp:All></wsp:All>
+        </wsp:ExactlyOne>
+    </wsp:Policy>
+    <wsdl:documentation>PasarelaWS</wsdl:documentation>
+    <wsdl:types>
+        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://domain/xsd">
+            <xs:complexType name="PersonaUCI">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="CI" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="apellidos" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="apto" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="area" nillable="true" type="ax247:Area"></xs:element>
+                    <xs:element minOccurs="0" name="areaCredencial" nillable="true" type="ax247:Area"></xs:element>
+                    <xs:element minOccurs="0" name="cargo" nillable="true" type="ax247:Cargo"></xs:element>
+                    <xs:element minOccurs="0" name="categoria" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="credencial" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="edificio" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="idExpediente" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="municipio" nillable="true" type="ax247:Municipio"></xs:element>
+                    <xs:element minOccurs="0" name="nombreCompleto" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="nombres" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="primerApellido" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="primerNombre" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="segundoApellido" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="segundoNombre" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="sexo" nillable="true" type="ax247:Sexo"></xs:element>
+                    <xs:element minOccurs="0" name="telefono" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="usuario" nillable="true" type="xs:string"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="Area">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="codigoArea" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="codigoAsset" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="idArea" nillable="true" type="xs:int"></xs:element>
+                    <xs:element minOccurs="0" name="idAreaPadre" nillable="true" type="xs:int"></xs:element>
+                    <xs:element minOccurs="0" name="nombreArea" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="nombreEstructuraCredencial" nillable="true" type="xs:string"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="Cargo">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="idCargo" nillable="true" type="xs:int"></xs:element>
+                    <xs:element minOccurs="0" name="nombreCargo" nillable="true" type="xs:string"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="Municipio">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="idMunicipio" nillable="true" type="xs:int"></xs:element>
+                    <xs:element minOccurs="0" name="nombreMunicipio" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="provincia" nillable="true" type="ax247:Provincia"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="Provincia">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="idProvincia" nillable="true" type="xs:int"></xs:element>
+                    <xs:element minOccurs="0" name="nombreProvincia" nillable="true" type="xs:string"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="Sexo">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="idSexo" nillable="true" type="xs:int"></xs:element>
+                    <xs:element minOccurs="0" name="nombreSexo" nillable="true" type="xs:string"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+        <xs:schema xmlns:ax248="http://domain/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://Services">
+            <xs:import namespace="http://domain/xsd"></xs:import>
+            <xs:element name="ObtenerPersonaDadoUsuario">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="user" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="ObtenerPersonaDadoUsuarioResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax248:PersonaUCI"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="ObtenerPersonaDadoCredencial">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="credencial" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="ObtenerPersonaDadoCredencialResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax248:PersonaUCI"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="ObtenerPersonaDadoIdExpediente">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="idExpediente" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="ObtenerPersonaDadoIdExpedienteResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax248:PersonaUCI"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="PasarelaWSNamingException">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="NamingException" nillable="true" type="xs:anyType"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="Autenticar">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="user" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="password" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="AutenticarResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax248:PersonaUCI"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="ObtenerEstructura">
+                <xs:complexType>
+                    <xs:sequence></xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="ObtenerEstructuraResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax248:Area"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="ObtenerPersonasDadoIdEstructura">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="idEstructura" type="xs:int"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="ObtenerPersonasDadoIdEstructuraResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax248:PersonaUCI"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="ObtenerPersonasDadoIdEstructuraCredencial">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="idEstructuraCredencial" type="xs:int"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="ObtenerPersonasDadoIdEstructuraCredencialResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax248:PersonaUCI"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="ObtenerPersonaDadoCodigoBarras">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="codigoBarras" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="ObtenerPersonaDadoCodigoBarrasResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax248:PersonaUCI"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="ObtenerPersonaDadoCredencialRequest">
+        <wsdl:part name="parameters" element="ns:ObtenerPersonaDadoCredencial"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="ObtenerPersonaDadoCredencialResponse">
+        <wsdl:part name="parameters" element="ns:ObtenerPersonaDadoCredencialResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="ObtenerPersonasDadoIdEstructuraCredencialRequest">
+        <wsdl:part name="parameters" element="ns:ObtenerPersonasDadoIdEstructuraCredencial"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="ObtenerPersonasDadoIdEstructuraCredencialResponse">
+        <wsdl:part name="parameters" element="ns:ObtenerPersonasDadoIdEstructuraCredencialResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="ObtenerPersonaDadoUsuarioRequest">
+        <wsdl:part name="parameters" element="ns:ObtenerPersonaDadoUsuario"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="ObtenerPersonaDadoUsuarioResponse">
+        <wsdl:part name="parameters" element="ns:ObtenerPersonaDadoUsuarioResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="ObtenerPersonaDadoIdExpedienteRequest">
+        <wsdl:part name="parameters" element="ns:ObtenerPersonaDadoIdExpediente"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="ObtenerPersonaDadoIdExpedienteResponse">
+        <wsdl:part name="parameters" element="ns:ObtenerPersonaDadoIdExpedienteResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="AutenticarRequest">
+        <wsdl:part name="parameters" element="ns:Autenticar"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="AutenticarResponse">
+        <wsdl:part name="parameters" element="ns:AutenticarResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="PasarelaWSNamingException">
+        <wsdl:part name="parameters" element="ns:PasarelaWSNamingException"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="ObtenerPersonasDadoIdEstructuraRequest">
+        <wsdl:part name="parameters" element="ns:ObtenerPersonasDadoIdEstructura"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="ObtenerPersonasDadoIdEstructuraResponse">
+        <wsdl:part name="parameters" element="ns:ObtenerPersonasDadoIdEstructuraResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="ObtenerEstructuraRequest">
+        <wsdl:part name="parameters" element="ns:ObtenerEstructura"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="ObtenerEstructuraResponse">
+        <wsdl:part name="parameters" element="ns:ObtenerEstructuraResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="ObtenerPersonaDadoCodigoBarrasRequest">
+        <wsdl:part name="parameters" element="ns:ObtenerPersonaDadoCodigoBarras"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="ObtenerPersonaDadoCodigoBarrasResponse">
+        <wsdl:part name="parameters" element="ns:ObtenerPersonaDadoCodigoBarrasResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:portType xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" name="PasarelaWSPortType" wsp:PolicyURIs="#WSO2CachingPolicy">
+        <wsdl:operation name="ObtenerPersonaDadoCredencial">
+            <wsdl:input message="ns:ObtenerPersonaDadoCredencialRequest" wsaw:Action="urn:ObtenerPersonaDadoCredencial"></wsdl:input>
+            <wsdl:output message="ns:ObtenerPersonaDadoCredencialResponse" wsaw:Action="urn:ObtenerPersonaDadoCredencialResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="ObtenerPersonasDadoIdEstructuraCredencial">
+            <wsdl:input message="ns:ObtenerPersonasDadoIdEstructuraCredencialRequest" wsaw:Action="urn:ObtenerPersonasDadoIdEstructuraCredencial"></wsdl:input>
+            <wsdl:output message="ns:ObtenerPersonasDadoIdEstructuraCredencialResponse" wsaw:Action="urn:ObtenerPersonasDadoIdEstructuraCredencialResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="ObtenerPersonaDadoUsuario">
+            <wsdl:input message="ns:ObtenerPersonaDadoUsuarioRequest" wsaw:Action="urn:ObtenerPersonaDadoUsuario"></wsdl:input>
+            <wsdl:output message="ns:ObtenerPersonaDadoUsuarioResponse" wsaw:Action="urn:ObtenerPersonaDadoUsuarioResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="ObtenerPersonaDadoIdExpediente">
+            <wsdl:input message="ns:ObtenerPersonaDadoIdExpedienteRequest" wsaw:Action="urn:ObtenerPersonaDadoIdExpediente"></wsdl:input>
+            <wsdl:output message="ns:ObtenerPersonaDadoIdExpedienteResponse" wsaw:Action="urn:ObtenerPersonaDadoIdExpedienteResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="Autenticar">
+            <wsdl:input message="ns:AutenticarRequest" wsaw:Action="urn:Autenticar"></wsdl:input>
+            <wsdl:output message="ns:AutenticarResponse" wsaw:Action="urn:AutenticarResponse"></wsdl:output>
+            <wsdl:fault message="ns:PasarelaWSNamingException" name="PasarelaWSNamingException" wsaw:Action="urn:AutenticarPasarelaWSNamingException"></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="ObtenerPersonasDadoIdEstructura">
+            <wsdl:input message="ns:ObtenerPersonasDadoIdEstructuraRequest" wsaw:Action="urn:ObtenerPersonasDadoIdEstructura"></wsdl:input>
+            <wsdl:output message="ns:ObtenerPersonasDadoIdEstructuraResponse" wsaw:Action="urn:ObtenerPersonasDadoIdEstructuraResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="ObtenerEstructura">
+            <wsdl:input message="ns:ObtenerEstructuraRequest" wsaw:Action="urn:ObtenerEstructura"></wsdl:input>
+            <wsdl:output message="ns:ObtenerEstructuraResponse" wsaw:Action="urn:ObtenerEstructuraResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="ObtenerPersonaDadoCodigoBarras">
+            <wsdl:input message="ns:ObtenerPersonaDadoCodigoBarrasRequest" wsaw:Action="urn:ObtenerPersonaDadoCodigoBarras"></wsdl:input>
+            <wsdl:output message="ns:ObtenerPersonaDadoCodigoBarrasResponse" wsaw:Action="urn:ObtenerPersonaDadoCodigoBarrasResponse"></wsdl:output>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="PasarelaWSSoap11Binding" type="ns:PasarelaWSPortType">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"></soap:binding>
+        <wsdl:operation name="ObtenerPersonaDadoCredencial">
+            <soap:operation soapAction="urn:ObtenerPersonaDadoCredencial" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="ObtenerPersonasDadoIdEstructuraCredencial">
+            <soap:operation soapAction="urn:ObtenerPersonasDadoIdEstructuraCredencial" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="ObtenerPersonaDadoUsuario">
+            <soap:operation soapAction="urn:ObtenerPersonaDadoUsuario" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="ObtenerPersonaDadoIdExpediente">
+            <soap:operation soapAction="urn:ObtenerPersonaDadoIdExpediente" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="Autenticar">
+            <soap:operation soapAction="urn:Autenticar" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+            <wsdl:fault name="PasarelaWSNamingException">
+                <soap:fault use="literal" name="PasarelaWSNamingException"></soap:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="ObtenerPersonasDadoIdEstructura">
+            <soap:operation soapAction="urn:ObtenerPersonasDadoIdEstructura" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="ObtenerEstructura">
+            <soap:operation soapAction="urn:ObtenerEstructura" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="ObtenerPersonaDadoCodigoBarras">
+            <soap:operation soapAction="urn:ObtenerPersonaDadoCodigoBarras" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="PasarelaWSSoap12Binding" type="ns:PasarelaWSPortType">
+        <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"></soap12:binding>
+        <wsdl:operation name="ObtenerPersonaDadoCredencial">
+            <soap12:operation soapAction="urn:ObtenerPersonaDadoCredencial" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="ObtenerPersonasDadoIdEstructuraCredencial">
+            <soap12:operation soapAction="urn:ObtenerPersonasDadoIdEstructuraCredencial" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="ObtenerPersonaDadoUsuario">
+            <soap12:operation soapAction="urn:ObtenerPersonaDadoUsuario" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="ObtenerPersonaDadoIdExpediente">
+            <soap12:operation soapAction="urn:ObtenerPersonaDadoIdExpediente" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="Autenticar">
+            <soap12:operation soapAction="urn:Autenticar" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+            <wsdl:fault name="PasarelaWSNamingException">
+                <soap12:fault use="literal" name="PasarelaWSNamingException"></soap12:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="ObtenerPersonasDadoIdEstructura">
+            <soap12:operation soapAction="urn:ObtenerPersonasDadoIdEstructura" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="ObtenerEstructura">
+            <soap12:operation soapAction="urn:ObtenerEstructura" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="ObtenerPersonaDadoCodigoBarras">
+            <soap12:operation soapAction="urn:ObtenerPersonaDadoCodigoBarras" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="PasarelaWS">
+        <wsdl:port name="PasarelaWSHttpSoap11Endpoint" binding="ns:PasarelaWSSoap11Binding">
+            <soap:address location="http://10.0.0.195:9763/services/PasarelaWS.PasarelaWSHttpSoap11Endpoint/"></soap:address>
+        </wsdl:port>
+        <wsdl:port name="PasarelaWSHttpsSoap11Endpoint" binding="ns:PasarelaWSSoap11Binding">
+            <soap:address location="https://10.0.0.195:9443/services/PasarelaWS.PasarelaWSHttpsSoap11Endpoint/"></soap:address>
+        </wsdl:port>
+        <wsdl:port name="PasarelaWSHttpSoap12Endpoint" binding="ns:PasarelaWSSoap12Binding">
+            <soap12:address location="http://10.0.0.195:9763/services/PasarelaWS.PasarelaWSHttpSoap12Endpoint/"></soap12:address>
+        </wsdl:port>
+        <wsdl:port name="PasarelaWSHttpsSoap12Endpoint" binding="ns:PasarelaWSSoap12Binding">
+            <soap12:address location="https://10.0.0.195:9443/services/PasarelaWS.PasarelaWSHttpsSoap12Endpoint/"></soap12:address>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

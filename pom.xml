@@ -16,7 +16,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.6.4</version>
+        <version>2.2.5.RELEASE</version>
     </parent>
 
     <repositories>
@@ -144,6 +144,10 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web-services</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin-testbench</artifactId>
             <scope>test</scope>
@@ -255,7 +259,20 @@
             <version>4.0.0-rc2</version>
         </dependency>
 
-        <!--Multiselect-Combobox-->        
+        <!--Multiselect-Combobox--> 
+        <!--consumo servicio uci-->
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+        </dependency>
+
+        <!-- JAXB RI -->
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+            <version>2.3.4</version>
+        </dependency>
+        <!--consumo servicio uci-->
     </dependencies>
 
     <build>
@@ -289,16 +306,27 @@
                     </execution>
                 </executions>
             </plugin>
-            <!-- Jetty plugin for easy testing without a server -->
-            <!-- <plugin>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-maven-plugin</artifactId>
-                <version>9.4.19.v20190610</version>
+            <!--servicios uci-->
+            <plugin>
+                <groupId>org.jvnet.jaxb2.maven2</groupId>
+                <artifactId>maven-jaxb2-plugin</artifactId>
+                <version>0.14.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
                 <configuration>
-                    <scanIntervalSeconds>1</scanIntervalSeconds>
+                    <schemaDirectory>${project.basedir}/src/main/resources/wsdl</schemaDirectory>
+                    <schemaIncludes>
+                        <include>*.wsdl</include>
+                    </schemaIncludes>
                 </configuration>
-            </plugin> -->
-        </plugins>
+            </plugin>
+            <!--servicios uci-->
+        </plugins>  
     </build>
 
     <profiles>
@@ -369,6 +397,7 @@
                             <enableAssertions>true</enableAssertions>
                         </configuration>
                     </plugin>
+                    
                 </plugins>
             </build>
         </profile>
