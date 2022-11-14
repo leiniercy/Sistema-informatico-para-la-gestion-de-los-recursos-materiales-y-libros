@@ -28,6 +28,10 @@ public class UserService {
      return repository.findById(id).get();
     }
     
+    public User findByUsername(String username){
+        return repository.findByUsername(username);
+    }
+    
     public User save(User user) {
         return repository.saveAndFlush(user);
     }
