@@ -41,8 +41,8 @@ public class TarjetaPrestamoEstudianteForm extends FormLayout {
     private Estudiante estudiante;
     private VerticalLayout content = new VerticalLayout();
     ComboBox<Libro> libro = new ComboBox<>("Libro");
-    DatePicker fechaPrestamo = new DatePicker("Fecha Prestamo");
-    DatePicker fechaDevolucion = new DatePicker("Fecha Devolucion");
+    DatePicker fechaPrestamo = new DatePicker("Fecha Préstamo");
+    DatePicker fechaDevolucion = new DatePicker("Fecha Devolución");
 
     Button save = new Button("Añadir", VaadinIcon.PLUS.create());
     Button close = new Button("Cancelar", VaadinIcon.ERASER.create());
