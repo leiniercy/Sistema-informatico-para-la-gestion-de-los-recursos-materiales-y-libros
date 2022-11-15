@@ -44,7 +44,6 @@ import trabajodediploma.data.tools.EmailSenderService;
 import trabajodediploma.security.AuthenticatedUser;
 import trabajodediploma.views.MainLayout;
 import trabajodediploma.views.footer.MyFooter;
-import trabajodediploma.views.login.crear_informacion_perfil.CrearInformacionPerfilView;
 
 @Tag("div")
 // @CssImport("./styles/css/bootstrap.css")
@@ -56,7 +55,6 @@ import trabajodediploma.views.login.crear_informacion_perfil.CrearInformacionPer
 @AnonymousAllowed
 public class InicioView extends Div {
 
-    private CrearInformacionPerfilView crearPerfil;
     private MyFooter footer;
     private Div container;
     private List<Estudiante> estudiantes;
@@ -92,47 +90,7 @@ public class InicioView extends Div {
         estudiantes = estudianteService.findAll();
         trabajadores = trabajadorService.findAll();
         Configuracion();
-        Optional<User> maybeUser = authenticatedUser.get();
-        if (maybeUser.isPresent()) {
-            user = maybeUser.get();
-            estudiantes = estudiantes.parallelStream()
-                    .filter(event -> event.getUser().getUsername().equals(user.getUsername()))
-                    .collect(Collectors.toList());
-            trabajadores = trabajadores.parallelStream()
-                    .filter(event -> event.getUser().getUsername().equals(user.getUsername()))
-                    .collect(Collectors.toList());
-
-            if (estudiantes.size() == 0 && trabajadores.size() == 0) {
-                /* crear perfil */
-                dialog = new Dialog();
-                crearPerfil = new CrearInformacionPerfilView(user, estudianteService, trabajadorService, areaService,
-                        grupoService, senderService, dialog);
-                dialog.open();
-                /*
-                 * Fin -> crear perfil
-                 * Header crear perfil usuario
-                 */
-                Button closeButton = new Button(new Icon("lumo", "cross"), (e) -> dialog.close());
-                closeButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
-                Span title = new Span("Perfil");
-                Div titleDiv = new Div(title);
-                titleDiv.addClassName("div-perfil-title");
-                Div buttonDiv = new Div(closeButton);
-                buttonDiv.addClassName("div-perfil-button");
-                header = new Div(titleDiv, buttonDiv);
-                header.addClassName("div-perfil-header");
-                dialog.add(header, crearPerfil);
-                /* Fin -> Header crear perfil usuario */
-                add(container/* ,footer */);
-            } else {
-                add(container/* ,footer */);
-            }
-
-        } else {
-            add(container/* ,footer */);
-        }
-
-        // add(container/*,footer*/);
+         add(container/*,footer*/);
     }
 
     private void Configuracion() {

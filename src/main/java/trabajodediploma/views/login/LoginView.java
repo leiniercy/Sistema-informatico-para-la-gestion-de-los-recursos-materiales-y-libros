@@ -1,7 +1,6 @@
 package trabajodediploma.views.login;
 
 import com.vaadin.flow.component.UI;
-import trabajodediploma.views.login.crear_usuario.CrearUsuarioView;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -49,7 +48,6 @@ public class LoginView extends Div implements BeforeEnterObserver {
     private PasswordEncoder passwordEncoder;
     private LoginOverlay loginOverlay;
     private Dialog dialog;
-    private CrearUsuarioView crearUsuario;
     private Div header;
 
     Binder<User> binderUser = new Binder<>(User.class);
@@ -90,7 +88,10 @@ public class LoginView extends Div implements BeforeEnterObserver {
         this.grupoService = grupoService;
         this.trabajadorService = trabajadorService;
         this.areaService = areaService;
-        Configuracion();
+        
+        loginOverlay = new LoginOverlay();
+        loginOverlay.setAction("login");
+//        Configuracion();
 
         LoginI18n i18n = LoginI18n.createDefault();
 
@@ -103,16 +104,13 @@ public class LoginView extends Div implements BeforeEnterObserver {
         i18n.getForm().setTitle("");
         i18n.getForm().setUsername("Usuario:");
         i18n.getForm().setPassword("Contraseña:");
-        i18n.getForm().setForgotPassword("Registrarse");
+        i18n.getForm().setForgotPassword("");
         i18n.getForm().setSubmit("Iniciar sesión");
 
         i18n.getErrorMessage().setTitle("Error:");
         i18n.getErrorMessage().setMessage("Usuario o contraseña incorrectos");
 
         loginOverlay.setI18n(i18n);
-        loginOverlay.addForgotPasswordListener(event -> {
-            dialog.open();
-        });
         loginOverlay.setForgotPasswordButtonVisible(true);
         loginOverlay.setOpened(true);
         add(loginOverlay);
@@ -174,7 +172,7 @@ public class LoginView extends Div implements BeforeEnterObserver {
                     binderUser.writeBeanIfValid(newUser);
                     userService.save(newUser);
                     binderUser.readBean(new User());
-                    
+
                     if (persona.getCargo().getNombreCargo().equals("Estudiante")) {
                         //Añadiendo estudiante
                         Estudiante estudiante = new Estudiante();
@@ -204,7 +202,7 @@ public class LoginView extends Div implements BeforeEnterObserver {
                         estudianteService.save(estudiante);
                         binderEstudiante.readBean(new Estudiante());
                     } else {
-                         //Añadiendo Trabajador
+                        //Añadiendo Trabajador
                     }
                     loginOverlay.setOpened(false);
                 }
@@ -212,31 +210,7 @@ public class LoginView extends Div implements BeforeEnterObserver {
         });
 
     }
-
-    private void Configuracion() {
-
-        dialog = new Dialog();
-        crearUsuario = new CrearUsuarioView(userService, passwordEncoder, dialog);
-        crearUsuario.addClassName("crear-usuario");
-        loginOverlay = new LoginOverlay();
-        loginOverlay.setAction("login");
-
-        /*Header crear usuario*/
-        Button closeButton = new Button(new Icon("lumo", "cross"), (e) -> dialog.close());
-        closeButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
-        Span title = new Span("Crear usuario");
-        Div titleDiv = new Div(title);
-        titleDiv.addClassName("title-div");
-        Div buttonDiv = new Div(closeButton);
-        buttonDiv.addClassName("button-div");
-        header = new Div(titleDiv, buttonDiv);
-        header.addClassName("registrar-header");
-        /*Fin -> Header crear usuario*/
-
-        dialog.add(header, crearUsuario);
-
-    }
-
+    
     @Override
     public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
         if (!loginOverlay.isOpened()) {

@@ -1,6 +1,5 @@
 package trabajodediploma.views;
 
-import trabajodediploma.views.menu_personal.modificar_clave.ModificarClaveView;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
@@ -14,10 +13,13 @@ import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Image;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.ListItem;
 import com.vaadin.flow.component.html.Nav;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.html.UnorderedList;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
@@ -46,7 +48,6 @@ import trabajodediploma.views.inicio.InicioView;
 import trabajodediploma.views.libros.LibroView;
 import trabajodediploma.views.libros.estadisticas.EstadisticasView;
 import trabajodediploma.views.libros.estadisticas.GraficoPastel;
-import trabajodediploma.views.menu_personal.modificar_perfil.ModificarPerfilView;
 import trabajodediploma.views.modeloPago.ModeloPagoView;
 import trabajodediploma.views.modulo.ModuloView;
 import trabajodediploma.views.usuarios.UsuarioView;
@@ -156,21 +157,15 @@ public class MainLayout extends AppLayout {
         Optional<User> maybeUser = authenticatedUser.get();
         if (maybeUser.isPresent()) {
             user = maybeUser.get();
-            
+
             Avatar avatar = new Avatar(user.getUsername(), user.getProfilePictureUrl());
             avatar.addClassNames("avatar", "me-xs");
-                        
+
             ContextMenu userMenu = new ContextMenu(avatar);
             userMenu.setOpenOnClick(true);
-            userMenu.addItem("Perfil", e -> {
-                ModificarUsuario();
-            });
-            userMenu.addItem("Cambiar clave", e -> {
-                ModificarClave();
-            });
             userMenu.addItem("Cerrar sesión", e -> {
-                authenticatedUser.logout();
-            });
+                        authenticatedUser.logout();
+                    });
 
             Span name = new Span(user.getName());
             name.addClassNames("span-name", "font-medium", "text-s", "text-secondary");
@@ -219,60 +214,29 @@ public class MainLayout extends AppLayout {
 
     //
     private MenuItemInfo[] createMenuItems() {
-        return new MenuItemInfo[] { //
-                new MenuItemInfo("Inicio", "la la-home", InicioView.class), //
+        return new MenuItemInfo[]{ //
+            new MenuItemInfo("Inicio", "la la-home", InicioView.class), //
 
-                new MenuItemInfo("Catálogo", "la la-th-list", CatalogoView.class), //
+            new MenuItemInfo("Catálogo", "la la-th-list", CatalogoView.class), //
 
-                new MenuItemInfo("Tarjeta Personal", "la la-address-card", TarjetaPersonalPrestamoView.class), //
+            new MenuItemInfo("Tarjeta Personal", "la la-address-card", TarjetaPersonalPrestamoView.class), //
 
-                new MenuItemInfo("Usuario", "la la-user", UsuarioView.class), //
+            new MenuItemInfo("Usuario", "la la-user", UsuarioView.class), //
 
-                new MenuItemInfo("Estadística", "la la-chart-bar", EstadisticasView.class), //
+            new MenuItemInfo("Estadística", "la la-chart-bar", EstadisticasView.class), //
 
-                new MenuItemInfo("Libros", "la la-book", LibroView.class), //
+            new MenuItemInfo("Libros", "la la-book", LibroView.class), //
 
-                new MenuItemInfo("Recursos Materiales ", "la la-tools", RecursosMaterialesView.class), //
+            new MenuItemInfo("Recursos Materiales ", "la la-tools", RecursosMaterialesView.class), //
 
-                new MenuItemInfo("Tarjeta Préstamo", "la la-file-invoice", TarjetaPrestamoView.class), //
+            new MenuItemInfo("Tarjeta Préstamo", "la la-file-invoice", TarjetaPrestamoView.class), //
 
-//                new MenuItemInfo("Modelo de Pago", "la la-file-contract", ModeloPagoView.class), //
-                
-                new MenuItemInfo("Módulo", "la la-gift", ModuloView.class), //
+            //                new MenuItemInfo("Modelo de Pago", "la la-file-contract", ModeloPagoView.class), //
 
-                new MenuItemInfo("Destino Final", "la la-user-check", TarjetaDestinoFinalView.class), //
+            new MenuItemInfo("Módulo", "la la-gift", ModuloView.class), //
+
+            new MenuItemInfo("Destino Final", "la la-user-check", TarjetaDestinoFinalView.class), //
         };
-    }
-
-    //
-    private void ModificarUsuario() {
-        modificarPerfil = new Dialog();
-        ModificarPerfilView modificarPerfilView = new ModificarPerfilView(user, userService, estudianteService,
-                trabajadorService, grupoService, areaService, senderService, modificarPerfil);
-        modificarPerfil.add(modificarPerfilView);
-
-        List<Estudiante> estudiantes = estudianteService.findAll();
-        estudiantes = estudiantes.stream().filter(est -> est.getUser().equals(user)).collect(Collectors.toList());
-        List<Trabajador> trabajadores = trabajadorService.findAll();
-        trabajadores = trabajadores.stream().filter(trab -> trab.getUser().equals(user)).collect(Collectors.toList());
-
-        if (estudiantes.size() == 0 && trabajadores.size() == 0) {
-            Notification notification = Notification.show(
-                    "Información de perfil no disponible",
-                    2000,
-                    Notification.Position.MIDDLE);
-            notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
-        } else {
-            modificarPerfil.open();
-        }
-    }
-
-    //
-    private void ModificarClave() {
-        modificarClave = new Dialog();
-        ModificarClaveView claveView = new ModificarClaveView(user, userService, passwordEncoder, modificarClave);
-        modificarClave.add(claveView);
-        modificarClave.open();
     }
 
 }

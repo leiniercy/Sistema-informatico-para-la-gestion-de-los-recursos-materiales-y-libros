@@ -232,12 +232,6 @@ public class DataGenerator {
                 logger.info("...La base de datos fue llenada satisfactoriamente ...");
             }
 
-            User userAdmin = userService.findByUsername("leiniercy");
-            userAdmin.setRoles(Stream.of(Rol.ADMIN, Rol.VD_ADIMN_ECONOMIA, Rol.RESP_ALMACEN, Rol.ASISTENTE_CONTROL, Rol.USER).collect(Collectors.toSet()));
-            binderUser.writeBeanIfValid(userAdmin);
-            userService.save(userAdmin);
-            binderUser.readBean(new User());
-
         };
     }
 
