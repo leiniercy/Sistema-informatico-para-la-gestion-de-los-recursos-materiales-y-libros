@@ -175,6 +175,7 @@ public class ModuloView extends Div {
  /* Configuracion de la tabla */
     private void configureGrid() {
         grid.setClassName("container__grid_content__table");
+        grid.getStyle().set("max-height", "550px");
 
         nombreColumn = grid.addColumn(Modulo::getNombre).setHeader("Nombre").setAutoWidth(true)
                 .setSortable(true);
@@ -204,6 +205,7 @@ public class ModuloView extends Div {
         headerRow.getCell(nombreColumn).setComponent(filterNombre);
 
         gridListDataView = grid.setItems(moduloService.findAll());
+        grid.setPageSize(moduloService.findAll().size());
         grid.setAllRowsVisible(true);
         grid.setSizeFull();
         grid.setWidthFull();
@@ -239,6 +241,7 @@ public class ModuloView extends Div {
         FiltrosGridEstudiante();
 
         gridListDataViewEstudiante = gridEstudiantes.setItems(estudianteService.findAll());
+        gridEstudiantes.setPageSize(estudianteService.findAll().size());
         gridEstudiantes.setSelectionMode(Grid.SelectionMode.MULTI);
         gridEstudiantes.getStyle().set("width", "500px").set("max-width", "100%");
     }
@@ -267,6 +270,7 @@ public class ModuloView extends Div {
         FiltrosGridTrabajador();
 
         gridListDataViewTrabajador = gridTrabajadores.setItems(trabajadorService.findAll());
+        gridTrabajadores.setPageSize(trabajadorService.findAll().size());
         gridTrabajadores.setSelectionMode(Grid.SelectionMode.MULTI);
         gridTrabajadores.getStyle().set("width", "500px").set("max-width", "100%");
     }
@@ -981,6 +985,7 @@ public class ModuloView extends Div {
 
     private void updateList() {
         grid.setItems(moduloService.findAll());
+        grid.setPageSize(moduloService.findAll().size());
     }
     /* Fin-Formulario */
 

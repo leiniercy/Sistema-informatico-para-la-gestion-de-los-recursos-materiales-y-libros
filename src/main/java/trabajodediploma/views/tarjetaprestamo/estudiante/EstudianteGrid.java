@@ -125,8 +125,9 @@ public class EstudianteGrid extends Div {
     }
 
     private void configureGrid() {
-
         gridEstudiantes.setClassName("container___estudiante_grid__div__table");
+        gridEstudiantes.getStyle().set("max-height", "550px");
+        
         nombreColumn = gridEstudiantes.addColumn(new ComponentRenderer<>(est -> {
             HorizontalLayout hl = new HorizontalLayout();
             hl.getStyle().set("align-items", "center");
@@ -154,6 +155,7 @@ public class EstudianteGrid extends Div {
         Filtros();
 
         gridListDataView = gridEstudiantes.setItems(estudianteService.findAll());
+        gridEstudiantes.setPageSize(estudianteService.findAll().size());
         gridEstudiantes.setAllRowsVisible(true);
         gridEstudiantes.setSelectionMode(Grid.SelectionMode.MULTI);
         gridEstudiantes.setSizeFull();

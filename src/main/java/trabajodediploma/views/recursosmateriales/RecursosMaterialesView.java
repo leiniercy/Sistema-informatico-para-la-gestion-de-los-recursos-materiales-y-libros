@@ -147,6 +147,7 @@ public class RecursosMaterialesView extends Div {
  /* Configuracion de la tabla */
     private void configureGrid() {
         grid.setClassName("recursoMaterial-grid");
+        grid.getStyle().set("max-height", "550px");
 
         codigoColumn = grid.addColumn(RecursoMaterial::getCodigo).setHeader("Código").setAutoWidth(true)
                 .setSortable(true);
@@ -172,6 +173,7 @@ public class RecursosMaterialesView extends Div {
         headerRow.getCell(tipoColumn).setComponent(filterTipo);
 
         gridListDataView = grid.setItems(materialService.findAll());
+        grid.setPageSize(materialService.findAll().size());
         grid.setAllRowsVisible(true);
         grid.setSizeFull();
         grid.setWidthFull();
@@ -204,7 +206,7 @@ public class RecursosMaterialesView extends Div {
         filterDescripcion.setClearButtonVisible(true);
         filterDescripcion.setWidth("100%");
         filterDescripcion.setValueChangeMode(ValueChangeMode.EAGER);
-        filterDescripcion.addValueChangeListener( event -> gridListDataView.addFilter(material -> StringUtils.containsIgnoreCase(material.getDescripcion(),filterDescripcion.getValue())));
+        filterDescripcion.addValueChangeListener(event -> gridListDataView.addFilter(material -> StringUtils.containsIgnoreCase(material.getDescripcion(), filterDescripcion.getValue())));
 
         filterTipo = new TextField();
         filterTipo.setPlaceholder("Filtrar");
@@ -212,7 +214,7 @@ public class RecursosMaterialesView extends Div {
         filterTipo.setClearButtonVisible(true);
         filterTipo.setWidth("100%");
         filterTipo.setValueChangeMode(ValueChangeMode.EAGER);
-        filterTipo.addValueChangeListener(event -> gridListDataView.addFilter(material -> StringUtils.containsIgnoreCase(material.getTipo(),filterTipo.getValue())));
+        filterTipo.addValueChangeListener(event -> gridListDataView.addFilter(material -> StringUtils.containsIgnoreCase(material.getTipo(), filterTipo.getValue())));
 
     }
 
@@ -344,8 +346,7 @@ public class RecursosMaterialesView extends Div {
             RecursoMaterial mat = materialService.findAll().get(i);
             if (event.getRecursoMaterial().getCodigo().equals(mat.getCodigo())
                     && event.getRecursoMaterial().getDescripcion().equals(mat.getDescripcion())
-                    && event.getRecursoMaterial().getTipo().equals(mat.getTipo())
-                    ) {
+                    && event.getRecursoMaterial().getTipo().equals(mat.getTipo())) {
                 materiales.add(mat);
                 band = true;
             }
@@ -415,6 +416,7 @@ public class RecursosMaterialesView extends Div {
 
     private void updateList() {
         grid.setItems(materialService.findAll());
+        grid.setPageSize(materialService.findAll().size());
     }
 
     /* Fin-Formulario */

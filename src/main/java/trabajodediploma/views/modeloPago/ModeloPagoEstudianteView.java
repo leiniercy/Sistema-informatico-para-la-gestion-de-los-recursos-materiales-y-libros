@@ -152,6 +152,7 @@ public class ModeloPagoEstudianteView extends Div {
  /* Configuracion de la tabla */
     private void configureGrid() {
         grid.setClassName("container__modelo__grid");
+        grid.getStyle().set("max-height", "550px");
 
         LitRenderer<ModeloPago> imagenRenderer = LitRenderer
                 .<ModeloPago>of("<img style='height: 64px' src=${item.imagen} />")
@@ -212,6 +213,7 @@ public class ModeloPagoEstudianteView extends Div {
         headerRow.getCell(estudianteColumn).setComponent(estudianteFilter);
 
         gridListDataView = grid.setItems(listModelosPago);
+        grid.setPageSize(listModelosPago.size());
         grid.setAllRowsVisible(true);
         grid.setSizeFull();
         grid.setWidthFull();
@@ -424,6 +426,7 @@ public class ModeloPagoEstudianteView extends Div {
             }
         }
         grid.setItems(listModelosPago);
+        grid.setPageSize(listModelosPago.size());
     }
 
     /* Form crear modelo de pago */

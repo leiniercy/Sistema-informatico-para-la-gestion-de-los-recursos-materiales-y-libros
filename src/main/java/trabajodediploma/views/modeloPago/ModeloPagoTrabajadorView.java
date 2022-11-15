@@ -80,934 +80,937 @@ import java.time.LocalDate;
 
 public class ModeloPagoTrabajadorView extends Div {
 
-        private Grid<ModeloPago> grid = new Grid<>(ModeloPago.class, false);
-        private GridListDataView<ModeloPago> gridListDataView;
-        private Grid.Column<ModeloPago> imagenColumn;
-        private Grid.Column<ModeloPago> trabajadorColumn;
-        private Grid.Column<ModeloPago> librosColumn;
-        private Grid.Column<ModeloPago> editColumn;
-        private TrabajadorService trabajadorService;
-        private LibroService libroService;
-        private Dialog dialog;
-        private Html total;
-        private HorizontalLayout toolbar;
-        private HorizontalLayout buttons;
-        private Div header;
-        private Dialog reportDialog;
-        private ModeloPagoService modeloPagoService;
-        private List<ModeloPago> listModelosPago;
-        private ModeloPagoTrabajador modeloTrabajador;
-        private ComboBox<Trabajador> trabajadorFilter;
+    private Grid<ModeloPago> grid = new Grid<>(ModeloPago.class, false);
+    private GridListDataView<ModeloPago> gridListDataView;
+    private Grid.Column<ModeloPago> imagenColumn;
+    private Grid.Column<ModeloPago> trabajadorColumn;
+    private Grid.Column<ModeloPago> librosColumn;
+    private Grid.Column<ModeloPago> editColumn;
+    private TrabajadorService trabajadorService;
+    private LibroService libroService;
+    private Dialog dialog;
+    private Html total;
+    private HorizontalLayout toolbar;
+    private HorizontalLayout buttons;
+    private Div header;
+    private Dialog reportDialog;
+    private ModeloPagoService modeloPagoService;
+    private List<ModeloPago> listModelosPago;
+    private ModeloPagoTrabajador modeloTrabajador;
+    private ComboBox<Trabajador> trabajadorFilter;
 
-        ModeloPagoTrabajadorForm form;
+    ModeloPagoTrabajadorForm form;
 
-        ComboBox<Trabajador> trabajador = new ComboBox<>();
-        MultiselectComboBox<Libro> libros = new MultiselectComboBox<>();
+    ComboBox<Trabajador> trabajador = new ComboBox<>();
+    MultiselectComboBox<Libro> libros = new MultiselectComboBox<>();
 
-        public ModeloPagoTrabajadorView(@Autowired ModeloPagoService modeloPagoService,
-                        @Autowired TrabajadorService trabajadorService,
-                        @Autowired LibroService libroService) {
-                addClassName("modelo_pago_view");
-                this.modeloPagoService = modeloPagoService;
-                this.trabajadorService = trabajadorService;
-                this.libroService = libroService;
-                listModelosPago = new LinkedList<>();
-                updateList();
-                configureForm();
-                configureGrid();
-                add(menuBar(), getContent());
-        }
+    public ModeloPagoTrabajadorView(@Autowired ModeloPagoService modeloPagoService,
+            @Autowired TrabajadorService trabajadorService,
+            @Autowired LibroService libroService) {
+        addClassName("modelo_pago_view");
+        this.modeloPagoService = modeloPagoService;
+        this.trabajadorService = trabajadorService;
+        this.libroService = libroService;
+        listModelosPago = new LinkedList<>();
+        updateList();
+        configureForm();
+        configureGrid();
+        add(menuBar(), getContent());
+    }
 
-        /* Contenido de la vista */
-        private Div getContent() {
+    /* Contenido de la vista */
+    private Div getContent() {
 
-                Div formContent = new Div(form);
-                formContent.addClassName("form_content");
-                Div gridContent = new Div(grid);
-                gridContent.addClassName("grid_content");
+        Div formContent = new Div(form);
+        formContent.addClassName("form_content");
+        Div gridContent = new Div(grid);
+        gridContent.addClassName("grid_content");
 
-                Div container = new Div(gridContent);
-                container.addClassName("container");
-                container.setSizeFull();
+        Div container = new Div(gridContent);
+        container.addClassName("container");
+        container.setSizeFull();
 
-                /* Dialog Header */
-                Button closeButton = new Button(new Icon("lumo", "cross"), (e) -> dialog.close());
-                closeButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-                Span title = new Span("Libro");
-                Div titleDiv = new Div(title);
-                titleDiv.addClassName("div-dialog-title");
-                Div buttonDiv = new Div(closeButton);
-                buttonDiv.addClassName("div-dialog-button");
-                header = new Div(titleDiv, buttonDiv);
-                header.addClassName("div-dialog-header");
-                /* Dialog Header */
+        /* Dialog Header */
+        Button closeButton = new Button(new Icon("lumo", "cross"), (e) -> dialog.close());
+        closeButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        Span title = new Span("Libro");
+        Div titleDiv = new Div(title);
+        titleDiv.addClassName("div-dialog-title");
+        Div buttonDiv = new Div(closeButton);
+        buttonDiv.addClassName("div-dialog-button");
+        header = new Div(titleDiv, buttonDiv);
+        header.addClassName("div-dialog-header");
+        /* Dialog Header */
 
-                dialog = new Dialog(header, formContent);
+        dialog = new Dialog(header, formContent);
 
-                return container;
-        }
+        return container;
+    }
 
-        /* Tabla */
-        /* Configuracion de la tabla */
-        private void configureGrid() {
-                grid.setClassName("tarjeta_Trabajador__content__grid-content__table");
+    /* Tabla */
+ /* Configuracion de la tabla */
+    private void configureGrid() {
+        grid.setClassName("tarjeta_Trabajador__content__grid-content__table");
+        grid.getStyle().set("max-height", "550px");
 
-                LitRenderer<ModeloPago> imagenRenderer = LitRenderer
-                                .<ModeloPago>of("<img style='height: 64px' src=${item.imagen} />")
-                                .withProperty("imagen", ModeloPago::getImagen);
+        LitRenderer<ModeloPago> imagenRenderer = LitRenderer
+                .<ModeloPago>of("<img style='height: 64px' src=${item.imagen} />")
+                .withProperty("imagen", ModeloPago::getImagen);
 
-                imagenColumn = grid.addColumn(imagenRenderer).setHeader("Imagen").setAutoWidth(true);
+        imagenColumn = grid.addColumn(imagenRenderer).setHeader("Imagen").setAutoWidth(true);
 
-                trabajadorColumn = grid.addColumn(new ComponentRenderer<>(modelo -> {
-                        modeloTrabajador = (ModeloPagoTrabajador) modelo;
-                        HorizontalLayout hl = new HorizontalLayout();
-                        hl.setAlignItems(Alignment.CENTER);
-                        Avatar avatar = new Avatar(modeloTrabajador.getTrabajador().getUser().getName(),
-                                        modeloTrabajador.getTrabajador().getUser().getProfilePictureUrl());
-                        VerticalLayout vl = new VerticalLayout();
-                        vl.getStyle().set("line-height", "0");
-                        Span name = new Span();
-                        name.addClassNames("name");
-                        name.setText(modeloTrabajador.getTrabajador().getUser().getName());
-                        Span email = new Span();
-                        email.addClassNames("text-s", "text-secondary");
-                        email.setText(modeloTrabajador.getTrabajador().getEmail());
-                        vl.add(name, email);
-                        hl.add(avatar, vl);
-                        return hl;
-                })).setHeader("Trabajador").setFrozen(true).setAutoWidth(true).setSortable(true);
+        trabajadorColumn = grid.addColumn(new ComponentRenderer<>(modelo -> {
+            modeloTrabajador = (ModeloPagoTrabajador) modelo;
+            HorizontalLayout hl = new HorizontalLayout();
+            hl.setAlignItems(Alignment.CENTER);
+            Avatar avatar = new Avatar(modeloTrabajador.getTrabajador().getUser().getName(),
+                    modeloTrabajador.getTrabajador().getUser().getProfilePictureUrl());
+            VerticalLayout vl = new VerticalLayout();
+            vl.getStyle().set("line-height", "0");
+            Span name = new Span();
+            name.addClassNames("name");
+            name.setText(modeloTrabajador.getTrabajador().getUser().getName());
+            Span email = new Span();
+            email.addClassNames("text-s", "text-secondary");
+            email.setText(modeloTrabajador.getTrabajador().getEmail());
+            vl.add(name, email);
+            hl.add(avatar, vl);
+            return hl;
+        })).setHeader("Trabajador").setFrozen(true).setAutoWidth(true).setSortable(true);
 
-                librosColumn = grid.addColumn(new ComponentRenderer<>(modelo -> {
-                        VerticalLayout layout = new VerticalLayout();
-                        layout.getStyle().set("line-height", "0.5");
-                        modeloTrabajador = (ModeloPagoTrabajador) modelo;
-                        Span span_libros = new Span();
-                        span_libros.setWidth("100%");
-                        List<Libro> libros = new LinkedList<>(modeloTrabajador.getLibros());
-                        String listLibros = new String();
-                        if (libros.size() != 0) {
-                                listLibros += "" + libros.get(0).getTitulo();
-                                for (int i = 1; i < libros.size(); i++) {
-                                        listLibros += ", " + libros.get(i).getTitulo();
-                                }
-                        }
-                        span_libros.setText(listLibros);
-                        layout.add(span_libros);
-                        layout.setWidth("100%");
-                        return layout;
-                })).setHeader("Libros").setAutoWidth(true);
+        librosColumn = grid.addColumn(new ComponentRenderer<>(modelo -> {
+            VerticalLayout layout = new VerticalLayout();
+            layout.getStyle().set("line-height", "0.5");
+            modeloTrabajador = (ModeloPagoTrabajador) modelo;
+            Span span_libros = new Span();
+            span_libros.setWidth("100%");
+            List<Libro> libros = new LinkedList<>(modeloTrabajador.getLibros());
+            String listLibros = new String();
+            if (libros.size() != 0) {
+                listLibros += "" + libros.get(0).getTitulo();
+                for (int i = 1; i < libros.size(); i++) {
+                    listLibros += ", " + libros.get(i).getTitulo();
+                }
+            }
+            span_libros.setText(listLibros);
+            layout.add(span_libros);
+            layout.setWidth("100%");
+            return layout;
+        })).setHeader("Libros").setAutoWidth(true);
 
-                editColumn = grid.addComponentColumn(modelo -> {
-                        modeloTrabajador = (ModeloPagoTrabajador) modelo;
-                        Button editButton = new Button(VaadinIcon.EDIT.create());
-                        editButton.addClickListener(e -> this.editModelo(modeloTrabajador));
-                        editButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-                        return editButton;
-                }).setTextAlign(ColumnTextAlign.CENTER).setFrozen(true).setFlexGrow(0);
+        editColumn = grid.addComponentColumn(modelo -> {
+            modeloTrabajador = (ModeloPagoTrabajador) modelo;
+            Button editButton = new Button(VaadinIcon.EDIT.create());
+            editButton.addClickListener(e -> this.editModelo(modeloTrabajador));
+            editButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+            return editButton;
+        }).setTextAlign(ColumnTextAlign.CENTER).setFrozen(true).setFlexGrow(0);
 
-                Filtros();
+        Filtros();
 
-                HeaderRow headerRow = grid.appendHeaderRow();
-                headerRow.getCell(trabajadorColumn).setComponent(trabajadorFilter);
+        HeaderRow headerRow = grid.appendHeaderRow();
+        headerRow.getCell(trabajadorColumn).setComponent(trabajadorFilter);
 
+        gridListDataView = grid.setItems(listModelosPago);
+        grid.setPageSize(listModelosPago.size());
+        grid.setAllRowsVisible(true);
+        grid.setSizeFull();
+        grid.setWidthFull();
+        grid.setHeightFull();
+        grid.setSelectionMode(Grid.SelectionMode.MULTI);
+        grid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS);
+        grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
+        grid.addThemeVariants(GridVariant.LUMO_WRAP_CELL_CONTENT);
+
+    }
+
+    /* Filtros */
+    private void Filtros() {
+
+        trabajadorFilter = new ComboBox<>();
+        trabajadorFilter.setItems(trabajadorService.findAll());
+        trabajadorFilter.setItemLabelGenerator(trabajador -> trabajador.getUser().getName());
+        trabajadorFilter.setPlaceholder("Filtrar");
+        trabajadorFilter.setClearButtonVisible(true);
+        trabajadorFilter.setWidth("100%");
+        trabajadorFilter.addValueChangeListener(event -> {
+            if (trabajadorFilter.getValue() == null) {
                 gridListDataView = grid.setItems(listModelosPago);
-                grid.setAllRowsVisible(true);
-                grid.setSizeFull();
-                grid.setWidthFull();
-                grid.setHeightFull();
-                grid.setSelectionMode(Grid.SelectionMode.MULTI);
-                grid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS);
-                grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
-                grid.addThemeVariants(GridVariant.LUMO_WRAP_CELL_CONTENT);
+            } else {
+                gridListDataView.addFilter(modelo -> areTrabajadorEqual(modelo, trabajadorFilter));
+            }
+        });
 
+    }
+
+    private boolean areTrabajadorEqual(ModeloPago modelo, ComboBox<Trabajador> trabajadorFilter) {
+        String trabajadorFilterValue = trabajadorFilter.getValue().getUser().getName();
+        modeloTrabajador = (ModeloPagoTrabajador) modelo;
+        if (trabajadorFilterValue != null) {
+            return StringUtils.equals(modeloTrabajador.getTrabajador().getUser().getName(),
+                    trabajadorFilterValue);
+        }
+        return true;
+    }
+
+    // Barra de menu
+    private HorizontalLayout menuBar() {
+        buttons = new HorizontalLayout();
+        Button refreshButton = new Button(VaadinIcon.REFRESH.create());
+        refreshButton.addClickListener(click -> updateList());
+        refreshButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        Button deleteButton = new Button(VaadinIcon.TRASH.create());
+        deleteButton.addClickListener(click -> deleteModelo());
+        deleteButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        Button addButton = new Button(VaadinIcon.PLUS.create());
+        addButton.addClickListener(click -> addModelo());
+        addButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        Button modelButton = new Button(VaadinIcon.FILE.create());
+        modelButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        modelButton.addClickListener(click -> formModeloPago());
+
+        buttons.add(refreshButton, deleteButton, addButton, modelButton);
+
+        if (listModelosPago.size() == 1) {
+            total = new Html("<span>Total: <b>" + listModelosPago.size() + "</b> modelo</span>");
+        } else if (listModelosPago.size() > 1 || listModelosPago.size() == 0) {
+            total = new Html("<span>Total: <b>" + listModelosPago.size() + "</b> modelos</span>");
         }
 
-        /* Filtros */
-        private void Filtros() {
+        toolbar = new HorizontalLayout(buttons, total);
+        toolbar.addClassName("toolbar");
+        toolbar.setAlignItems(FlexComponent.Alignment.CENTER);
+        toolbar.setWidth("100%");
+        toolbar.setFlexGrow(1, buttons);
+        toolbar.getStyle()
+                .set("padding", "var(--lumo-space-wide-m)");
 
-                trabajadorFilter = new ComboBox<>();
-                trabajadorFilter.setItems(trabajadorService.findAll());
-                trabajadorFilter.setItemLabelGenerator(trabajador -> trabajador.getUser().getName());
-                trabajadorFilter.setPlaceholder("Filtrar");
-                trabajadorFilter.setClearButtonVisible(true);
-                trabajadorFilter.setWidth("100%");
-                trabajadorFilter.addValueChangeListener(event -> {
-                        if (trabajadorFilter.getValue() == null) {
-                                gridListDataView = grid.setItems(listModelosPago);
-                        } else {
-                                gridListDataView.addFilter(modelo -> areTrabajadorEqual(modelo, trabajadorFilter));
-                        }
-                });
+        return toolbar;
+    }
 
-        }
+    private void deleteModelo() {
+        try {
 
-        private boolean areTrabajadorEqual(ModeloPago modelo, ComboBox<Trabajador> trabajadorFilter) {
-                String trabajadorFilterValue = trabajadorFilter.getValue().getUser().getName();
-                modeloTrabajador = (ModeloPagoTrabajador) modelo;
-                if (trabajadorFilterValue != null) {
-                        return StringUtils.equals(modeloTrabajador.getTrabajador().getUser().getName(),
-                                        trabajadorFilterValue);
-                }
-                return true;
-        }
-
-        // Barra de menu
-        private HorizontalLayout menuBar() {
-                buttons = new HorizontalLayout();
-                Button refreshButton = new Button(VaadinIcon.REFRESH.create());
-                refreshButton.addClickListener(click -> updateList());
-                refreshButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-                Button deleteButton = new Button(VaadinIcon.TRASH.create());
-                deleteButton.addClickListener(click -> deleteModelo());
-                deleteButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-                Button addButton = new Button(VaadinIcon.PLUS.create());
-                addButton.addClickListener(click -> addModelo());
-                addButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-                Button modelButton = new Button(VaadinIcon.FILE.create());
-                modelButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-                modelButton.addClickListener(click -> formModeloPago());
-
-                buttons.add(refreshButton, deleteButton, addButton, modelButton);
-
-                if (listModelosPago.size() == 1) {
-                        total = new Html("<span>Total: <b>" + listModelosPago.size() + "</b> modelo</span>");
-                } else if (listModelosPago.size() > 1 || listModelosPago.size() == 0) {
-                        total = new Html("<span>Total: <b>" + listModelosPago.size() + "</b> modelos</span>");
-                }
-
-                toolbar = new HorizontalLayout(buttons, total);
-                toolbar.addClassName("toolbar");
-                toolbar.setAlignItems(FlexComponent.Alignment.CENTER);
-                toolbar.setWidth("100%");
-                toolbar.setFlexGrow(1, buttons);
-                toolbar.getStyle()
-                                .set("padding", "var(--lumo-space-wide-m)");
-
-                return toolbar;
-        }
-
-        private void deleteModelo() {
-                try {
-
-                        if (grid.asMultiSelect().isEmpty()) {
-                                Notification notification = Notification.show("Debe elegir al menos un campo", 5000,
-                                                Notification.Position.MIDDLE);
-                                notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
-                        } else {
-                                deleteItems(grid.getSelectedItems().size(), grid.getSelectedItems());
-                                updateList();
-                                toolbar.remove(total);
-                                if (listModelosPago.size() == 1) {
-                                        total = new Html("<span>Total: <b>" + listModelosPago.size()
-                                                        + "</b> modelo</span>");
-                                } else if (listModelosPago.size() > 1 || listModelosPago.size() == 0) {
-                                        total = new Html("<span>Total: <b>" + listModelosPago.size()
-                                                        + "</b> modelos</span>");
-                                }
-                                toolbar.addComponentAtIndex(1, total);
-                                toolbar.setFlexGrow(1, buttons);
-                        }
-
-                } catch (Exception e) {
-                        e.printStackTrace();
-                        Notification notification = Notification.show(
-                                        "Ocurrió un problema al intentar eliminar el Trabajador",
-                                        2000,
-                                        Notification.Position.MIDDLE);
-                        ;
-                        notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
-                }
-        }
-
-        private void deleteItems(int cantidad, Set<ModeloPago> modelo) {
-                Notification notification;
-                modeloPagoService.deleteAll(modelo);
-                if (cantidad == 1) {
-                        notification = Notification.show("Modelo de pago eliminado", 2000,
-                                        Notification.Position.BOTTOM_START);
-                } else {
-                        notification = Notification.show("Han sido eliminados" + cantidad + " modelos de pago", 5000,
-                                        Notification.Position.BOTTOM_START);
-                }
-                notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-        }
-
-        private void configureForm() {
-                form = new ModeloPagoTrabajadorForm(trabajadorService.findAll(), libroService.findAll());
-                form.setWidth("25em");
-                form.addListener(ModeloPagoTrabajadorForm.SaveEvent.class, this::saveModelo);
-                form.addListener(ModeloPagoTrabajadorForm.CloseEvent.class, e -> closeEditor());
-        }
-
-        private void saveModelo(ModeloPagoTrabajadorForm.SaveEvent event) {
-
-                listModelosPago.clear();
-                modeloPagoService.findAll().stream().forEach(modelo -> {
-                        if (modelo instanceof ModeloPagoTrabajador) {
-                                modeloTrabajador = (ModeloPagoTrabajador) modelo;
-                                if (modeloTrabajador.getTrabajador().getId() == event.getModeloPago().getTrabajador()
-                                                .getId()) {
-                                        listModelosPago.add(modeloTrabajador);
-                                }
-                        }
-                });
-
-                if (listModelosPago.size() != 0) {
-                        Notification notification = Notification.show(
-                                        "Este trabajador ya tiene un modelo de pago",
-                                        5000,
-                                        Notification.Position.MIDDLE);
-                        notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
-                } else {
-                        if (event.getModeloPago().getId() == null) {
-                                modeloPagoService.save(event.getModeloPago());
-                                Notification notification = Notification.show(
-                                                "Modelo de pago añadido",
-                                                2000,
-                                                Notification.Position.BOTTOM_START);
-                                notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-                        } else {
-                                modeloPagoService.update(event.getModeloPago());
-                                Notification notification = Notification.show(
-                                                "Modelo modificado",
-                                                5000,
-                                                Notification.Position.BOTTOM_START);
-                                notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-                        }
-                }
+            if (grid.asMultiSelect().isEmpty()) {
+                Notification notification = Notification.show("Debe elegir al menos un campo", 5000,
+                        Notification.Position.MIDDLE);
+                notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+            } else {
+                deleteItems(grid.getSelectedItems().size(), grid.getSelectedItems());
+                updateList();
                 toolbar.remove(total);
                 if (listModelosPago.size() == 1) {
-                        total = new Html("<span>Total: <b>" + listModelosPago.size() + "</b> modelo</span>");
+                    total = new Html("<span>Total: <b>" + listModelosPago.size()
+                            + "</b> modelo</span>");
                 } else if (listModelosPago.size() > 1 || listModelosPago.size() == 0) {
-                        total = new Html("<span>Total: <b>" + listModelosPago.size() + "</b> modelos</span>");
+                    total = new Html("<span>Total: <b>" + listModelosPago.size()
+                            + "</b> modelos</span>");
                 }
                 toolbar.addComponentAtIndex(1, total);
                 toolbar.setFlexGrow(1, buttons);
-                updateList();
-                closeEditor();
-        }
+            }
 
-        private void editModelo(ModeloPagoTrabajador modeloPago) {
-                if (modeloPago == null) {
-                        closeEditor();
-                } else {
-                        form.setModeloPago(modeloPago);
-                        form.setVisible(true);
-                        addClassName("editing");
-                        dialog.open();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Notification notification = Notification.show(
+                    "Ocurrió un problema al intentar eliminar el Trabajador",
+                    2000,
+                    Notification.Position.MIDDLE);
+            ;
+            notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+        }
+    }
+
+    private void deleteItems(int cantidad, Set<ModeloPago> modelo) {
+        Notification notification;
+        modeloPagoService.deleteAll(modelo);
+        if (cantidad == 1) {
+            notification = Notification.show("Modelo de pago eliminado", 2000,
+                    Notification.Position.BOTTOM_START);
+        } else {
+            notification = Notification.show("Han sido eliminados" + cantidad + " modelos de pago", 5000,
+                    Notification.Position.BOTTOM_START);
+        }
+        notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+    }
+
+    private void configureForm() {
+        form = new ModeloPagoTrabajadorForm(trabajadorService.findAll(), libroService.findAll());
+        form.setWidth("25em");
+        form.addListener(ModeloPagoTrabajadorForm.SaveEvent.class, this::saveModelo);
+        form.addListener(ModeloPagoTrabajadorForm.CloseEvent.class, e -> closeEditor());
+    }
+
+    private void saveModelo(ModeloPagoTrabajadorForm.SaveEvent event) {
+
+        listModelosPago.clear();
+        modeloPagoService.findAll().stream().forEach(modelo -> {
+            if (modelo instanceof ModeloPagoTrabajador) {
+                modeloTrabajador = (ModeloPagoTrabajador) modelo;
+                if (modeloTrabajador.getTrabajador().getId() == event.getModeloPago().getTrabajador()
+                        .getId()) {
+                    listModelosPago.add(modeloTrabajador);
                 }
+            }
+        });
+
+        if (listModelosPago.size() != 0) {
+            Notification notification = Notification.show(
+                    "Este trabajador ya tiene un modelo de pago",
+                    5000,
+                    Notification.Position.MIDDLE);
+            notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+        } else {
+            if (event.getModeloPago().getId() == null) {
+                modeloPagoService.save(event.getModeloPago());
+                Notification notification = Notification.show(
+                        "Modelo de pago añadido",
+                        2000,
+                        Notification.Position.BOTTOM_START);
+                notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+            } else {
+                modeloPagoService.update(event.getModeloPago());
+                Notification notification = Notification.show(
+                        "Modelo modificado",
+                        5000,
+                        Notification.Position.BOTTOM_START);
+                notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+            }
         }
-
-        private void addModelo() {
-                grid.asMultiSelect().clear();
-                ModeloPagoTrabajador modelo = new ModeloPagoTrabajador();
-                modelo.setImagen("");
-                editModelo(modelo);
+        toolbar.remove(total);
+        if (listModelosPago.size() == 1) {
+            total = new Html("<span>Total: <b>" + listModelosPago.size() + "</b> modelo</span>");
+        } else if (listModelosPago.size() > 1 || listModelosPago.size() == 0) {
+            total = new Html("<span>Total: <b>" + listModelosPago.size() + "</b> modelos</span>");
         }
+        toolbar.addComponentAtIndex(1, total);
+        toolbar.setFlexGrow(1, buttons);
+        updateList();
+        closeEditor();
+    }
 
-        private void closeEditor() {
-                ModeloPagoTrabajador modelo = new ModeloPagoTrabajador();
-                modelo.setImagen("");
-                form.setModeloPago(modelo);
-                form.setVisible(false);
-                removeClassName("editing");
-                dialog.close();
+    private void editModelo(ModeloPagoTrabajador modeloPago) {
+        if (modeloPago == null) {
+            closeEditor();
+        } else {
+            form.setModeloPago(modeloPago);
+            form.setVisible(true);
+            addClassName("editing");
+            dialog.open();
         }
+    }
 
-        private void updateList() {
+    private void addModelo() {
+        grid.asMultiSelect().clear();
+        ModeloPagoTrabajador modelo = new ModeloPagoTrabajador();
+        modelo.setImagen("");
+        editModelo(modelo);
+    }
 
-                listModelosPago.clear();
-                List<ModeloPago> aux = modeloPagoService.findAll();
-                for (int i = 0; i < aux.size(); i++) {
-                        if (aux.get(i) instanceof ModeloPagoTrabajador) {
-                                modeloTrabajador = (ModeloPagoTrabajador) aux.get(i);
-                                listModelosPago.add(modeloTrabajador);
-                        }
+    private void closeEditor() {
+        ModeloPagoTrabajador modelo = new ModeloPagoTrabajador();
+        modelo.setImagen("");
+        form.setModeloPago(modelo);
+        form.setVisible(false);
+        removeClassName("editing");
+        dialog.close();
+    }
+
+    private void updateList() {
+
+        listModelosPago.clear();
+        List<ModeloPago> aux = modeloPagoService.findAll();
+        for (int i = 0; i < aux.size(); i++) {
+            if (aux.get(i) instanceof ModeloPagoTrabajador) {
+                modeloTrabajador = (ModeloPagoTrabajador) aux.get(i);
+                listModelosPago.add(modeloTrabajador);
+            }
+        }
+        grid.setItems(listModelosPago);
+        grid.setPageSize(listModelosPago.size());
+    }
+
+    /* Form crear modelo de pago */
+    private void formModeloPago() {
+        reportDialog = new Dialog();
+        Div reportContainer = new Div();
+        reportContainer.addClassNames("report-form-container");
+
+        /* Dialog Header */
+        Button closeButton = new Button(new Icon("lumo", "cross"), (e) -> reportDialog.close());
+        closeButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        Span title = new Span("Modelo de Pago");
+        Div titleDiv = new Div(title);
+        titleDiv.addClassName("div-dialog-title");
+        Div buttonDiv = new Div(closeButton);
+        buttonDiv.addClassName("div-dialog-button");
+        header = new Div(titleDiv, buttonDiv);
+        header.addClassName("div-dialog-header");
+        /* Dialog Header */
+
+        trabajador.setPlaceholder("Trabajador");
+        trabajador.setRequired(true);
+        trabajador.setItems(trabajadorService.findAll());
+        trabajador.setItemLabelGenerator(t -> t.getUser().getName());
+
+        libros.setPlaceholder("Libros");
+        libros.setRequired(true);
+        libros.setItems(libroService.findAll());
+        libros.setItemLabelGenerator(libro -> libro.getTitulo());
+
+        Anchor reporteLink = new Anchor(ModeloPagoPDF(), "Crear Modelo");
+        reporteLink.addClassNames("link-modelo");
+        reporteLink.setEnabled(false);
+        reporteLink.setTarget("_BLANK");
+
+        reportContainer.add(header, trabajador, libros, reporteLink);
+        reportDialog.add(reportContainer);
+        reportDialog.open();
+
+        trabajador.addValueChangeListener(e -> {
+            libros.addValueChangeListener(event -> {
+                if (trabajador.getValue() != null && libros.getValue() != null) {
+                    reporteLink.setEnabled(true);
                 }
-                grid.setItems(listModelosPago);
-        }
+            });
+        });
 
-        /* Form crear modelo de pago */
-        private void formModeloPago() {
-                reportDialog = new Dialog();
-                Div reportContainer = new Div();
-                reportContainer.addClassNames("report-form-container");
-
-                /* Dialog Header */
-                Button closeButton = new Button(new Icon("lumo", "cross"), (e) -> reportDialog.close());
-                closeButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-                Span title = new Span("Modelo de Pago");
-                Div titleDiv = new Div(title);
-                titleDiv.addClassName("div-dialog-title");
-                Div buttonDiv = new Div(closeButton);
-                buttonDiv.addClassName("div-dialog-button");
-                header = new Div(titleDiv, buttonDiv);
-                header.addClassName("div-dialog-header");
-                /* Dialog Header */
-
-                trabajador.setPlaceholder("Trabajador");
-                trabajador.setRequired(true);
-                trabajador.setItems(trabajadorService.findAll());
-                trabajador.setItemLabelGenerator(t -> t.getUser().getName());
-
-                libros.setPlaceholder("Libros");
-                libros.setRequired(true);
-                libros.setItems(libroService.findAll());
-                libros.setItemLabelGenerator(libro -> libro.getTitulo());
-
-                Anchor reporteLink = new Anchor(ModeloPagoPDF(), "Crear Modelo");
-                reporteLink.addClassNames("link-modelo");
-                reporteLink.setEnabled(false);
-                reporteLink.setTarget("_BLANK");
-
-                reportContainer.add(header, trabajador, libros, reporteLink);
-                reportDialog.add(reportContainer);
-                reportDialog.open();
-
-                trabajador.addValueChangeListener(e -> {
-                        libros.addValueChangeListener(event -> {
-                                if (trabajador.getValue() != null && libros.getValue() != null) {
-                                        reporteLink.setEnabled(true);
-                                }
-                        });
-                });
-
-                libros.addValueChangeListener(e -> {
-                        trabajador.addValueChangeListener(event -> {
-                                if (trabajador.getValue() != null && libros.getValue() != null) {
-                                        reporteLink.setEnabled(true);
-                                }
-                        });
-                });
-
-                reporteLink.addBlurListener(e -> {
-                        if (!trabajador.isEmpty() && !libros.isEmpty()) {
-                                reportDialog.close();
-                        } else {
-                                Notification notification = Notification.show(
-                                                "Debe seleccionar todos los campos del formulario",
-                                                5000,
-                                                Notification.Position.MIDDLE);
-                                notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
-                        }
-                });
-
-        }
-
-        /* cear pdf modelo de pago */
-        private StreamResource ModeloPagoPDF() {
-                StreamResource source = new StreamResource("ModeloPago.pdf", () -> {
-
-                        String path = "src/main/resources/META-INF/resources/archivos/ModeloPago.pdf";
-
-                        try {
-                                PdfWriter pdfWriter = new PdfWriter(path);
-                                PdfDocument pdfDocument = new PdfDocument(pdfWriter);
-                                Document document = new Document(pdfDocument);
-
-                                document.add(primeraFila());
-                                document.add(segundaFila());
-                                document.add(terceraFila());
-                                document.add(cuartaFila());
-                                document.add(quintaFila());
-                                document.add(sextaFila());
-                                document.add(septimaFila());
-                                document.add(octavaFila());
-
-                                document.close();
-
-                                File initialFile = new File(path);
-                                InputStream targetStream = new FileInputStream(initialFile);
-                                return targetStream;
-                        } catch (FileNotFoundException e) {
-                                e.printStackTrace();
-                                System.out.println("Error al crear el modelo");
-                                return null;
-                        }
-
-                });
-                return source;
-        }
-
-        private Table primeraFila() {
-                float firstGrow_columnWidth[] = { 300, 125, 175 };
-                Table firstGrow = new Table(firstGrow_columnWidth);
-                /* Primer Fila */
-                firstGrow.addCell(new Cell().add("Organismo: Ministerio Educación Superior")
-                                .setTextAlignment(TextAlignment.LEFT)
-                                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                                .setMarginTop(1f)
-                                .setMarginBottom(1f)
-                                .setFontSize(10f));
-
-                firstGrow.addCell(new Cell().add("()Factura")
-                                .setTextAlignment(TextAlignment.LEFT)
-                                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                                .setMarginTop(1f)
-                                .setMarginBottom(1f)
-                                .setBorderRight(Border.NO_BORDER)
-                                .setBorderBottom(Border.NO_BORDER)
-                                .setFontSize(10f));
-
-                firstGrow.addCell(new Cell().add("()Vale de entrega o Devolución")
-                                .setTextAlignment(TextAlignment.LEFT)
-                                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                                .setMarginTop(1f)
-                                .setMarginBottom(1f)
-                                .setBorderLeft(Border.NO_BORDER)
-                                .setBorderBottom(Border.NO_BORDER)
-                                .setFontSize(10f));
-                /* Primer Fila */
-                /* Segunda Fila */
-                firstGrow.addCell(new Cell().add("Empresa: Universidad de las Ciencias Informáticas")
-                                .setTextAlignment(TextAlignment.LEFT)
-                                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                                .setMarginTop(1f)
-                                .setMarginBottom(1f)
-                                .setFontSize(10f));
-
-                firstGrow.addCell(new Cell().add("()Transferencia/Almacenes")
-                                .setTextAlignment(TextAlignment.LEFT)
-                                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                                .setMarginTop(1f)
-                                .setMarginBottom(1f)
-                                .setBorderRight(Border.NO_BORDER)
-                                .setBorderBottom(Border.NO_BORDER)
-                                .setBorderTop(Border.NO_BORDER)
-                                .setFontSize(10f));
-
-                firstGrow.addCell(new Cell().add("()Solicitud de Entreg. Mat.")
-                                .setTextAlignment(TextAlignment.LEFT)
-                                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                                .setMarginTop(1f)
-                                .setMarginBottom(1f)
-                                .setBorderLeft(Border.NO_BORDER)
-                                .setBorderTop(Border.NO_BORDER)
-                                .setBorderBottom(Border.NO_BORDER)
-                                .setFontSize(10f));
-                /* Segunda Fila */
-                /* Tercera Fila */
-                firstGrow.addCell(new Cell().add("Unidad/Almacén: " + trabajador.getValue().getArea())
-                                .setTextAlignment(TextAlignment.LEFT)
-                                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                                .setMarginTop(1f)
-                                .setMarginBottom(1f)
-                                .setFontSize(10f));
-
-                firstGrow.addCell(new Cell().add("()Ajuste de inventario")
-                                .setTextAlignment(TextAlignment.LEFT)
-                                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                                .setMarginTop(1f)
-                                .setMarginBottom(1f)
-                                .setBorderRight(Border.NO_BORDER)
-                                .setBorderTop(Border.NO_BORDER)
-                                .setBorderBottom(Border.NO_BORDER)
-                                .setFontSize(10f));
-
-                firstGrow.addCell(new Cell().add("()Produción Terminada")
-                                .setTextAlignment(TextAlignment.LEFT)
-                                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                                .setMarginTop(1f)
-                                .setMarginBottom(1f)
-                                .setBorderLeft(Border.NO_BORDER)
-                                .setBorderTop(Border.NO_BORDER)
-                                .setBorderBottom(Border.NO_BORDER)
-                                .setFontSize(10f));
-                /* Tercera Fila */
-                /* Cuarta Fila */
-                firstGrow.addCell(new Cell().add("Suministrador: " + trabajador.getValue().getUser().getName())
-                                .setTextAlignment(TextAlignment.LEFT)
-                                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                                .setMarginTop(1f)
-                                .setMarginBottom(1f)
-                                .setFontSize(10f));
-
-                firstGrow.addCell(new Cell().add("()Informe de Recepción")
-                                .setTextAlignment(TextAlignment.LEFT)
-                                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                                .setMarginTop(1f)
-                                .setMarginBottom(1f)
-                                .setBorderRight(Border.NO_BORDER)
-                                .setBorderTop(Border.NO_BORDER)
-                                .setFontSize(10f));
-
-                firstGrow.addCell(new Cell().add("()Conduce")
-                                .setTextAlignment(TextAlignment.LEFT)
-                                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                                .setMarginTop(1f)
-                                .setMarginBottom(1f)
-                                .setBorderLeft(Border.NO_BORDER)
-                                .setBorderTop(Border.NO_BORDER)
-                                .setFontSize(10f));
-                /* Cuarta Fila */
-
-                return firstGrow;
-        }
-
-        private Table segundaFila() {
-                float secondGrow_columnWidth[] = { 2, 2, 200, 140, 140 };
-                Table secondGrow = new Table(secondGrow_columnWidth);
-                /* Primer Fila */
-                secondGrow.addCell(new Cell().add("END")
-                                .setTextAlignment(TextAlignment.LEFT)
-                                .setVerticalAlignment(VerticalAlignment.BOTTOM)
-                                .setHorizontalAlignment(HorizontalAlignment.CENTER)
-                                .setRotationAngle(Math.toRadians(90))
-                                .setBorderRight(Border.NO_BORDER)
-                                .setBorderTop(Border.NO_BORDER)
-                                .setBorderBottom(Border.NO_BORDER)
-                                .setFontSize(10f));
-
-                secondGrow.addCell(new Cell().add("CED")
-                                .setTextAlignment(TextAlignment.LEFT)
-                                .setVerticalAlignment(VerticalAlignment.BOTTOM)
-                                .setHorizontalAlignment(HorizontalAlignment.CENTER)
-                                .setRotationAngle(Math.toRadians(90))
-                                .setBorderLeft(Border.NO_BORDER)
-                                .setBorderTop(Border.NO_BORDER)
-                                .setBorderBottom(Border.NO_BORDER)
-                                .setFontSize(10f));
-
-                secondGrow.addCell(new Cell().add("Orden No. ")
-                                .setTextAlignment(TextAlignment.LEFT)
-                                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                                .setBorderTop(Border.NO_BORDER)
-                                .setFontSize(10f));
-
-                secondGrow.addCell(new Cell().add("Centro de Costo. ")
-                                .setTextAlignment(TextAlignment.LEFT)
-                                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                                .setBorderTop(Border.NO_BORDER)
-                                .setFontSize(10f));
-
-                secondGrow.addCell(new Cell().add("Código. ")
-                                .setTextAlignment(TextAlignment.LEFT)
-                                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                                .setBorderTop(Border.NO_BORDER)
-                                .setFontSize(10f));
-                /* Primer Fila */
-                /* Segunda Fila */
-                secondGrow.addCell(new Cell().add("DEP")
-                                .setTextAlignment(TextAlignment.RIGHT)
-                                .setVerticalAlignment(VerticalAlignment.BOTTOM)
-                                .setHorizontalAlignment(HorizontalAlignment.CENTER)
-                                .setRotationAngle(Math.toRadians(90))
-                                .setBorderRight(Border.NO_BORDER)
-                                .setBorderTop(Border.NO_BORDER)
-                                .setFontSize(10f));
-
-                secondGrow.addCell(new Cell().add("PRO")
-                                .setTextAlignment(TextAlignment.RIGHT)
-                                .setVerticalAlignment(VerticalAlignment.BOTTOM)
-                                .setHorizontalAlignment(HorizontalAlignment.CENTER)
-                                .setRotationAngle(Math.toRadians(90))
-                                .setBorderLeft(Border.NO_BORDER)
-                                .setBorderTop(Border.NO_BORDER)
-                                .setFontSize(10f));
-
-                secondGrow.addCell(new Cell().add("Lote No. ")
-                                .setTextAlignment(TextAlignment.LEFT)
-                                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                                .setBorderTop(Border.NO_BORDER)
-                                .setFontSize(10f));
-
-                secondGrow.addCell(new Cell().add("Producto. ")
-                                .setTextAlignment(TextAlignment.LEFT)
-                                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                                .setBorderTop(Border.NO_BORDER)
-                                .setFontSize(10f));
-
-                secondGrow.addCell(new Cell().add("Otros. ")
-                                .setTextAlignment(TextAlignment.LEFT)
-                                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                                .setBorderTop(Border.NO_BORDER)
-                                .setFontSize(10f));
-                /* Segunda Fila */
-
-                return secondGrow;
-        }
-
-        private Table terceraFila() {
-                float terceraFila_columnWidth[] = { 80, 200, 30, 30, 80, 80, 80 };
-                Table terceraFila = new Table(terceraFila_columnWidth);
-
-                terceraFila.addCell(new Cell().add("Código")
-                                .setTextAlignment(TextAlignment.CENTER)
-                                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                                .setBorderTop(Border.NO_BORDER)
-                                .setFontSize(10f));
-
-                terceraFila.addCell(new Cell().add("Descripción")
-                                .setTextAlignment(TextAlignment.CENTER)
-                                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                                .setBorderTop(Border.NO_BORDER)
-                                .setFontSize(10f));
-
-                terceraFila.addCell(new Cell().add("U.M.")
-                                .setTextAlignment(TextAlignment.CENTER)
-                                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                                .setBorderTop(Border.NO_BORDER)
-                                .setFontSize(10f));
-
-                terceraFila.addCell(new Cell().add("Cantidad")
-                                .setTextAlignment(TextAlignment.CENTER)
-                                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                                .setBorderTop(Border.NO_BORDER)
-                                .setFontSize(10f));
-
-                terceraFila.addCell(new Cell().add("Precio")
-                                .setTextAlignment(TextAlignment.CENTER)
-                                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                                .setBorderTop(Border.NO_BORDER)
-                                .setFontSize(10f));
-
-                terceraFila.addCell(new Cell().add("Importe")
-                                .setTextAlignment(TextAlignment.CENTER)
-                                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                                .setBorderTop(Border.NO_BORDER)
-                                .setFontSize(10f));
-
-                terceraFila.addCell(new Cell().add("Saldo Existencia")
-                                .setTextAlignment(TextAlignment.CENTER)
-                                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                                .setBorderTop(Border.NO_BORDER)
-                                .setFontSize(10f));
-
-                return terceraFila;
-        }
-
-        private Table cuartaFila() {
-                float cuartaFila_columnWidth[] = { 78, 177, 32, 48, 78, 78, 80 };
-                Table cuartaFila = new Table(cuartaFila_columnWidth);
-
-                List<Libro> listLibros = new LinkedList<>(libros.getValue());
-
-                for (int i = 0; i < listLibros.size(); i++) {
-
-                        cuartaFila.addCell(new Cell().add("  ")
-                                        .setTextAlignment(TextAlignment.CENTER)
-                                        .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                                        .setBorderTop(Border.NO_BORDER)
-                                        .setFontSize(10f));
-
-                        cuartaFila.addCell(new Cell().add(listLibros.get(i).getTitulo())
-                                        .setTextAlignment(TextAlignment.LEFT)
-                                        .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                                        .setBorderTop(Border.NO_BORDER)
-                                        .setFontSize(10f));
-
-                        cuartaFila.addCell(new Cell().add("U")
-                                        .setTextAlignment(TextAlignment.CENTER)
-                                        .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                                        .setBorderTop(Border.NO_BORDER)
-                                        .setFontSize(10f));
-
-                        cuartaFila.addCell(new Cell().add("1")
-                                        .setTextAlignment(TextAlignment.CENTER)
-                                        .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                                        .setBorderTop(Border.NO_BORDER)
-                                        .setFontSize(10f));
-
-                        cuartaFila.addCell(new Cell().add("  ")
-                                        .setTextAlignment(TextAlignment.CENTER)
-                                        .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                                        .setBorderTop(Border.NO_BORDER)
-                                        .setFontSize(10f));
-
-                        cuartaFila.addCell(new Cell().add("  ")
-                                        .setTextAlignment(TextAlignment.CENTER)
-                                        .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                                        .setBorderTop(Border.NO_BORDER)
-                                        .setFontSize(10f));
-
-                        cuartaFila.addCell(new Cell().add("  ")
-                                        .setTextAlignment(TextAlignment.CENTER)
-                                        .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                                        .setBorderTop(Border.NO_BORDER)
-                                        .setFontSize(10f));
-
+        libros.addValueChangeListener(e -> {
+            trabajador.addValueChangeListener(event -> {
+                if (trabajador.getValue() != null && libros.getValue() != null) {
+                    reporteLink.setEnabled(true);
                 }
+            });
+        });
 
-                return cuartaFila;
+        reporteLink.addBlurListener(e -> {
+            if (!trabajador.isEmpty() && !libros.isEmpty()) {
+                reportDialog.close();
+            } else {
+                Notification notification = Notification.show(
+                        "Debe seleccionar todos los campos del formulario",
+                        5000,
+                        Notification.Position.MIDDLE);
+                notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+            }
+        });
+
+    }
+
+    /* cear pdf modelo de pago */
+    private StreamResource ModeloPagoPDF() {
+        StreamResource source = new StreamResource("ModeloPago.pdf", () -> {
+
+            String path = "src/main/resources/META-INF/resources/archivos/ModeloPago.pdf";
+
+            try {
+                PdfWriter pdfWriter = new PdfWriter(path);
+                PdfDocument pdfDocument = new PdfDocument(pdfWriter);
+                Document document = new Document(pdfDocument);
+
+                document.add(primeraFila());
+                document.add(segundaFila());
+                document.add(terceraFila());
+                document.add(cuartaFila());
+                document.add(quintaFila());
+                document.add(sextaFila());
+                document.add(septimaFila());
+                document.add(octavaFila());
+
+                document.close();
+
+                File initialFile = new File(path);
+                InputStream targetStream = new FileInputStream(initialFile);
+                return targetStream;
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                System.out.println("Error al crear el modelo");
+                return null;
+            }
+
+        });
+        return source;
+    }
+
+    private Table primeraFila() {
+        float firstGrow_columnWidth[] = {300, 125, 175};
+        Table firstGrow = new Table(firstGrow_columnWidth);
+        /* Primer Fila */
+        firstGrow.addCell(new Cell().add("Organismo: Ministerio Educación Superior")
+                .setTextAlignment(TextAlignment.LEFT)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setMarginTop(1f)
+                .setMarginBottom(1f)
+                .setFontSize(10f));
+
+        firstGrow.addCell(new Cell().add("()Factura")
+                .setTextAlignment(TextAlignment.LEFT)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setMarginTop(1f)
+                .setMarginBottom(1f)
+                .setBorderRight(Border.NO_BORDER)
+                .setBorderBottom(Border.NO_BORDER)
+                .setFontSize(10f));
+
+        firstGrow.addCell(new Cell().add("()Vale de entrega o Devolución")
+                .setTextAlignment(TextAlignment.LEFT)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setMarginTop(1f)
+                .setMarginBottom(1f)
+                .setBorderLeft(Border.NO_BORDER)
+                .setBorderBottom(Border.NO_BORDER)
+                .setFontSize(10f));
+        /* Primer Fila */
+ /* Segunda Fila */
+        firstGrow.addCell(new Cell().add("Empresa: Universidad de las Ciencias Informáticas")
+                .setTextAlignment(TextAlignment.LEFT)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setMarginTop(1f)
+                .setMarginBottom(1f)
+                .setFontSize(10f));
+
+        firstGrow.addCell(new Cell().add("()Transferencia/Almacenes")
+                .setTextAlignment(TextAlignment.LEFT)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setMarginTop(1f)
+                .setMarginBottom(1f)
+                .setBorderRight(Border.NO_BORDER)
+                .setBorderBottom(Border.NO_BORDER)
+                .setBorderTop(Border.NO_BORDER)
+                .setFontSize(10f));
+
+        firstGrow.addCell(new Cell().add("()Solicitud de Entreg. Mat.")
+                .setTextAlignment(TextAlignment.LEFT)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setMarginTop(1f)
+                .setMarginBottom(1f)
+                .setBorderLeft(Border.NO_BORDER)
+                .setBorderTop(Border.NO_BORDER)
+                .setBorderBottom(Border.NO_BORDER)
+                .setFontSize(10f));
+        /* Segunda Fila */
+ /* Tercera Fila */
+        firstGrow.addCell(new Cell().add("Unidad/Almacén: " + trabajador.getValue().getArea())
+                .setTextAlignment(TextAlignment.LEFT)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setMarginTop(1f)
+                .setMarginBottom(1f)
+                .setFontSize(10f));
+
+        firstGrow.addCell(new Cell().add("()Ajuste de inventario")
+                .setTextAlignment(TextAlignment.LEFT)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setMarginTop(1f)
+                .setMarginBottom(1f)
+                .setBorderRight(Border.NO_BORDER)
+                .setBorderTop(Border.NO_BORDER)
+                .setBorderBottom(Border.NO_BORDER)
+                .setFontSize(10f));
+
+        firstGrow.addCell(new Cell().add("()Produción Terminada")
+                .setTextAlignment(TextAlignment.LEFT)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setMarginTop(1f)
+                .setMarginBottom(1f)
+                .setBorderLeft(Border.NO_BORDER)
+                .setBorderTop(Border.NO_BORDER)
+                .setBorderBottom(Border.NO_BORDER)
+                .setFontSize(10f));
+        /* Tercera Fila */
+ /* Cuarta Fila */
+        firstGrow.addCell(new Cell().add("Suministrador: " + trabajador.getValue().getUser().getName())
+                .setTextAlignment(TextAlignment.LEFT)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setMarginTop(1f)
+                .setMarginBottom(1f)
+                .setFontSize(10f));
+
+        firstGrow.addCell(new Cell().add("()Informe de Recepción")
+                .setTextAlignment(TextAlignment.LEFT)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setMarginTop(1f)
+                .setMarginBottom(1f)
+                .setBorderRight(Border.NO_BORDER)
+                .setBorderTop(Border.NO_BORDER)
+                .setFontSize(10f));
+
+        firstGrow.addCell(new Cell().add("()Conduce")
+                .setTextAlignment(TextAlignment.LEFT)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setMarginTop(1f)
+                .setMarginBottom(1f)
+                .setBorderLeft(Border.NO_BORDER)
+                .setBorderTop(Border.NO_BORDER)
+                .setFontSize(10f));
+        /* Cuarta Fila */
+
+        return firstGrow;
+    }
+
+    private Table segundaFila() {
+        float secondGrow_columnWidth[] = {2, 2, 200, 140, 140};
+        Table secondGrow = new Table(secondGrow_columnWidth);
+        /* Primer Fila */
+        secondGrow.addCell(new Cell().add("END")
+                .setTextAlignment(TextAlignment.LEFT)
+                .setVerticalAlignment(VerticalAlignment.BOTTOM)
+                .setHorizontalAlignment(HorizontalAlignment.CENTER)
+                .setRotationAngle(Math.toRadians(90))
+                .setBorderRight(Border.NO_BORDER)
+                .setBorderTop(Border.NO_BORDER)
+                .setBorderBottom(Border.NO_BORDER)
+                .setFontSize(10f));
+
+        secondGrow.addCell(new Cell().add("CED")
+                .setTextAlignment(TextAlignment.LEFT)
+                .setVerticalAlignment(VerticalAlignment.BOTTOM)
+                .setHorizontalAlignment(HorizontalAlignment.CENTER)
+                .setRotationAngle(Math.toRadians(90))
+                .setBorderLeft(Border.NO_BORDER)
+                .setBorderTop(Border.NO_BORDER)
+                .setBorderBottom(Border.NO_BORDER)
+                .setFontSize(10f));
+
+        secondGrow.addCell(new Cell().add("Orden No. ")
+                .setTextAlignment(TextAlignment.LEFT)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setBorderTop(Border.NO_BORDER)
+                .setFontSize(10f));
+
+        secondGrow.addCell(new Cell().add("Centro de Costo. ")
+                .setTextAlignment(TextAlignment.LEFT)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setBorderTop(Border.NO_BORDER)
+                .setFontSize(10f));
+
+        secondGrow.addCell(new Cell().add("Código. ")
+                .setTextAlignment(TextAlignment.LEFT)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setBorderTop(Border.NO_BORDER)
+                .setFontSize(10f));
+        /* Primer Fila */
+ /* Segunda Fila */
+        secondGrow.addCell(new Cell().add("DEP")
+                .setTextAlignment(TextAlignment.RIGHT)
+                .setVerticalAlignment(VerticalAlignment.BOTTOM)
+                .setHorizontalAlignment(HorizontalAlignment.CENTER)
+                .setRotationAngle(Math.toRadians(90))
+                .setBorderRight(Border.NO_BORDER)
+                .setBorderTop(Border.NO_BORDER)
+                .setFontSize(10f));
+
+        secondGrow.addCell(new Cell().add("PRO")
+                .setTextAlignment(TextAlignment.RIGHT)
+                .setVerticalAlignment(VerticalAlignment.BOTTOM)
+                .setHorizontalAlignment(HorizontalAlignment.CENTER)
+                .setRotationAngle(Math.toRadians(90))
+                .setBorderLeft(Border.NO_BORDER)
+                .setBorderTop(Border.NO_BORDER)
+                .setFontSize(10f));
+
+        secondGrow.addCell(new Cell().add("Lote No. ")
+                .setTextAlignment(TextAlignment.LEFT)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setBorderTop(Border.NO_BORDER)
+                .setFontSize(10f));
+
+        secondGrow.addCell(new Cell().add("Producto. ")
+                .setTextAlignment(TextAlignment.LEFT)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setBorderTop(Border.NO_BORDER)
+                .setFontSize(10f));
+
+        secondGrow.addCell(new Cell().add("Otros. ")
+                .setTextAlignment(TextAlignment.LEFT)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setBorderTop(Border.NO_BORDER)
+                .setFontSize(10f));
+        /* Segunda Fila */
+
+        return secondGrow;
+    }
+
+    private Table terceraFila() {
+        float terceraFila_columnWidth[] = {80, 200, 30, 30, 80, 80, 80};
+        Table terceraFila = new Table(terceraFila_columnWidth);
+
+        terceraFila.addCell(new Cell().add("Código")
+                .setTextAlignment(TextAlignment.CENTER)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setBorderTop(Border.NO_BORDER)
+                .setFontSize(10f));
+
+        terceraFila.addCell(new Cell().add("Descripción")
+                .setTextAlignment(TextAlignment.CENTER)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setBorderTop(Border.NO_BORDER)
+                .setFontSize(10f));
+
+        terceraFila.addCell(new Cell().add("U.M.")
+                .setTextAlignment(TextAlignment.CENTER)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setBorderTop(Border.NO_BORDER)
+                .setFontSize(10f));
+
+        terceraFila.addCell(new Cell().add("Cantidad")
+                .setTextAlignment(TextAlignment.CENTER)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setBorderTop(Border.NO_BORDER)
+                .setFontSize(10f));
+
+        terceraFila.addCell(new Cell().add("Precio")
+                .setTextAlignment(TextAlignment.CENTER)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setBorderTop(Border.NO_BORDER)
+                .setFontSize(10f));
+
+        terceraFila.addCell(new Cell().add("Importe")
+                .setTextAlignment(TextAlignment.CENTER)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setBorderTop(Border.NO_BORDER)
+                .setFontSize(10f));
+
+        terceraFila.addCell(new Cell().add("Saldo Existencia")
+                .setTextAlignment(TextAlignment.CENTER)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setBorderTop(Border.NO_BORDER)
+                .setFontSize(10f));
+
+        return terceraFila;
+    }
+
+    private Table cuartaFila() {
+        float cuartaFila_columnWidth[] = {78, 177, 32, 48, 78, 78, 80};
+        Table cuartaFila = new Table(cuartaFila_columnWidth);
+
+        List<Libro> listLibros = new LinkedList<>(libros.getValue());
+
+        for (int i = 0; i < listLibros.size(); i++) {
+
+            cuartaFila.addCell(new Cell().add("  ")
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                    .setBorderTop(Border.NO_BORDER)
+                    .setFontSize(10f));
+
+            cuartaFila.addCell(new Cell().add(listLibros.get(i).getTitulo())
+                    .setTextAlignment(TextAlignment.LEFT)
+                    .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                    .setBorderTop(Border.NO_BORDER)
+                    .setFontSize(10f));
+
+            cuartaFila.addCell(new Cell().add("U")
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                    .setBorderTop(Border.NO_BORDER)
+                    .setFontSize(10f));
+
+            cuartaFila.addCell(new Cell().add("1")
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                    .setBorderTop(Border.NO_BORDER)
+                    .setFontSize(10f));
+
+            cuartaFila.addCell(new Cell().add("  ")
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                    .setBorderTop(Border.NO_BORDER)
+                    .setFontSize(10f));
+
+            cuartaFila.addCell(new Cell().add("  ")
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                    .setBorderTop(Border.NO_BORDER)
+                    .setFontSize(10f));
+
+            cuartaFila.addCell(new Cell().add("  ")
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                    .setBorderTop(Border.NO_BORDER)
+                    .setFontSize(10f));
+
         }
 
-        private Table quintaFila() {
-                float quintaFila_columnWidth[] = { 400, 400, 400 };
-                Table quintaFila = new Table(quintaFila_columnWidth);
+        return cuartaFila;
+    }
 
-                quintaFila.addCell(new Cell().add("Despachado por:")
-                                .setTextAlignment(TextAlignment.CENTER)
-                                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                                .setBorderTop(Border.NO_BORDER)
-                                .setFontSize(10f));
+    private Table quintaFila() {
+        float quintaFila_columnWidth[] = {400, 400, 400};
+        Table quintaFila = new Table(quintaFila_columnWidth);
 
-                quintaFila.addCell(new Cell().add("Recibido por:")
-                                .setTextAlignment(TextAlignment.CENTER)
-                                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                                .setBorderTop(Border.NO_BORDER)
-                                .setFontSize(10f));
+        quintaFila.addCell(new Cell().add("Despachado por:")
+                .setTextAlignment(TextAlignment.CENTER)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setBorderTop(Border.NO_BORDER)
+                .setFontSize(10f));
 
-                quintaFila.addCell(new Cell().add("Autorizado por:")
-                                .setTextAlignment(TextAlignment.CENTER)
-                                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                                .setBorderTop(Border.NO_BORDER)
-                                .setFontSize(10f));
+        quintaFila.addCell(new Cell().add("Recibido por:")
+                .setTextAlignment(TextAlignment.CENTER)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setBorderTop(Border.NO_BORDER)
+                .setFontSize(10f));
 
-                return quintaFila;
-        }
+        quintaFila.addCell(new Cell().add("Autorizado por:")
+                .setTextAlignment(TextAlignment.CENTER)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setBorderTop(Border.NO_BORDER)
+                .setFontSize(10f));
 
-        private Table sextaFila() {
-                float sexta_columnWidth[] = { 320, 100, 320, 65, 320, 80 };
-                Table sextaFila = new Table(sexta_columnWidth);
+        return quintaFila;
+    }
 
-                sextaFila.addCell(new Cell().add("Nombre y apellidos:")
-                                .setTextAlignment(TextAlignment.CENTER)
-                                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                                .setBorderTop(Border.NO_BORDER)
-                                .setFontSize(10f));
+    private Table sextaFila() {
+        float sexta_columnWidth[] = {320, 100, 320, 65, 320, 80};
+        Table sextaFila = new Table(sexta_columnWidth);
 
-                sextaFila.addCell(new Cell().add("Firma:")
-                                .setTextAlignment(TextAlignment.CENTER)
-                                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                                .setBorderTop(Border.NO_BORDER)
-                                .setFontSize(10f));
+        sextaFila.addCell(new Cell().add("Nombre y apellidos:")
+                .setTextAlignment(TextAlignment.CENTER)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setBorderTop(Border.NO_BORDER)
+                .setFontSize(10f));
 
-                sextaFila.addCell(new Cell().add("Nombre y apellidos:")
-                                .setTextAlignment(TextAlignment.CENTER)
-                                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                                .setBorderTop(Border.NO_BORDER)
-                                .setFontSize(10f));
+        sextaFila.addCell(new Cell().add("Firma:")
+                .setTextAlignment(TextAlignment.CENTER)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setBorderTop(Border.NO_BORDER)
+                .setFontSize(10f));
 
-                sextaFila.addCell(new Cell().add("Firma:")
-                                .setTextAlignment(TextAlignment.CENTER)
-                                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                                .setBorderTop(Border.NO_BORDER)
-                                .setFontSize(10f));
+        sextaFila.addCell(new Cell().add("Nombre y apellidos:")
+                .setTextAlignment(TextAlignment.CENTER)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setBorderTop(Border.NO_BORDER)
+                .setFontSize(10f));
 
-                sextaFila.addCell(new Cell().add("Nombre y apellidos:")
-                                .setTextAlignment(TextAlignment.CENTER)
-                                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                                .setBorderTop(Border.NO_BORDER)
-                                .setFontSize(10f));
+        sextaFila.addCell(new Cell().add("Firma:")
+                .setTextAlignment(TextAlignment.CENTER)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setBorderTop(Border.NO_BORDER)
+                .setFontSize(10f));
 
-                sextaFila.addCell(new Cell().add("Firma:")
-                                .setTextAlignment(TextAlignment.CENTER)
-                                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                                .setBorderTop(Border.NO_BORDER)
-                                .setFontSize(10f));
+        sextaFila.addCell(new Cell().add("Nombre y apellidos:")
+                .setTextAlignment(TextAlignment.CENTER)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setBorderTop(Border.NO_BORDER)
+                .setFontSize(10f));
 
-                return sextaFila;
-        }
+        sextaFila.addCell(new Cell().add("Firma:")
+                .setTextAlignment(TextAlignment.CENTER)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setBorderTop(Border.NO_BORDER)
+                .setFontSize(10f));
 
-        private Table septimaFila() {
-                float septimaFila_columnWidth[] = { 305, 120, 305, 100, 305, 105 };
-                Table septimaFila = new Table(septimaFila_columnWidth);
+        return sextaFila;
+    }
 
-                septimaFila.addCell(new Cell().add(" ")
-                                .setTextAlignment(TextAlignment.CENTER)
-                                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                                .setBorderTop(Border.NO_BORDER)
-                                .setMarginTop(10f)
-                                .setMarginBottom(10f)
-                                .setFontSize(10f));
+    private Table septimaFila() {
+        float septimaFila_columnWidth[] = {305, 120, 305, 100, 305, 105};
+        Table septimaFila = new Table(septimaFila_columnWidth);
 
-                septimaFila.addCell(new Cell().add(" ")
-                                .setTextAlignment(TextAlignment.CENTER)
-                                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                                .setBorderTop(Border.NO_BORDER)
-                                .setMarginTop(10f)
-                                .setMarginBottom(10f)
-                                .setFontSize(10f));
+        septimaFila.addCell(new Cell().add(" ")
+                .setTextAlignment(TextAlignment.CENTER)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setBorderTop(Border.NO_BORDER)
+                .setMarginTop(10f)
+                .setMarginBottom(10f)
+                .setFontSize(10f));
 
-                septimaFila.addCell(new Cell().add(" ")
-                                .setTextAlignment(TextAlignment.CENTER)
-                                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                                .setBorderTop(Border.NO_BORDER)
-                                .setMarginTop(10f)
-                                .setMarginBottom(10f)
-                                .setFontSize(10f));
+        septimaFila.addCell(new Cell().add(" ")
+                .setTextAlignment(TextAlignment.CENTER)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setBorderTop(Border.NO_BORDER)
+                .setMarginTop(10f)
+                .setMarginBottom(10f)
+                .setFontSize(10f));
 
-                septimaFila.addCell(new Cell().add(" ")
-                                .setTextAlignment(TextAlignment.CENTER)
-                                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                                .setBorderTop(Border.NO_BORDER)
-                                .setMarginTop(10f)
-                                .setMarginBottom(10f)
-                                .setFontSize(10f));
+        septimaFila.addCell(new Cell().add(" ")
+                .setTextAlignment(TextAlignment.CENTER)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setBorderTop(Border.NO_BORDER)
+                .setMarginTop(10f)
+                .setMarginBottom(10f)
+                .setFontSize(10f));
 
-                septimaFila.addCell(new Cell().add(" ")
-                                .setTextAlignment(TextAlignment.CENTER)
-                                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                                .setBorderTop(Border.NO_BORDER)
-                                .setMarginTop(10f)
-                                .setMarginBottom(10f)
-                                .setFontSize(10f));
+        septimaFila.addCell(new Cell().add(" ")
+                .setTextAlignment(TextAlignment.CENTER)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setBorderTop(Border.NO_BORDER)
+                .setMarginTop(10f)
+                .setMarginBottom(10f)
+                .setFontSize(10f));
 
-                septimaFila.addCell(new Cell().add(" ")
-                                .setTextAlignment(TextAlignment.CENTER)
-                                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                                .setBorderTop(Border.NO_BORDER)
-                                .setMarginTop(10f)
-                                .setMarginBottom(10f)
-                                .setFontSize(10f));
+        septimaFila.addCell(new Cell().add(" ")
+                .setTextAlignment(TextAlignment.CENTER)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setBorderTop(Border.NO_BORDER)
+                .setMarginTop(10f)
+                .setMarginBottom(10f)
+                .setFontSize(10f));
 
-                return septimaFila;
-        }
+        septimaFila.addCell(new Cell().add(" ")
+                .setTextAlignment(TextAlignment.CENTER)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setBorderTop(Border.NO_BORDER)
+                .setMarginTop(10f)
+                .setMarginBottom(10f)
+                .setFontSize(10f));
 
-        private Table octavaFila() {
-                float octavaFila_columnWidth[] = { 300, 300, 300, 40, 40, 40, 40 };
-                Table octavaFila = new Table(octavaFila_columnWidth);
+        return septimaFila;
+    }
 
-                octavaFila.addCell(new Cell().add("Anotado Sub-Mayor Inventario:")
-                                .setTextAlignment(TextAlignment.LEFT)
-                                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                                .setBorderTop(Border.NO_BORDER)
-                                .setMarginBottom(10f)
-                                .setFontSize(10f));
+    private Table octavaFila() {
+        float octavaFila_columnWidth[] = {300, 300, 300, 40, 40, 40, 40};
+        Table octavaFila = new Table(octavaFila_columnWidth);
 
-                octavaFila.addCell(new Cell().add("Contabilizado por:")
-                                .setTextAlignment(TextAlignment.LEFT)
-                                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                                .setBorderTop(Border.NO_BORDER)
-                                .setMarginBottom(10f)
-                                .setFontSize(10f));
+        octavaFila.addCell(new Cell().add("Anotado Sub-Mayor Inventario:")
+                .setTextAlignment(TextAlignment.LEFT)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setBorderTop(Border.NO_BORDER)
+                .setMarginBottom(10f)
+                .setFontSize(10f));
 
-                octavaFila.addCell(new Cell().add("Solicitud de materiales No.")
-                                .setTextAlignment(TextAlignment.LEFT)
-                                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                                .setBorderTop(Border.NO_BORDER)
-                                .setMarginBottom(10f)
-                                .setFontSize(10f));
+        octavaFila.addCell(new Cell().add("Contabilizado por:")
+                .setTextAlignment(TextAlignment.LEFT)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setBorderTop(Border.NO_BORDER)
+                .setMarginBottom(10f)
+                .setFontSize(10f));
 
-                octavaFila.addCell(new Cell().add("D")
-                                .setTextAlignment(TextAlignment.CENTER)
-                                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                                .setBorderTop(Border.NO_BORDER)
-                                .setMarginBottom(10f)
-                                .setFontSize(10f));
+        octavaFila.addCell(new Cell().add("Solicitud de materiales No.")
+                .setTextAlignment(TextAlignment.LEFT)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setBorderTop(Border.NO_BORDER)
+                .setMarginBottom(10f)
+                .setFontSize(10f));
 
-                octavaFila.addCell(new Cell().add("M")
-                                .setTextAlignment(TextAlignment.CENTER)
-                                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                                .setBorderTop(Border.NO_BORDER)
-                                .setMarginBottom(10f)
-                                .setFontSize(10f));
+        octavaFila.addCell(new Cell().add("D")
+                .setTextAlignment(TextAlignment.CENTER)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setBorderTop(Border.NO_BORDER)
+                .setMarginBottom(10f)
+                .setFontSize(10f));
 
-                octavaFila.addCell(new Cell().add("A")
-                                .setTextAlignment(TextAlignment.CENTER)
-                                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                                .setBorderTop(Border.NO_BORDER)
-                                .setMarginBottom(10f)
-                                .setFontSize(10f));
+        octavaFila.addCell(new Cell().add("M")
+                .setTextAlignment(TextAlignment.CENTER)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setBorderTop(Border.NO_BORDER)
+                .setMarginBottom(10f)
+                .setFontSize(10f));
 
-                octavaFila.addCell(new Cell().add("No.")
-                                .setTextAlignment(TextAlignment.CENTER)
-                                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                                .setBorderTop(Border.NO_BORDER)
-                                .setMarginBottom(10f)
-                                .setFontSize(10f));
+        octavaFila.addCell(new Cell().add("A")
+                .setTextAlignment(TextAlignment.CENTER)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setBorderTop(Border.NO_BORDER)
+                .setMarginBottom(10f)
+                .setFontSize(10f));
 
-                return octavaFila;
-        }
-        /* Fin-> cear pdf modelo de pago */
+        octavaFila.addCell(new Cell().add("No.")
+                .setTextAlignment(TextAlignment.CENTER)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setBorderTop(Border.NO_BORDER)
+                .setMarginBottom(10f)
+                .setFontSize(10f));
+
+        return octavaFila;
+    }
+    /* Fin-> cear pdf modelo de pago */
 }

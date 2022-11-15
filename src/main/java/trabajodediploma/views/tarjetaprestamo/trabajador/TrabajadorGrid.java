@@ -61,7 +61,7 @@ import trabajodediploma.views.tarjetaprestamo.trabajadorPrestamo.TarjetaPrestamo
  */
 public class TrabajadorGrid extends Div {
 
-    private Grid<Trabajador> gridTrabajadors = new Grid<>(Trabajador.class, false);
+    private Grid<Trabajador> gridTrabajadores = new Grid<>(Trabajador.class, false);
     TrabajadorForm form;
     TarjetaPrestamoTrabajadorView tarjetaPrestamoTrabajadorView;
     private TarjetaPrestamoTrabajador tarjetaTrabajador;
@@ -101,7 +101,7 @@ public class TrabajadorGrid extends Div {
         menuBar();
         content = new Div();
         content.addClassName("container___trabajador_grid__div");
-        content.add(barra_menu, div_filtros, gridTrabajadors);
+        content.add(barra_menu, div_filtros, gridTrabajadores);
         add(content);
 
     }
@@ -125,9 +125,10 @@ public class TrabajadorGrid extends Div {
     }
 
     private void configureGrid() {
-
-        gridTrabajadors.setClassName("container___trabajador_grid__div__table");
-        nombreColumn = gridTrabajadors.addColumn(new ComponentRenderer<>(est -> {
+        gridTrabajadores.setClassName("container___trabajador_grid__div__table");
+        gridTrabajadores.getStyle().set("max-height", "550px");
+        
+        nombreColumn = gridTrabajadores.addColumn(new ComponentRenderer<>(est -> {
             HorizontalLayout hl = new HorizontalLayout();
             hl.getStyle().set("align-items", "center");
             hl.setAlignItems(Alignment.CENTER);
@@ -145,7 +146,7 @@ public class TrabajadorGrid extends Div {
             return hl;
         })).setHeader("Nombre").setAutoWidth(true).setSortable(true);
 
-        tarjetaColumn = gridTrabajadors.addComponentColumn(event -> {
+        tarjetaColumn = gridTrabajadores.addComponentColumn(event -> {
             Button cardButton = new Button("Tarjeta", VaadinIcon.FILE_TABLE.create(), e -> this.editCard(event));
             cardButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
             return cardButton;
@@ -153,15 +154,16 @@ public class TrabajadorGrid extends Div {
 
         Filtros();
 
-        gridListDataView = gridTrabajadors.setItems(trabajadorService.findAll());
-        gridTrabajadors.setAllRowsVisible(true);
-        gridTrabajadors.setSelectionMode(Grid.SelectionMode.MULTI);
-        gridTrabajadors.setSizeFull();
-        gridTrabajadors.setWidthFull();
-        gridTrabajadors.setHeightFull();
-        gridTrabajadors.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS);
-        gridTrabajadors.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
-        gridTrabajadors.addThemeVariants(GridVariant.LUMO_WRAP_CELL_CONTENT);
+        gridListDataView = gridTrabajadores.setItems(trabajadorService.findAll());
+        gridTrabajadores.setPageSize(trabajadorService.findAll().size());
+        gridTrabajadores.setAllRowsVisible(true);
+        gridTrabajadores.setSelectionMode(Grid.SelectionMode.MULTI);
+        gridTrabajadores.setSizeFull();
+        gridTrabajadores.setWidthFull();
+        gridTrabajadores.setHeightFull();
+        gridTrabajadores.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS);
+        gridTrabajadores.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
+        gridTrabajadores.addThemeVariants(GridVariant.LUMO_WRAP_CELL_CONTENT);
     }
 
     //Barra de Menu
@@ -169,16 +171,16 @@ public class TrabajadorGrid extends Div {
         barra_menu = new HorizontalLayout();
 
         Button anadirPor = new Button("Añadir", VaadinIcon.PLUS.create(), click -> {
-            if (gridTrabajadors.getSelectedItems().size() == 0) {
+            if (gridTrabajadores.getSelectedItems().size() == 0) {
                 Notification notification = Notification.show(
                         "Debe elegir al menos un elemento",
                         2000,
                         Notification.Position.MIDDLE);
                 notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
-            } else if (gridTrabajadors.getSelectedItems().size() > 0) {
+            } else if (gridTrabajadores.getSelectedItems().size() > 0) {
                 configureForm();
                 getContent();
-                addLibro(gridTrabajadors.getSelectedItems());
+                addLibro(gridTrabajadores.getSelectedItems());
             }
         });
         anadirPor.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
@@ -322,7 +324,7 @@ public class TrabajadorGrid extends Div {
         );
         trabajadorFilter.addValueChangeListener(event -> {
             if (trabajadorFilter.getValue() == null) {
-                gridListDataView = gridTrabajadors.setItems(trabajadorService.findAll());
+                gridListDataView = gridTrabajadores.setItems(trabajadorService.findAll());
             } else {
                 gridListDataView.addFilter(trabajador -> areTrabajadorEqual(trabajador, trabajadorFilter));
             }
@@ -335,7 +337,7 @@ public class TrabajadorGrid extends Div {
         areaFilter.setWidth("100%");
         areaFilter.addValueChangeListener(event -> {
             if (areaFilter.getValue() == null) {
-                gridListDataView = gridTrabajadors.setItems(trabajadorService.findAll());
+                gridListDataView = gridTrabajadores.setItems(trabajadorService.findAll());
             } else {
                 gridListDataView.addFilter(trabajador -> areAreaEqual(trabajador, areaFilter));
             }
@@ -368,7 +370,7 @@ public class TrabajadorGrid extends Div {
     // Configuracion del Formulario
     private void configureForm() {
 
-        List<Trabajador> listTrabajadorSeleccionados = new LinkedList<>(gridTrabajadors.getSelectedItems());
+        List<Trabajador> listTrabajadorSeleccionados = new LinkedList<>(gridTrabajadores.getSelectedItems());
         listTrabajadorSeleccionados.sort(Comparator.comparing(Trabajador::getId));
 
         form = new TrabajadorForm(listTrabajadorSeleccionados, libroService.findAll());
@@ -382,7 +384,7 @@ public class TrabajadorGrid extends Div {
         prestamos.clear();
         List<TarjetaPrestamo> listTarjetas = prestamoService.findAll();
         boolean band = false;
-        List<Trabajador> listTrabajadorSeleccionados = new LinkedList<>(gridTrabajadors.getSelectedItems());
+        List<Trabajador> listTrabajadorSeleccionados = new LinkedList<>(gridTrabajadores.getSelectedItems());
         for (int i = 0; i < listTarjetas.size() && band == false; i++) {
             if (listTarjetas.get(i) instanceof TarjetaPrestamoTrabajador) {
                 tarjetaTrabajador = (TarjetaPrestamoTrabajador) listTarjetas.get(i);
@@ -503,7 +505,7 @@ public class TrabajadorGrid extends Div {
         form.setVisible(false);
         removeClassName("editing");
         dialog.close();
-        gridTrabajadors.deselectAll();
+        gridTrabajadores.deselectAll();
     }
 
 }

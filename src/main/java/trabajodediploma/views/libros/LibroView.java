@@ -135,6 +135,8 @@ public class LibroView extends Div {
  /* Configuracion de la tabla */
     private void configureGrid() {
         grid.setClassName("grid_content__table");
+         grid.getStyle().set("max-height", "550px");
+         
         LitRenderer<Libro> imagenRenderer = LitRenderer.<Libro>of("<img style='height: 64px' src=${item.imagen} />")
                 .withProperty("imagen", Libro::getImagen);
         imagenColumn = grid.addColumn(imagenRenderer).setHeader("Imagen").setAutoWidth(true);
@@ -178,6 +180,7 @@ public class LibroView extends Div {
         headerRow.getCell(asignaturaColumn).setComponent(filterAsignatura);
 
         gridListDataView = grid.setItems(libroService.findAll());
+        grid.setPageSize(libroService.findAll().size());
         grid.setSizeFull();
         grid.setWidthFull();
         grid.setHeightFull();
@@ -186,11 +189,6 @@ public class LibroView extends Div {
         grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         grid.addThemeVariants(GridVariant.LUMO_WRAP_CELL_CONTENT);
 
-    }
-
-    private void refreshGrid() {
-        grid.setVisible(true);
-        grid.setItems(libroService.findAll());
     }
 
     /* Filtros */
@@ -322,7 +320,7 @@ public class LibroView extends Div {
     private HorizontalLayout menuBar() {
         buttons = new HorizontalLayout();
         Button refreshButton = new Button(VaadinIcon.REFRESH.create());
-        refreshButton.addClickListener(click -> refreshGrid());
+        refreshButton.addClickListener(click -> updateList());
         refreshButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         Button deleteButton = new Button(VaadinIcon.TRASH.create());
         deleteButton.addClickListener(click -> deleteLibro());
@@ -356,7 +354,7 @@ public class LibroView extends Div {
                 notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
             } else {
                 deleteItems(grid.getSelectedItems().size(), grid.getSelectedItems());
-                refreshGrid();
+                updateList();
                 toolbar.remove(total);
                 total = new Html("<span>Total: <b>" + libroService.count() + "</b> libros</span>");
                 toolbar.addComponentAtIndex(1, total);
@@ -536,6 +534,7 @@ public class LibroView extends Div {
     /* Actualizar lista de  Libro */
     private void updateList() {
         grid.setItems(libroService.findAll());
+        grid.setPageSize(libroService.findAll().size());
         grid.deselectAll();
     }
 

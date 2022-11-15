@@ -114,9 +114,9 @@ public class UsuarioView extends Div {
     /* Tabla */
  /* Configuracion de la tabla */
     private void configureGrid() {
-
         grid.setClassName("usuario_view__container__div_grid");
         grid.getStyle().set("max-height", "550px");
+        
         LitRenderer<User> imagenRenderer = LitRenderer.<User>of(
                 "<vaadin-horizontal-layout style=\"align-items: center;\" theme=\"spacing\">"
                 + "<vaadin-avatar img=\"${item.profilePictureUrl}\" name=\"${item.name}\" alt=\"User avatar\"></vaadin-avatar>"
@@ -180,7 +180,7 @@ public class UsuarioView extends Div {
         filterName.setWidth("100%");
         filterName.setValueChangeMode(ValueChangeMode.EAGER);
         filterName.addValueChangeListener(event -> {
-                gridListDataView.addFilter(user -> StringUtils.containsIgnoreCase(user.getName(), filterName.getValue()));
+            gridListDataView.addFilter(user -> StringUtils.containsIgnoreCase(user.getName(), filterName.getValue()));
         });
 
         // usuario
@@ -347,6 +347,7 @@ public class UsuarioView extends Div {
     private void updateList() {
         grid.setItems(userService.findAll());
         grid.setPageSize(userService.findAll().size());
+        grid.deselectAll();
     }
     /* Formulario */
 }

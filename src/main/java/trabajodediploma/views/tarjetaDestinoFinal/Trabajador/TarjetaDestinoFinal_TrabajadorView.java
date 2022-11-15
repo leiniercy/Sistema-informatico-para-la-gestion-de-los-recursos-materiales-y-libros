@@ -140,6 +140,7 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
  /* Configuracion de la tabla TarjetaDestino */
     private void configurarGridTarjetaDestino() {
         gridDestinoFinal.setClassName("tarjeta_trabajador__content__grid-content__table");
+        gridDestinoFinal.getStyle().set("max-height", "550px");
 
         trabajadorColumn = gridDestinoFinal.addColumn(new ComponentRenderer<>(tarjeta -> {
             tarjetaTrabajador = (DestinoFinalTrabajador) tarjeta;
@@ -220,6 +221,7 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
         headerRow.getCell(fechaEntregaColumn).setComponent(entregaFilter);
 
         gridListDataViewDestinoFinal = gridDestinoFinal.setItems(tarjetas);
+        gridDestinoFinal.setPageSize(tarjetas.size());
         gridDestinoFinal.setAllRowsVisible(true);
         gridDestinoFinal.setSizeFull();
         gridDestinoFinal.setWidthFull();
@@ -255,6 +257,7 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
         FiltrosGridTrabajador();
 
         gridTrabajadores.setItems(trabajadorService.findAll());
+        gridTrabajadores.setPageSize(trabajadorService.findAll().size());
         gridTrabajadores.setSelectionMode(Grid.SelectionMode.MULTI);
         gridTrabajadores.getStyle().set("width", "500px").set("max-width", "100%");
     }
@@ -860,6 +863,7 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
             }
         }
         gridDestinoFinal.setItems(tarjetas);
+        gridDestinoFinal.setPageSize(tarjetas.size());
     }
     /* Fin-Barra de tarjetas */
 }

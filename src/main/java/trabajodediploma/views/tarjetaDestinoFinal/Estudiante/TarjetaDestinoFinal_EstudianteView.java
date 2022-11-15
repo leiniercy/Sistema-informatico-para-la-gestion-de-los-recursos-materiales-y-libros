@@ -140,7 +140,8 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
  /* Configuracion de la tabla */
     private void configurarGridTarjetaDestino() {
         gridDestinoFinal.setClassName("tarjeta_estudiante__content__grid-content__table");
-
+        gridDestinoFinal.getStyle().set("max-height", "550px");
+        
         estudianteColumn = gridDestinoFinal.addColumn(new ComponentRenderer<>(tarjeta -> {
             tarjetaEstudiante = (DestinoFinalEstudiante) tarjeta;
             HorizontalLayout hl = new HorizontalLayout();
@@ -220,6 +221,7 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
         headerRow.getCell(fechaEntregaColumn).setComponent(entregaFilter);
 
         gridListDataViewDestinoFinal = gridDestinoFinal.setItems(tarjetas);
+        gridDestinoFinal.setPageSize(tarjetas.size());
         gridDestinoFinal.setAllRowsVisible(true);
         gridDestinoFinal.setSizeFull();
         gridDestinoFinal.setWidthFull();
@@ -255,6 +257,7 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
         FiltrosGridEstudiante();
 
         gridEstudiantes.setItems(estudianteService.findAll());
+        gridEstudiantes.setPageSize(estudianteService.findAll().size());
         gridEstudiantes.setSelectionMode(Grid.SelectionMode.MULTI);
         gridEstudiantes.getStyle().set("width", "500px").set("max-width", "100%");
     }
@@ -859,6 +862,7 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
             }
         }
         gridDestinoFinal.setItems(tarjetas);
+        gridDestinoFinal.setPageSize(tarjetas.size());
     }
     /* Fin-Barra de tarjetas */
 }

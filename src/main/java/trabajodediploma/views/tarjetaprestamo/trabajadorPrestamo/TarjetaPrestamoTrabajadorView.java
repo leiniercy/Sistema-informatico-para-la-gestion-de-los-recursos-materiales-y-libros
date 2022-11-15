@@ -143,6 +143,7 @@ public class TarjetaPrestamoTrabajadorView extends Div {
  /* Configuracion de la tabla */
     private void configureGrid() {
         grid.setClassName("container__modelo__grid");
+        grid.getStyle().set("max-height", "550px");
 
         libroColumn = grid.addColumn(new ComponentRenderer<>(tarjeta -> {
             HorizontalLayout hl = new HorizontalLayout();
@@ -235,6 +236,7 @@ public class TarjetaPrestamoTrabajadorView extends Div {
         headerRow.getCell(fechaDevolucionColumn).setComponent(devolucionFilter);
 
         gridListDataView = grid.setItems(prestamos);
+        grid.setPageSize(prestamos.size());
         grid.setAllRowsVisible(true);
         grid.setSizeFull();
         grid.setWidthFull();
@@ -567,6 +569,7 @@ public class TarjetaPrestamoTrabajadorView extends Div {
             }
         });
         grid.setItems(prestamos);
+        grid.setPageSize(prestamos.size());
     }
     /* Fin-Barra de menu */
 
