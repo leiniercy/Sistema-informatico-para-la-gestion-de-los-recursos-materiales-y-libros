@@ -20,16 +20,19 @@ public class EstudianteService {
     public List<Estudiante> findAll() {
         return repository.findAll();
     }
-    
-    public Estudiante findById(Integer id){
-     return repository.findById(id).get();
+
+    public Estudiante findById(Integer id) {
+        return repository.findById(id).get();
     }
-    
+
+    public Estudiante findBySolapin(String solapin) {
+        return repository.findBySolapin(solapin);
+    }
+
     public Estudiante save(Estudiante estudiante) {
         return repository.save(estudiante);
     }
 
-    
     public Estudiante update(Estudiante estudiante) {
         return repository.save(estudiante);
     }
@@ -38,10 +41,12 @@ public class EstudianteService {
         repository.delete(estudiante);
     }
 
-    public void deleteAll(Set<Estudiante>estudiantes){repository.deleteAll(estudiantes);}
-    
-    public long count(){
-      return repository.count();
+    public void deleteAll(Set<Estudiante> estudiantes) {
+        repository.deleteAll(estudiantes);
     }
-    
+
+    public long count() {
+        return repository.count();
+    }
+
 }

@@ -62,7 +62,7 @@ public class Estudiante extends AbstractEntity {
     @Column()
     private String facultad;
 
-    @NotNull(message = "debe elegir un campo")
+//    @NotNull(message = "debe elegir un campo")
     @JsonIgnoreProperties({"estudiantes"})
     @JoinColumn(name = "grupo_id", nullable = false, updatable = false)
     @ManyToOne(optional = false)

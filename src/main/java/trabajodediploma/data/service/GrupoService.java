@@ -20,19 +20,22 @@ public class GrupoService {
         this.repository = repository;
     }
 
- public List<Grupo> findAll() {
+    public List<Grupo> findAll() {
         return repository.findAll();
     }
-    
-    public Grupo findById(Integer id){
-     return repository.findById(id).get();
+
+    public Grupo findById(Integer id) {
+        return repository.findById(id).get();
+    }
+
+    public  Grupo findByNumero(String numero){
+        return repository.findByNumero(numero);
     }
     
     public Grupo save(Grupo grupo) {
         return repository.save(grupo);
     }
 
-    
     public Grupo update(Grupo grupo) {
         return repository.save(grupo);
     }
@@ -41,10 +44,12 @@ public class GrupoService {
         repository.delete(grupo);
     }
 
-    public void deleteAll(Set<Grupo>grupos){repository.deleteAll(grupos);}
-    
-    public long count(){
-      return repository.count();
+    public void deleteAll(Set<Grupo> grupos) {
+        repository.deleteAll(grupos);
+    }
+
+    public long count() {
+        return repository.count();
     }
 
 }

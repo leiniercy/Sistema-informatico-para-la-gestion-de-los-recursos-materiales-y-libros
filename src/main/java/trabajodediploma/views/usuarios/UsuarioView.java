@@ -116,6 +116,7 @@ public class UsuarioView extends Div {
     private void configureGrid() {
 
         grid.setClassName("usuario_view__container__div_grid");
+        grid.getStyle().set("max-height", "550px");
         LitRenderer<User> imagenRenderer = LitRenderer.<User>of(
                 "<vaadin-horizontal-layout style=\"align-items: center;\" theme=\"spacing\">"
                 + "<vaadin-avatar img=\"${item.profilePictureUrl}\" name=\"${item.name}\" alt=\"User avatar\"></vaadin-avatar>"
@@ -157,6 +158,7 @@ public class UsuarioView extends Div {
         headerRow.getCell(rolColumn).setComponent(filterRol);
 
         gridListDataView = grid.setItems(userService.findAll());
+        grid.setPageSize(userService.findAll().size());
         grid.setAllRowsVisible(true);
         grid.setSizeFull();
         grid.setWidthFull();
@@ -178,11 +180,7 @@ public class UsuarioView extends Div {
         filterName.setWidth("100%");
         filterName.setValueChangeMode(ValueChangeMode.EAGER);
         filterName.addValueChangeListener(event -> {
-            if (filterName.getValue() == null) {
-                gridListDataView = grid.setItems(userService.findAll());
-            } else {
                 gridListDataView.addFilter(user -> StringUtils.containsIgnoreCase(user.getName(), filterName.getValue()));
-            }
         });
 
         // usuario
@@ -234,7 +232,7 @@ public class UsuarioView extends Div {
 
         buttons = new HorizontalLayout();
         Button refreshButton = new Button(VaadinIcon.REFRESH.create());
-        refreshButton.addClickListener(click -> refreshGrid());
+        refreshButton.addClickListener(click -> updateList());
         refreshButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         Button deleteButton = new Button(VaadinIcon.TRASH.create());
         deleteButton.addClickListener(click -> deleteLibro());
@@ -255,11 +253,6 @@ public class UsuarioView extends Div {
     }
 
     /* Barra de menu */
-    private void refreshGrid() {
-        grid.setVisible(true);
-        grid.setItems(userService.findAll());
-    }
-
     private void deleteLibro() {
 
         try {
@@ -269,7 +262,7 @@ public class UsuarioView extends Div {
                 notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
             } else {
                 deleteItems(grid.getSelectedItems().size(), grid.getSelectedItems());
-                refreshGrid();
+                updateList();
                 toolbar.remove(total);
                 total = new Html("<span>Total: <b>" + userService.count() + "</b> usuarios</span>");
                 toolbar.addComponentAtIndex(1, total);
@@ -353,6 +346,7 @@ public class UsuarioView extends Div {
 
     private void updateList() {
         grid.setItems(userService.findAll());
+        grid.setPageSize(userService.findAll().size());
     }
     /* Formulario */
 }

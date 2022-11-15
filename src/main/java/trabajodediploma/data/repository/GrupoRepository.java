@@ -7,5 +7,5 @@ import trabajodediploma.data.entity.Grupo;
 
 @Repository
 public interface GrupoRepository extends JpaRepository<Grupo, Integer> {
-
+     Grupo findByNumero(String numero);
 }

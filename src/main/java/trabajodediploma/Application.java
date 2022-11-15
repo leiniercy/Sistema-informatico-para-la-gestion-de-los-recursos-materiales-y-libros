@@ -50,66 +50,66 @@ public class Application extends SpringBootServletInitializer implements AppShel
         SpringApplication.run(Application.class, args);
     }
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @EventListener(ApplicationReadyEvent.class)
-    public void fillDB() {
-        Logger logger = LoggerFactory.getLogger(getClass());
-        if (userRepository.count() != 0L) {
-            logger.info("Using existing database");
-            return;
-        }
-
-        logger.info("Generating demo data");
-        logger.info("... generando Usuarios");
-
-        // Estudiantes
-        createUser1("Leinier Caraballo Yanes", "leiniercy", "1234");
-        createUser("Frank A Valero López", "frankavl", "1234");
-        createUser("Daryan Gustavo Góngora", "daryanggg", "1234");
-        createUser("Christian Sosa Jímenez", "christiansj", "1234");
-        createUser("Catherín Mya Zamora Hernández", "catherinmzh", "1234");
-        createUser("Leanet Alfonso Tirse", "leanetat", "1234");
-        createUser("Sabrina Izquierdo Borrero", "sabrinadlcib", "1234");
-        createUser("Sulennis Saray Jiménez Viltres", "sulennissjv", "1234");
-
-        //Trabajadores
-        createUser("José Emilio Badia Valdés", "jebadia", "1234");
-        createUser("Aranelys Lazo Campo", "amlazo", "1234");
-        createUser("Marcos Henrique Pelegrino Infante", "mhpelegrino", "1234");
-        createUser("Maydalis Hernández Pérez", "mhernandezp", "1234");
-        createUser("Reiman Alfonso Azcuy", "razcuy", "1234");
-        createUser("Angel Alberto Vazquez Sánchez", "aavazquez", "1234");
-        createUser("Yadira Ramírez Rodríguez", "yramirezr", "1234");
-        createUser("Yordankis Matos López", "yluguen", "1234");
-        createUser("Yasirys Terry González", "yterry", "1234");
-        createUser("Mayra Texidor Ferral", "mtexidor", "Elsecreto");
-    }
-
-    private User createUser(String name, String username, String password) {
-        User user = new User();
-        user.setName(name);
-        user.setUsername(username);
-        user.setHashedPassword(passwordEncoder.encode(password));
-        user.setRoles(Collections.singleton(Rol.USER));
-        userRepository.saveAndFlush(user);
-        return user;
-    }
-
-    private User createUser1(String name, String username, String password) {
-        User user = new User();
-        user.setName(name);
-        user.setUsername(username);
-        user.setHashedPassword(passwordEncoder.encode(password));
-        user.setRoles(Stream.of(Rol.ADMIN, Rol.VD_ADIMN_ECONOMIA, Rol.RESP_ALMACEN, Rol.ASISTENTE_CONTROL, Rol.USER)
-                .collect(Collectors.toSet()));
-        userRepository.saveAndFlush(user);
-        return user;
-    }
+//    @Autowired
+//    private UserRepository userRepository;
+//
+//    @Autowired
+//    private PasswordEncoder passwordEncoder;
+//
+//    @EventListener(ApplicationReadyEvent.class)
+//    public void fillDB() {
+//        Logger logger = LoggerFactory.getLogger(getClass());
+//        if (userRepository.count() != 0L) {
+//            logger.info("Using existing database");
+//            return;
+//        }
+//
+//        logger.info("Generating demo data");
+//        logger.info("... generando Usuarios");
+//
+//        // Estudiantes
+//        createUser1("Leinier Caraballo Yanes", "leiniercy", "1234");
+//        createUser("Frank A Valero López", "frankavl", "1234");
+//        createUser("Daryan Gustavo Góngora", "daryanggg", "1234");
+//        createUser("Christian Sosa Jímenez", "christiansj", "1234");
+//        createUser("Catherín Mya Zamora Hernández", "catherinmzh", "1234");
+//        createUser("Leanet Alfonso Tirse", "leanetat", "1234");
+//        createUser("Sabrina Izquierdo Borrero", "sabrinadlcib", "1234");
+//        createUser("Sulennis Saray Jiménez Viltres", "sulennissjv", "1234");
+//
+//        //Trabajadores
+//        createUser("José Emilio Badia Valdés", "jebadia", "1234");
+//        createUser("Aranelys Lazo Campo", "amlazo", "1234");
+//        createUser("Marcos Henrique Pelegrino Infante", "mhpelegrino", "1234");
+//        createUser("Maydalis Hernández Pérez", "mhernandezp", "1234");
+//        createUser("Reiman Alfonso Azcuy", "razcuy", "1234");
+//        createUser("Angel Alberto Vazquez Sánchez", "aavazquez", "1234");
+//        createUser("Yadira Ramírez Rodríguez", "yramirezr", "1234");
+//        createUser("Yordankis Matos López", "yluguen", "1234");
+//        createUser("Yasirys Terry González", "yterry", "1234");
+//        createUser("Mayra Texidor Ferral", "mtexidor", "Elsecreto");
+//    }
+//
+//    private User createUser(String name, String username, String password) {
+//        User user = new User();
+//        user.setName(name);
+//        user.setUsername(username);
+//        user.setHashedPassword(passwordEncoder.encode(password));
+//        user.setRoles(Collections.singleton(Rol.USER));
+//        userRepository.saveAndFlush(user);
+//        return user;
+//    }
+//
+//    private User createUser1(String name, String username, String password) {
+//        User user = new User();
+//        user.setName(name);
+//        user.setUsername(username);
+//        user.setHashedPassword(passwordEncoder.encode(password));
+//        user.setRoles(Stream.of(Rol.ADMIN, Rol.VD_ADIMN_ECONOMIA, Rol.RESP_ALMACEN, Rol.ASISTENTE_CONTROL, Rol.USER)
+//                .collect(Collectors.toSet()));
+//        userRepository.saveAndFlush(user);
+//        return user;
+//    }
 
 //    @Autowired
 //    private EmailSenderService senderService;

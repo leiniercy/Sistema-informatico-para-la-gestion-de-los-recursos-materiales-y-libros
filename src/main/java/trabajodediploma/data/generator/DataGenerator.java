@@ -2,12 +2,20 @@ package trabajodediploma.data.generator;
 
 import com.vaadin.exampledata.DataType;
 import com.vaadin.exampledata.ExampleDataGenerator;
+import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.spring.annotation.SpringComponent;
+import domain.xsd.PersonaUCI;
+import https.autenticacion2_uci_cu.v7.Persona;
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -32,124 +40,205 @@ import trabajodediploma.data.repository.RecursoMaterialRepository;
 import trabajodediploma.data.repository.TrabajadorRepository;
 import trabajodediploma.data.repository.UserRepository;
 import trabajodediploma.data.repository.TarjetaPrestamoRepository;
+import trabajodediploma.data.service.AreaService;
+import trabajodediploma.data.service.EstudianteService;
+import trabajodediploma.data.service.GrupoService;
+import trabajodediploma.data.service.TrabajadorService;
+import trabajodediploma.data.service.UserService;
+import trabajodediploma.data.tools.serviciosUCI.ClienteDatosUCIWSDL;
+import trabajodediploma.data.tools.serviciosUCI.HelloWorldClient;
 
-//@SpringComponent
+@SpringComponent
 public class DataGenerator {
 
-//    @Bean
-//    public CommandLineRunner loadData(PasswordEncoder passwordEncoder, UserRepository userRepository,
-//            TrabajadorRepository trabajadorRepository, EstudianteRepository estudianteRepository,
-//            RecursoMaterialRepository recursoMaterialRepository,
-//            TarjetaPrestamoEstudianteRepository tarjetaPrestamoEstudianteRepository, GrupoRepository grupoRepository,
-//            AreaRepository areaRepository, LibroRepository libroRepository,
-//            DestinoFinalRepository destinoFinalRepository, ModuloRepository moduloRepository) {
-//        return args -> {
-//            Logger logger = LoggerFactory.getLogger(getClass());
-//            if (userRepository.count() != 0L) {
-//                logger.info("Using existing database");
-//                return;
-//            }
-//            int seed = 123;
-//
-//            logger.info("Generating demo data");
-//
-//            logger.info("... generating 2 User entities...");
-//            User user = new User();
-//            user.setName("John Normal");
-//            user.setUsername("user");
-//            user.setHashedPassword(passwordEncoder.encode("user"));
-//            user.setProfilePictureUrl(
-//                    "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=128&h=128&q=80");
-//            user.setRoles(Collections.singleton(Role.USER));
-//            userRepository.save(user);
-//            User admin = new User();
-//            admin.setName("Emma Powerful");
-//            admin.setUsername("admin");
-//            admin.setHashedPassword(passwordEncoder.encode("admin"));
-//            admin.setProfilePictureUrl(
-//                    "https://images.unsplash.com/photo-1607746882042-944635dfe10e?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=128&h=128&q=80");
-//            admin.setRoles(Set.of(Role.USER, Role.ADMIN));
-//            userRepository.save(admin);
-//            logger.info("... generating 100 Trabajador entities...");
-//            ExampleDataGenerator<Trabajador> trabajadorRepositoryGenerator = new ExampleDataGenerator<>(
-//                    Trabajador.class, LocalDateTime.of(2022, 3, 20, 0, 0, 0));
-//            trabajadorRepositoryGenerator.setData(Trabajador::setNombre, DataType.FIRST_NAME);
-//            trabajadorRepositoryGenerator.setData(Trabajador::setApellidos, DataType.LAST_NAME);
-//            trabajadorRepositoryGenerator.setData(Trabajador::setCi, DataType.WORD);
-//            trabajadorRepositoryGenerator.setData(Trabajador::setSolapin, DataType.WORD);
-//            trabajadorRepositoryGenerator.setData(Trabajador::setCategoria, DataType.WORD);
-//            trabajadorRepositoryGenerator.setData(Trabajador::setArea, DataType.WORD);
-//            trabajadorRepository.saveAll(trabajadorRepositoryGenerator.create(100, seed));
-//
-//            logger.info("... generating 100 Estudiante entities...");
-//            ExampleDataGenerator<Estudiante> estudianteRepositoryGenerator = new ExampleDataGenerator<>(
-//                    Estudiante.class, LocalDateTime.of(2022, 3, 20, 0, 0, 0));
-//            estudianteRepositoryGenerator.setData(Estudiante::setNombre, DataType.FIRST_NAME);
-//            estudianteRepositoryGenerator.setData(Estudiante::setApellidos, DataType.LAST_NAME);
-//            estudianteRepositoryGenerator.setData(Estudiante::setCi, DataType.WORD);
-//            estudianteRepositoryGenerator.setData(Estudiante::setSolapin, DataType.WORD);
-//            estudianteRepositoryGenerator.setData(Estudiante::setAnno_academico, DataType.NUMBER_UP_TO_10);
-//            estudianteRepositoryGenerator.setData(Estudiante::setFacultad, DataType.WORD);
-//            estudianteRepository.saveAll(estudianteRepositoryGenerator.create(100, seed));
-//
-//            logger.info("... generating 100 Recurso Material entities...");
-//            ExampleDataGenerator<RecursoMaterial> recursoMaterialRepositoryGenerator = new ExampleDataGenerator<>(
-//                    RecursoMaterial.class, LocalDateTime.of(2022, 3, 20, 0, 0, 0));
-//            recursoMaterialRepositoryGenerator.setData(RecursoMaterial::setCodigo, DataType.WORD);
-//            recursoMaterialRepositoryGenerator.setData(RecursoMaterial::setDescripcion, DataType.WORD);
-//            recursoMaterialRepositoryGenerator.setData(RecursoMaterial::setUnidadMedida, DataType.WORD);
-//            recursoMaterialRepositoryGenerator.setData(RecursoMaterial::setCantidad, DataType.NUMBER_UP_TO_1000);
-//            recursoMaterialRepository.saveAll(recursoMaterialRepositoryGenerator.create(100, seed));
-//
-//            logger.info("... generating 100 Tarjeta Prestamo Estudiante entities...");
-//            ExampleDataGenerator<TarjetaPrestamoEstudiante> tarjetaPrestamoEstudianteRepositoryGenerator = new ExampleDataGenerator<>(
-//                    TarjetaPrestamoEstudiante.class, LocalDateTime.of(2022, 3, 20, 0, 0, 0));
-//            tarjetaPrestamoEstudianteRepositoryGenerator.setData(TarjetaPrestamoEstudiante::setFechaPrestamo,
-//                    DataType.DATE_LAST_30_DAYS);
-//            tarjetaPrestamoEstudianteRepositoryGenerator.setData(TarjetaPrestamoEstudiante::setFechaDevolucion,
-//                    DataType.DATE_LAST_30_DAYS);
-//            tarjetaPrestamoEstudianteRepository.saveAll(tarjetaPrestamoEstudianteRepositoryGenerator.create(100, seed));
-//
-//            logger.info("... generating 100 Grupo entities...");
-//            ExampleDataGenerator<Grupo> grupoRepositoryGenerator = new ExampleDataGenerator<>(Grupo.class,
-//                    LocalDateTime.of(2022, 3, 20, 0, 0, 0));
-//            grupoRepositoryGenerator.setData(Grupo::setNumero, DataType.WORD);
-//            grupoRepository.saveAll(grupoRepositoryGenerator.create(100, seed));
-//
-//            logger.info("... generating 100 Area entities...");
-//            ExampleDataGenerator<Area> areaRepositoryGenerator = new ExampleDataGenerator<>(Area.class,
-//                    LocalDateTime.of(2022, 3, 20, 0, 0, 0));
-//            areaRepositoryGenerator.setData(Area::setNombre, DataType.WORD);
-//            areaRepository.saveAll(areaRepositoryGenerator.create(100, seed));
-//
-//            logger.info("... generating 100 Libro entities...");
-//            ExampleDataGenerator<Libro> libroRepositoryGenerator = new ExampleDataGenerator<>(Libro.class,
-//                    LocalDateTime.of(2022, 3, 20, 0, 0, 0));
-//            libroRepositoryGenerator.setData(Libro::setImagen, DataType.BOOK_IMAGE_URL);
-//            libroRepositoryGenerator.setData(Libro::setTitulo, DataType.BOOK_TITLE);
-//            libroRepositoryGenerator.setData(Libro::setAutor, DataType.FULL_NAME);
-//            libroRepositoryGenerator.setData(Libro::setVolumen, DataType.NUMBER_UP_TO_10);
-//            libroRepositoryGenerator.setData(Libro::setTomo, DataType.NUMBER_UP_TO_10);
-//            libroRepositoryGenerator.setData(Libro::setParte, DataType.NUMBER_UP_TO_10);
-//            libroRepositoryGenerator.setData(Libro::setCantidad, DataType.NUMBER_UP_TO_1000);
-//           // libroRepositoryGenerator.setData(Libro::setPrecio, DataType.NUMBER_UP_TO_1000);
-//            libroRepository.saveAll(libroRepositoryGenerator.create(0, seed));
-//
-//            logger.info("... generating 100 Destino Final entities...");
-//            ExampleDataGenerator<DestinoFinal> destinoFinalRepositoryGenerator = new ExampleDataGenerator<>(
-//                    DestinoFinal.class, LocalDateTime.of(2022, 3, 20, 0, 0, 0));
-//            destinoFinalRepositoryGenerator.setData(DestinoFinal::setFecha, DataType.DATE_LAST_10_YEARS);
-//            destinoFinalRepositoryGenerator.setData(DestinoFinal::setCantidad, DataType.NUMBER_UP_TO_100);
-//            destinoFinalRepository.saveAll(destinoFinalRepositoryGenerator.create(100, seed));
-//
-//            logger.info("... generating 100 Modulo entities...");
-//            ExampleDataGenerator<Modulo> moduloRepositoryGenerator = new ExampleDataGenerator<>(Modulo.class,
-//                    LocalDateTime.of(2022, 3, 20, 0, 0, 0));
-//            moduloRepositoryGenerator.setData(Modulo::setAnno_academico, DataType.NUMBER_UP_TO_10);
-//            moduloRepository.saveAll(moduloRepositoryGenerator.create(100, seed));
-//
-//            logger.info("Generated demo data");
-//        };
-//    }
+    @Bean
+    public CommandLineRunner loadData(
+            @Autowired ClienteDatosUCIWSDL datosUCIWSDL,
+            @Autowired HelloWorldClient helloWorldClient,
+            @Autowired PasswordEncoder passwordEncoder,
+            @Autowired UserService userService,
+            @Autowired EstudianteService estudianteService,
+            @Autowired GrupoService grupoService,
+            @Autowired TrabajadorService trabajadorService,
+            @Autowired AreaService areaService
+    ) {
+        return args -> {
+            Logger logger = LoggerFactory.getLogger(getClass());
+
+            /**
+             * ID del Grupo - Estudiantes - Facultad 4 Grupo 4101 -> Grupo 4102
+             * -> 352 Grupo 4103 -> 385 Grupo 4104 -> 350 Grupo 4201 -> 392
+             * Grupo 4202 -> 387 Grupo 4203 -> 397 Grupo 4204 -> 382 Grupo 4205
+             * -> Grupo 4206 -> Grupo 4301 -> 421 Grupo 4302 -> 437 Grupo 4303
+             * -> 460 Grupo 4304 -> 407 Grupo 4305 -> 373 ---> preguntar por
+             * este Grupo 4401 -> 450 Grupo 4402 -> 359 Grupo 4403 -> 346 Grupo
+             * 4404 -> Grupo 4501 -> 377 Grupo 4502 -> 430 Grupo 4503 -> 440
+             *
+             */
+            List<PersonaUCI> lista = new LinkedList<>();
+            List<String> listaUsuariosEstudiantes = new LinkedList<>();
+            //1er año
+//        services.ObtenerPersonasDadoIdEstructuraResponse grupo4101 = datosUCIWSDL.personasDadoArea();
+            services.ObtenerPersonasDadoIdEstructuraResponse grupo4102 = datosUCIWSDL.personasDadoArea(352);
+            services.ObtenerPersonasDadoIdEstructuraResponse grupo4103 = datosUCIWSDL.personasDadoArea(385);
+            services.ObtenerPersonasDadoIdEstructuraResponse grupo4104 = datosUCIWSDL.personasDadoArea(350);
+            //2do año
+            services.ObtenerPersonasDadoIdEstructuraResponse grupo4201 = datosUCIWSDL.personasDadoArea(392);
+            services.ObtenerPersonasDadoIdEstructuraResponse grupo4202 = datosUCIWSDL.personasDadoArea(387);
+            services.ObtenerPersonasDadoIdEstructuraResponse grupo4203 = datosUCIWSDL.personasDadoArea(397);
+            services.ObtenerPersonasDadoIdEstructuraResponse grupo4204 = datosUCIWSDL.personasDadoArea(382);
+//        services.ObtenerPersonasDadoIdEstructuraResponse grupo4205 = datosUCIWSDL.personasDadoArea(350);
+            //3er año
+            services.ObtenerPersonasDadoIdEstructuraResponse grupo4301 = datosUCIWSDL.personasDadoArea(421);
+            services.ObtenerPersonasDadoIdEstructuraResponse grupo4302 = datosUCIWSDL.personasDadoArea(437);
+            services.ObtenerPersonasDadoIdEstructuraResponse grupo4303 = datosUCIWSDL.personasDadoArea(460);
+            services.ObtenerPersonasDadoIdEstructuraResponse grupo4304 = datosUCIWSDL.personasDadoArea(407);
+            services.ObtenerPersonasDadoIdEstructuraResponse grupo4305 = datosUCIWSDL.personasDadoArea(373);
+            //4to año
+            services.ObtenerPersonasDadoIdEstructuraResponse grupo4401 = datosUCIWSDL.personasDadoArea(450);
+            services.ObtenerPersonasDadoIdEstructuraResponse grupo4402 = datosUCIWSDL.personasDadoArea(359);
+            services.ObtenerPersonasDadoIdEstructuraResponse grupo4403 = datosUCIWSDL.personasDadoArea(346);
+//        services.ObtenerPersonasDadoIdEstructuraResponse grupo4404 = datosUCIWSDL.personasDadoArea(350);
+            //5to año
+            services.ObtenerPersonasDadoIdEstructuraResponse grupo4501 = datosUCIWSDL.personasDadoArea(377);
+            services.ObtenerPersonasDadoIdEstructuraResponse grupo4502 = datosUCIWSDL.personasDadoArea(430);
+            services.ObtenerPersonasDadoIdEstructuraResponse grupo4503 = datosUCIWSDL.personasDadoArea(440);
+
+            //1er año
+            for (int i = 0; i < grupo4102.getReturn().size(); i++) {
+                lista.add(grupo4102.getReturn().get(i));
+            }
+            for (int i = 0; i < grupo4103.getReturn().size(); i++) {
+                lista.add(grupo4103.getReturn().get(i));
+            }
+            for (int i = 0; i < grupo4104.getReturn().size(); i++) {
+                lista.add(grupo4104.getReturn().get(i));
+            }
+            //2do año
+            for (int i = 0; i < grupo4201.getReturn().size(); i++) {
+                lista.add(grupo4201.getReturn().get(i));
+            }
+            for (int i = 0; i < grupo4202.getReturn().size(); i++) {
+                lista.add(grupo4202.getReturn().get(i));
+            }
+            for (int i = 0; i < grupo4203.getReturn().size(); i++) {
+                lista.add(grupo4203.getReturn().get(i));
+            }
+            for (int i = 0; i < grupo4204.getReturn().size(); i++) {
+                lista.add(grupo4204.getReturn().get(i));
+            }
+            //3er año
+            for (int i = 0; i < grupo4301.getReturn().size(); i++) {
+                lista.add(grupo4301.getReturn().get(i));
+            }
+            for (int i = 0; i < grupo4302.getReturn().size(); i++) {
+                lista.add(grupo4302.getReturn().get(i));
+            }
+            for (int i = 0; i < grupo4303.getReturn().size(); i++) {
+                lista.add(grupo4303.getReturn().get(i));
+            }
+            for (int i = 0; i < grupo4304.getReturn().size(); i++) {
+                lista.add(grupo4304.getReturn().get(i));
+            }
+            for (int i = 0; i < grupo4305.getReturn().size(); i++) {
+                lista.add(grupo4305.getReturn().get(i));
+            }
+            //4to año
+            for (int i = 0; i < grupo4401.getReturn().size(); i++) {
+                lista.add(grupo4401.getReturn().get(i));
+            }
+            for (int i = 0; i < grupo4402.getReturn().size(); i++) {
+                lista.add(grupo4402.getReturn().get(i));
+            }
+            for (int i = 0; i < grupo4403.getReturn().size(); i++) {
+                lista.add(grupo4403.getReturn().get(i));
+            }
+            //5to ano
+            for (int i = 0; i < grupo4501.getReturn().size(); i++) {
+                lista.add(grupo4501.getReturn().get(i));
+            }
+            for (int i = 0; i < grupo4502.getReturn().size(); i++) {
+                lista.add(grupo4502.getReturn().get(i));
+            }
+            for (int i = 0; i < grupo4503.getReturn().size(); i++) {
+                lista.add(grupo4503.getReturn().get(i));
+            }
+            for (int i = 0; i < lista.size(); i++) {
+                listaUsuariosEstudiantes.add(lista.get(i).getUsuario().getValue());
+            }
+
+            Binder<User> binderUser = new Binder<>(User.class);
+            Binder<Grupo> binderGrupo = new Binder<>(Grupo.class);
+            Binder<Estudiante> binderEstudiante = new Binder<>(Estudiante.class);
+
+            //Añadiendo usuarios a la BD
+            if (estudianteService.findAll().size() == listaUsuariosEstudiantes.size()) {
+                logger.info("Base de datos actualizada");
+                return;
+            }
+            if (estudianteService.findAll().size() < listaUsuariosEstudiantes.size()) {
+                logger.info("... LLenando BD con usuarios UCI...");
+                // llenando la BD
+                for (int i = 0; i < listaUsuariosEstudiantes.size(); i++) {
+                    //obteniendo informacion del estudiante dado el usuario
+                    Persona persona = helloWorldClient.sayHello(listaUsuariosEstudiantes.get(i), "");
+                    services.ObtenerPersonaDadoUsuarioResponse p = datosUCIWSDL.obtenerPersonaDadoUsuario(listaUsuariosEstudiantes.get(i));
+                    //obteniendo informacion del estudiante dado el usuario
+                    User user = userService.findByUsername(listaUsuariosEstudiantes.get(i));
+                    if (user == null) {
+                        //creando Estudiante
+                        Estudiante estudiante = new Estudiante();
+                        //creando usuario
+                        User newUser = new User();
+                        newUser.setName(p.getReturn().getValue().getNombreCompleto().getValue());
+                        newUser.setUsername(p.getReturn().getValue().getUsuario().getValue());
+                        newUser.setHashedPassword(passwordEncoder.encode("1234"));
+                        newUser.setConfirmPassword("1234");
+                        newUser.setRoles(Collections.singleton(Rol.USER));
+                        binderUser.writeBeanIfValid(newUser);
+                        userService.save(newUser);
+                        //modificando usuario
+                        estudiante.setUser(newUser);
+                        binderUser.readBean(new User());
+                        //modificando  los  restantes datos de estudiante Estudiante
+                        estudiante.setSolapin(p.getReturn().getValue().getCredencial().getValue());
+                        estudiante.setEmail(persona.getCorreo());
+                        String anno_academico = p.getReturn().getValue().getArea().getValue().getNombreArea().getValue().charAt(4) + "";
+                        try {
+                            int number = Integer.parseInt(anno_academico);
+                            estudiante.setAnno_academico(number);
+                        } catch (NumberFormatException ex) {
+                            ex.printStackTrace();
+                        }
+                        //verificando si el grupo existe
+                        Grupo grupo = grupoService.findByNumero(p.getReturn().getValue().getArea().getValue().getNombreArea().getValue());
+                        if (grupo == null) {
+                            //creando grupo
+                            Grupo newGrupo = new Grupo();
+                            newGrupo.setNumero(p.getReturn().getValue().getArea().getValue().getNombreArea().getValue());
+                            binderGrupo.writeBeanIfValid(newGrupo);
+                            grupoService.save(newGrupo);
+                            estudiante.setGrupo(newGrupo);
+                            binderGrupo.readBean(new Grupo());
+                        } else {
+                            estudiante.setGrupo(grupo);
+                        }
+                        estudiante.setFacultad(persona.getArea().getNombreArea());
+                        binderEstudiante.writeBeanIfValid(estudiante);
+                        estudianteService.save(estudiante);
+                        binderEstudiante.readBean(new Estudiante());
+                    }
+                }
+                logger.info("...La base de datos fue llenada satisfactoriamente ...");
+            }
+
+            User userAdmin = userService.findByUsername("leiniercy");
+            userAdmin.setRoles(Stream.of(Rol.ADMIN, Rol.VD_ADIMN_ECONOMIA, Rol.RESP_ALMACEN, Rol.ASISTENTE_CONTROL, Rol.USER).collect(Collectors.toSet()));
+            binderUser.writeBeanIfValid(userAdmin);
+            userService.save(userAdmin);
+            binderUser.readBean(new User());
+
+        };
+    }
 
 }

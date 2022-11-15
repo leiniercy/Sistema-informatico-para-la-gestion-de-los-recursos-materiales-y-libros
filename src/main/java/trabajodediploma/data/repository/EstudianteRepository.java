@@ -8,4 +8,6 @@ import trabajodediploma.data.entity.Estudiante;
 @Repository
 public interface EstudianteRepository extends JpaRepository<Estudiante, Integer> {
 
+    Estudiante findBySolapin(String solapin);
+    
 }
