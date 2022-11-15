@@ -64,17 +64,31 @@ public class DataGenerator {
     ) {
         return args -> {
             Logger logger = LoggerFactory.getLogger(getClass());
+            
+//          ID del Grupo - Estudiantes - Facultad 4 
+//          Grupo 4101 ->
+//          Grupo 4102 -> 352
+//          Grupo 4103 -> 385
+//          Grupo 4104 -> 350 
+//          Grupo 4201 -> 392 
+//          Grupo 4202 -> 387
+//          Grupo 4203 -> 397
+//          Grupo 4204 -> 382
+//          Grupo 4205 ->
+//          Grupo 4206 ->
+//          Grupo 4301 -> 421
+//          Grupo 4302 -> 437
+//          Grupo 4303 -> 460
+//          Grupo 4304 -> 407
+//          Grupo 4305 -> 373 ---> preguntar por este 
+//          Grupo 4401 -> 450 
+//          Grupo 4402 -> 359 
+//          Grupo 4403 -> 346 
+//          Grupo 4404 ->  
+//          Grupo 4501 -> 377 
+//          Grupo 4502 -> 430
+//         Grupo 4503 -> 440
 
-            /**
-             * ID del Grupo - Estudiantes - Facultad 4 Grupo 4101 -> Grupo 4102
-             * -> 352 Grupo 4103 -> 385 Grupo 4104 -> 350 Grupo 4201 -> 392
-             * Grupo 4202 -> 387 Grupo 4203 -> 397 Grupo 4204 -> 382 Grupo 4205
-             * -> Grupo 4206 -> Grupo 4301 -> 421 Grupo 4302 -> 437 Grupo 4303
-             * -> 460 Grupo 4304 -> 407 Grupo 4305 -> 373 ---> preguntar por
-             * este Grupo 4401 -> 450 Grupo 4402 -> 359 Grupo 4403 -> 346 Grupo
-             * 4404 -> Grupo 4501 -> 377 Grupo 4502 -> 430 Grupo 4503 -> 440
-             *
-             */
             List<PersonaUCI> lista = new LinkedList<>();
             List<String> listaUsuariosEstudiantes = new LinkedList<>();
             //1er año
@@ -202,6 +216,7 @@ public class DataGenerator {
                         binderUser.readBean(new User());
                         //modificando  los  restantes datos de estudiante Estudiante
                         estudiante.setSolapin(p.getReturn().getValue().getCredencial().getValue());
+                        estudiante.setCi(p.getReturn().getValue().getCI().getValue());
                         estudiante.setEmail(persona.getCorreo());
                         String anno_academico = p.getReturn().getValue().getArea().getValue().getNombreArea().getValue().charAt(4) + "";
                         try {

@@ -7,5 +7,5 @@ import trabajodediploma.data.entity.Trabajador;
 
 @Repository
 public interface TrabajadorRepository extends JpaRepository<Trabajador,Integer> {
-
+    Trabajador findBySolapin(String solapin);
 }

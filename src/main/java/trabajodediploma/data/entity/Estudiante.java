@@ -53,6 +53,10 @@ public class Estudiante extends AbstractEntity {
     @Column(name = "solapin", nullable = false, unique = true)
     private String solapin;
 
+    @Size(message = "Mínimo 11 caracteres y máximo 11 ", min = 11, max = 11)
+    @Column(name = "CI", nullable = false, unique = true)
+    private String ci;
+
     @NotNull(message = "campo vacío")
     @Column(name = "anno_academico")
     @Max(message = "Máximo 5", value = 5)
@@ -79,7 +83,7 @@ public class Estudiante extends AbstractEntity {
 
     public Estudiante() {
     }
-    
+
     public String getNombreApellidos() {
         return user.getName();
     }
@@ -163,5 +167,12 @@ public class Estudiante extends AbstractEntity {
     public void setId(Integer id) {
         this.id = id;
     }
-    
+
+    public String getCi() {
+        return ci;
+    }
+
+    public void setCi(String ci) {
+        this.ci = ci;
+    }
 }

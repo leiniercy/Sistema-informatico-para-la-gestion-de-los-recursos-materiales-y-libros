@@ -26,8 +26,10 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import trabajodediploma.data.Rol;
+import trabajodediploma.data.entity.Area;
 import trabajodediploma.data.entity.Estudiante;
 import trabajodediploma.data.entity.Grupo;
+import trabajodediploma.data.entity.Trabajador;
 import trabajodediploma.data.entity.User;
 import trabajodediploma.data.service.AreaService;
 import trabajodediploma.data.service.EstudianteService;
@@ -50,9 +52,12 @@ public class LoginView extends Div implements BeforeEnterObserver {
     private Dialog dialog;
     private Div header;
 
-    Binder<User> binderUser = new Binder<>(User.class);
-    Binder<Grupo> binderGrupo = new Binder<>(Grupo.class);
-    Binder<Estudiante> binderEstudiante = new Binder<>(Estudiante.class);
+    private Binder<User> binderUser = new Binder<>(User.class);
+    private Binder<Grupo> binderGrupo = new Binder<>(Grupo.class);
+    private Binder<Estudiante> binderEstudiante = new Binder<>(Estudiante.class);
+    private Binder<Area> binderArea = new Binder<>(Area.class);
+    private Binder<Trabajador> binderTrabajador = new Binder<>(Trabajador.class);
+
     private AuthenticatedUser authenticatedUser;
     private ClienteAutenticacionUCIWSDL autenticacionUCIWSDL;
     private ClienteDatosUCIWSDL datosUCIWSDL;
@@ -88,7 +93,7 @@ public class LoginView extends Div implements BeforeEnterObserver {
         this.grupoService = grupoService;
         this.trabajadorService = trabajadorService;
         this.areaService = areaService;
-        
+
         loginOverlay = new LoginOverlay();
         loginOverlay.setAction("login");
 //        Configuracion();
@@ -117,9 +122,12 @@ public class LoginView extends Div implements BeforeEnterObserver {
 
         loginOverlay.addLoginListener(event -> {
             AutenticarUsuarioResponse datos = autenticacionUCIWSDL.autenticar(event.getUsername(), event.getPassword());
+//            comprobando si la persona existe en la BD UCI
             if (datos.getPersona().isAutenticado()) {
+                //si existe
                 Persona persona = helloWorldClient.sayHello(event.getUsername(), "");
                 services.ObtenerPersonaDadoUsuarioResponse p = datosUCIWSDL.obtenerPersonaDadoUsuario(event.getUsername());
+//            comprobando si el usuario existe en la BD local
                 User user = userService.findByUsername(event.getUsername());
                 if (user != null) {
                     //si existe
@@ -130,33 +138,13 @@ public class LoginView extends Div implements BeforeEnterObserver {
                     binderUser.writeBeanIfValid(user);
                     userService.save(user);
                     binderUser.readBean(new User());
+//                    comprobando si es etudiante o trabajador
                     if (persona.getCargo().getNombreCargo().equals("Estudiante")) {
                         //actualizando los datos del estudiante
-                        Estudiante estudiante = estudianteService.findBySolapin(p.getReturn().getValue().getCredencial().getValue());
-                        Grupo grupo = grupoService.findByNumero(p.getReturn().getValue().getArea().getValue().getNombreArea().getValue());
-                        if (grupo == null) {
-                            Grupo newGrupo = new Grupo();
-                            newGrupo.setNumero(p.getReturn().getValue().getArea().getValue().getNombreArea().getValue());
-                            binderGrupo.writeBeanIfValid(newGrupo);
-                            grupoService.save(newGrupo);
-                            estudiante.setGrupo(newGrupo);
-                            binderGrupo.readBean(new Grupo());
-                        } else {
-                            estudiante.setGrupo(grupo);
-                        }
-                        String anno_academico = p.getReturn().getValue().getArea().getValue().getNombreArea().getValue().charAt(4) + "";
-                        try {
-                            int number = Integer.parseInt(anno_academico);
-                            estudiante.setAnno_academico(number);
-                        } catch (NumberFormatException ex) {
-                            ex.printStackTrace();
-                        }
-                        estudiante.setFacultad(persona.getArea().getNombreArea());
-                        binderEstudiante.writeBeanIfValid(estudiante);
-                        estudianteService.save(estudiante);
-                        binderEstudiante.readBean(new Estudiante());
+                        modificarEstudiante(persona, p);
                     } else {
                         //actualizando los datos del trabajador
+                        modificarTrabajador(persona, p);
                     }
                     loginOverlay.setOpened(false);
                 } else {
@@ -172,37 +160,13 @@ public class LoginView extends Div implements BeforeEnterObserver {
                     binderUser.writeBeanIfValid(newUser);
                     userService.save(newUser);
                     binderUser.readBean(new User());
-
+//                    comprobando si es etudiante o trabajador
                     if (persona.getCargo().getNombreCargo().equals("Estudiante")) {
                         //Añadiendo estudiante
-                        Estudiante estudiante = new Estudiante();
-                        estudiante.setUser(newUser);
-                        estudiante.setSolapin(p.getReturn().getValue().getCredencial().getValue());
-                        estudiante.setEmail(persona.getCorreo());
-                        String anno_academico = p.getReturn().getValue().getArea().getValue().getNombreArea().getValue().charAt(4) + "";
-                        try {
-                            int number = Integer.parseInt(anno_academico);
-                            estudiante.setAnno_academico(number);
-                        } catch (NumberFormatException ex) {
-                            ex.printStackTrace();
-                        }
-                        Grupo grupo = grupoService.findByNumero(p.getReturn().getValue().getArea().getValue().getNombreArea().getValue());
-                        if (grupo == null) {
-                            Grupo newGrupo = new Grupo();
-                            newGrupo.setNumero(p.getReturn().getValue().getArea().getValue().getNombreArea().getValue());
-                            binderGrupo.writeBeanIfValid(newGrupo);
-                            grupoService.save(newGrupo);
-                            estudiante.setGrupo(newGrupo);
-                            binderGrupo.readBean(new Grupo());
-                        } else {
-                            estudiante.setGrupo(grupo);
-                        }
-                        estudiante.setFacultad(persona.getArea().getNombreArea());
-                        binderEstudiante.writeBeanIfValid(estudiante);
-                        estudianteService.save(estudiante);
-                        binderEstudiante.readBean(new Estudiante());
+                        crearEstudiante(newUser, persona, p);
                     } else {
                         //Añadiendo Trabajador
+                        crearTrabajador(newUser, persona, p);
                     }
                     loginOverlay.setOpened(false);
                 }
@@ -210,21 +174,124 @@ public class LoginView extends Div implements BeforeEnterObserver {
         });
 
     }
-    
+
+    private void crearEstudiante(User newUser, Persona persona, services.ObtenerPersonaDadoUsuarioResponse p) {
+        //Añadiendo estudiante
+        Estudiante estudiante = new Estudiante();
+        estudiante.setUser(newUser);
+        estudiante.setSolapin(p.getReturn().getValue().getCredencial().getValue());
+        estudiante.setCi(p.getReturn().getValue().getCI().getValue());
+        estudiante.setEmail(persona.getCorreo());
+        String anno_academico = p.getReturn().getValue().getArea().getValue().getNombreArea().getValue().charAt(4) + "";
+        try {
+            int number = Integer.parseInt(anno_academico);
+            estudiante.setAnno_academico(number);
+        } catch (NumberFormatException ex) {
+            ex.printStackTrace();
+        }
+        Grupo grupo = grupoService.findByNumero(p.getReturn().getValue().getArea().getValue().getNombreArea().getValue());
+        if (grupo == null) {
+            Grupo newGrupo = new Grupo();
+            newGrupo.setNumero(p.getReturn().getValue().getArea().getValue().getNombreArea().getValue());
+            binderGrupo.writeBeanIfValid(newGrupo);
+            grupoService.save(newGrupo);
+            estudiante.setGrupo(newGrupo);
+            binderGrupo.readBean(new Grupo());
+        } else {
+            estudiante.setGrupo(grupo);
+        }
+        estudiante.setFacultad(persona.getArea().getNombreArea());
+        binderEstudiante.writeBeanIfValid(estudiante);
+        estudianteService.save(estudiante);
+        binderEstudiante.readBean(new Estudiante());
+    }
+
+    private void modificarEstudiante(Persona persona, services.ObtenerPersonaDadoUsuarioResponse p) {
+        //actualizando los datos del estudiante
+        Estudiante estudiante = estudianteService.findBySolapin(p.getReturn().getValue().getCredencial().getValue());
+        Grupo grupo = grupoService.findByNumero(p.getReturn().getValue().getArea().getValue().getNombreArea().getValue());
+        if (grupo == null) {
+            Grupo newGrupo = new Grupo();
+            newGrupo.setNumero(p.getReturn().getValue().getArea().getValue().getNombreArea().getValue());
+            binderGrupo.writeBeanIfValid(newGrupo);
+            grupoService.save(newGrupo);
+            estudiante.setGrupo(newGrupo);
+            binderGrupo.readBean(new Grupo());
+        } else {
+            estudiante.setGrupo(grupo);
+        }
+        String anno_academico = p.getReturn().getValue().getArea().getValue().getNombreArea().getValue().charAt(4) + "";
+        try {
+            int number = Integer.parseInt(anno_academico);
+            estudiante.setAnno_academico(number);
+        } catch (NumberFormatException ex) {
+            ex.printStackTrace();
+        }
+        estudiante.setFacultad(persona.getArea().getNombreArea());
+        binderEstudiante.writeBeanIfValid(estudiante);
+        estudianteService.save(estudiante);
+        binderEstudiante.readBean(new Estudiante());
+    }
+
+    private void crearTrabajador(User newUser, Persona persona, services.ObtenerPersonaDadoUsuarioResponse p) {
+        //Añadiendo Trabajador
+        Trabajador trabajador = new Trabajador();
+        trabajador.setUser(newUser);
+        trabajador.setSolapin(p.getReturn().getValue().getCredencial().getValue());
+        trabajador.setEmail(persona.getCorreo());
+        trabajador.setCategoria(p.getReturn().getValue().getCategoria().getValue());
+        trabajador.setCargo(p.getReturn().getValue().getCargo().getValue().getNombreCargo().getValue());
+        trabajador.setCi(p.getReturn().getValue().getCI().getValue());
+        Area area = areaService.findByNombre(p.getReturn().getValue().getArea().getValue().getNombreArea().getValue());
+        if (area == null) {
+            Area newArea = new Area();
+            newArea.setNombre(p.getReturn().getValue().getArea().getValue().getNombreArea().getValue());
+            binderArea.writeBeanIfValid(newArea);
+            areaService.save(newArea);
+            trabajador.setArea(newArea);
+            binderArea.readBean(new Area());
+        } else {
+            trabajador.setArea(area);
+        }
+        binderTrabajador.writeBeanIfValid(trabajador);
+        trabajadorService.save(trabajador);
+        binderTrabajador.readBean(new Trabajador());
+    }
+
+    private void modificarTrabajador(Persona persona, services.ObtenerPersonaDadoUsuarioResponse p) {
+        //actualizando los datos del trabajador
+        Trabajador trabajador = trabajadorService.findBySolapin(p.getReturn().getValue().getCredencial().getValue());
+        trabajador.setCategoria(p.getReturn().getValue().getCategoria().getValue());
+        trabajador.setCargo(p.getReturn().getValue().getCargo().getValue().getNombreCargo().getValue());
+        Area area = areaService.findByNombre(p.getReturn().getValue().getArea().getValue().getNombreArea().getValue());
+        if (area == null) {
+            Area newArea = new Area();
+            newArea.setNombre(p.getReturn().getValue().getArea().getValue().getNombreArea().getValue());
+            binderArea.writeBeanIfValid(newArea);
+            areaService.save(newArea);
+            trabajador.setArea(newArea);
+            binderArea.readBean(new Area());
+        } else {
+            trabajador.setArea(area);
+        }
+        binderTrabajador.writeBeanIfValid(trabajador);
+        trabajadorService.save(trabajador);
+        binderTrabajador.readBean(new Trabajador());
+    }
+
     @Override
     public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
-        if (!loginOverlay.isOpened()) {
-            // Already logged in
-            //loginOverlay.setOpened(false);
-            beforeEnterEvent.forwardTo("");
-        } // inform the user about an authentication error
-        else if (beforeEnterEvent.getLocation()
+        // inform the user about an authentication error
+        if (beforeEnterEvent.getLocation()
                 .getQueryParameters()
                 .getParameters()
                 .containsKey("error")) {
             loginOverlay.setError(true);
+        } else if (!loginOverlay.isOpened()) {
+            // Already logged in
+            //loginOverlay.setOpened(false);
+            beforeEnterEvent.forwardTo("");
         }
-
     }
 
 }

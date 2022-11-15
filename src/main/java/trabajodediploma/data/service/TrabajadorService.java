@@ -20,16 +20,19 @@ public class TrabajadorService {
     public List<Trabajador> findAll() {
         return repository.findAll();
     }
-    
-    public Trabajador findById(Integer id){
-     return repository.findById(id).get();
+
+    public Trabajador findById(Integer id) {
+        return repository.findById(id).get();
     }
-    
+
+    public Trabajador findBySolapin(String solapin) {
+        return repository.findBySolapin(solapin);
+    }
+
     public Trabajador save(Trabajador trabajador) {
         return repository.save(trabajador);
     }
 
-    
     public Trabajador update(Trabajador trabajador) {
         return repository.save(trabajador);
     }
@@ -38,11 +41,12 @@ public class TrabajadorService {
         repository.delete(trabajador);
     }
 
-    public void deleteAll(Set<Trabajador>trabajadors){repository.deleteAll(trabajadors);}
-    
-    public long count(){
-      return repository.count();
+    public void deleteAll(Set<Trabajador> trabajadors) {
+        repository.deleteAll(trabajadors);
     }
-    
+
+    public long count() {
+        return repository.count();
+    }
 
 }

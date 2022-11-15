@@ -7,5 +7,5 @@ import trabajodediploma.data.entity.Area;
 
 @Repository
 public interface AreaRepository extends JpaRepository<Area, Integer> {
-
+    Area findByNombre(String nombre);
 }

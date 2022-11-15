@@ -50,10 +50,19 @@ public class Trabajador extends AbstractEntity {
     @Column(name = "solapin", nullable = false, unique = true)
     private String solapin;
 
+    @Size(message = "Mínimo 11 caracteres y máximo 11 ", min = 11, max = 11)
+    @Column(name = "CI", nullable = false, unique = true)
+    private String ci;
+
     @NotEmpty
     @NotBlank(message = "debe elegir un campo")
     @Column(name = "categoria", nullable = false)
     private String categoria;
+
+    @NotEmpty
+    @NotBlank(message = "debe elegir un campo")
+    @Column(name = "cargo", nullable = false)
+    private String cargo;
 
     @NotNull(message = "debe elegir un campo de área")
     @JsonIgnoreProperties({"trabajadores"})
@@ -141,4 +150,29 @@ public class Trabajador extends AbstractEntity {
         this.id = id;
     }
 
+    public String getCargo() {
+        return cargo;
+    }
+
+    public void setCargo(String cargo) {
+        this.cargo = cargo;
+    }
+
+    public List<ModeloPagoTrabajador> getModeloPagos() {
+        return modeloPagos;
+    }
+
+    public void setModeloPagos(List<ModeloPagoTrabajador> modeloPagos) {
+        this.modeloPagos = modeloPagos;
+    }
+
+    public String getCi() {
+        return ci;
+    }
+
+    public void setCi(String ci) {
+        this.ci = ci;
+    }
+    
+    
 }

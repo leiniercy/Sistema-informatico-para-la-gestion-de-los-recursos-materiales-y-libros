@@ -25,11 +25,14 @@ public class AreaService {
      return repository.findById(id).get();
     }
     
+    public Area findByNombre(String nombre){
+     return repository.findByNombre(nombre);
+    }
+    
     public Area save(Area area) {
         return repository.save(area);
     }
 
-    
     public Area update(Area area) {
         return repository.save(area);
     }

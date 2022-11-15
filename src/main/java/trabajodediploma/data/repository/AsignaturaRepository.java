@@ -15,5 +15,5 @@ import trabajodediploma.data.entity.Asignatura;
  */
 @Repository
 public interface AsignaturaRepository extends JpaRepository<Asignatura, Integer>  {
-    
+
 }
