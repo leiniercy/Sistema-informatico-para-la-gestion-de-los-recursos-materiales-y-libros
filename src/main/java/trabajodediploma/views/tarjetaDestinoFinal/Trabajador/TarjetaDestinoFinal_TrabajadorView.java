@@ -221,7 +221,11 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
         headerRow.getCell(fechaEntregaColumn).setComponent(entregaFilter);
 
         gridListDataViewDestinoFinal = gridDestinoFinal.setItems(tarjetas);
-        gridDestinoFinal.setPageSize(tarjetas.size());
+        if (tarjetas.size() < 50) {
+            gridDestinoFinal.setPageSize(50);
+        } else {
+            gridDestinoFinal.setPageSize(tarjetas.size());
+        }
         gridDestinoFinal.setAllRowsVisible(true);
         gridDestinoFinal.setSizeFull();
         gridDestinoFinal.setWidthFull();
@@ -257,6 +261,11 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
         FiltrosGridTrabajador();
 
         gridTrabajadores.setItems(trabajadorService.findAll());
+        if (trabajadorService.findAll().size() < 50) {
+            gridTrabajadores.setPageSize(50);
+        } else {
+            gridTrabajadores.setPageSize(trabajadorService.findAll().size());
+        }
         gridTrabajadores.setPageSize(trabajadorService.findAll().size());
         gridTrabajadores.setSelectionMode(Grid.SelectionMode.MULTI);
         gridTrabajadores.getStyle().set("width", "500px").set("max-width", "100%");
@@ -863,7 +872,12 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
             }
         }
         gridDestinoFinal.setItems(tarjetas);
-        gridDestinoFinal.setPageSize(tarjetas.size());
+        if (tarjetas.size() < 50) {
+            gridDestinoFinal.setPageSize(50);
+        } else {
+            gridDestinoFinal.setPageSize(tarjetas.size());
+        }
+        gridDestinoFinal.deselectAll();
     }
     /* Fin-Barra de tarjetas */
 }

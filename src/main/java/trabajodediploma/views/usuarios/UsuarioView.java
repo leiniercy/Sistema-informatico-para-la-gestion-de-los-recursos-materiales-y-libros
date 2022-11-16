@@ -116,7 +116,7 @@ public class UsuarioView extends Div {
     private void configureGrid() {
         grid.setClassName("usuario_view__container__div_grid");
         grid.getStyle().set("max-height", "550px");
-        
+
         LitRenderer<User> imagenRenderer = LitRenderer.<User>of(
                 "<vaadin-horizontal-layout style=\"align-items: center;\" theme=\"spacing\">"
                 + "<vaadin-avatar img=\"${item.profilePictureUrl}\" name=\"${item.name}\" alt=\"User avatar\"></vaadin-avatar>"
@@ -158,7 +158,11 @@ public class UsuarioView extends Div {
         headerRow.getCell(rolColumn).setComponent(filterRol);
 
         gridListDataView = grid.setItems(userService.findAll());
-        grid.setPageSize(userService.findAll().size());
+        if (userService.findAll().size() < 50) {
+            grid.setPageSize(50);
+        } else {
+            grid.setPageSize(userService.findAll().size());
+        }
         grid.setAllRowsVisible(true);
         grid.setSizeFull();
         grid.setWidthFull();
@@ -346,7 +350,11 @@ public class UsuarioView extends Div {
 
     private void updateList() {
         grid.setItems(userService.findAll());
-        grid.setPageSize(userService.findAll().size());
+        if (userService.findAll().size() < 50) {
+            grid.setPageSize(50);
+        } else {
+            grid.setPageSize(userService.findAll().size());
+        }
         grid.deselectAll();
     }
     /* Formulario */

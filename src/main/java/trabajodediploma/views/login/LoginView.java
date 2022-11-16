@@ -121,7 +121,7 @@ public class LoginView extends Div implements BeforeEnterObserver {
         add(loginOverlay);
 
         loginOverlay.addLoginListener(event -> {
-            AutenticarUsuarioResponse datos = autenticacionUCIWSDL.autenticar(event.getUsername(), event.getPassword());
+            AutenticarUsuarioResponse datos = autenticacionUCIWSDL.autenticar(event.getUsername(), event.getPassword());           
 //            comprobando si la persona existe en la BD UCI
             if (datos.getPersona().isAutenticado()) {
                 //si existe

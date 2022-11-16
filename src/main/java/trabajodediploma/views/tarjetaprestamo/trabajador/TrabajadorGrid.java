@@ -155,7 +155,13 @@ public class TrabajadorGrid extends Div {
         Filtros();
 
         gridListDataView = gridTrabajadores.setItems(trabajadorService.findAll());
-        gridTrabajadores.setPageSize(trabajadorService.findAll().size());
+       
+        if (prestamos.size() < 50) {
+          gridTrabajadores.setPageSize(50);
+        } else {
+          gridTrabajadores.setPageSize(trabajadorService.findAll().size());
+        }
+        
         gridTrabajadores.setAllRowsVisible(true);
         gridTrabajadores.setSelectionMode(Grid.SelectionMode.MULTI);
         gridTrabajadores.setSizeFull();

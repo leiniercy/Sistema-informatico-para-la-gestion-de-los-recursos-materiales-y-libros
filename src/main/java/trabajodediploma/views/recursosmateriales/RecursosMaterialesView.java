@@ -173,7 +173,11 @@ public class RecursosMaterialesView extends Div {
         headerRow.getCell(tipoColumn).setComponent(filterTipo);
 
         gridListDataView = grid.setItems(materialService.findAll());
-        grid.setPageSize(materialService.findAll().size());
+        if (materialService.findAll().size()< 50) {
+            grid.setPageSize(50);
+        } else {
+            grid.setPageSize(materialService.findAll().size());
+        }
         grid.setAllRowsVisible(true);
         grid.setSizeFull();
         grid.setWidthFull();
@@ -416,7 +420,12 @@ public class RecursosMaterialesView extends Div {
 
     private void updateList() {
         grid.setItems(materialService.findAll());
-        grid.setPageSize(materialService.findAll().size());
+         if (materialService.findAll().size()< 50) {
+            grid.setPageSize(50);
+        } else {
+            grid.setPageSize(materialService.findAll().size());
+        }
+        grid.deselectAll();
     }
 
     /* Fin-Formulario */

@@ -155,7 +155,13 @@ public class EstudianteGrid extends Div {
         Filtros();
 
         gridListDataView = gridEstudiantes.setItems(estudianteService.findAll());
-        gridEstudiantes.setPageSize(estudianteService.findAll().size());
+      
+        if (estudianteService.findAll().size() < 50) {
+           gridEstudiantes.setPageSize(50);
+        } else {
+           gridEstudiantes.setPageSize(estudianteService.findAll().size());
+        }
+      
         gridEstudiantes.setAllRowsVisible(true);
         gridEstudiantes.setSelectionMode(Grid.SelectionMode.MULTI);
         gridEstudiantes.setSizeFull();

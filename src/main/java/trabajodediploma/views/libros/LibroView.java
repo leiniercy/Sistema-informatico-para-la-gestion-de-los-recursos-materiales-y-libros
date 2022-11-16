@@ -135,8 +135,8 @@ public class LibroView extends Div {
  /* Configuracion de la tabla */
     private void configureGrid() {
         grid.setClassName("grid_content__table");
-         grid.getStyle().set("max-height", "550px");
-         
+        grid.getStyle().set("max-height", "550px");
+
         LitRenderer<Libro> imagenRenderer = LitRenderer.<Libro>of("<img style='height: 64px' src=${item.imagen} />")
                 .withProperty("imagen", Libro::getImagen);
         imagenColumn = grid.addColumn(imagenRenderer).setHeader("Imagen").setAutoWidth(true);
@@ -180,7 +180,11 @@ public class LibroView extends Div {
         headerRow.getCell(asignaturaColumn).setComponent(filterAsignatura);
 
         gridListDataView = grid.setItems(libroService.findAll());
-        grid.setPageSize(libroService.findAll().size());
+        if (libroService.findAll().size() < 50) {
+            grid.setPageSize(50);
+        } else {
+            grid.setPageSize(libroService.findAll().size());
+        }
         grid.setSizeFull();
         grid.setWidthFull();
         grid.setHeightFull();
@@ -534,7 +538,11 @@ public class LibroView extends Div {
     /* Actualizar lista de  Libro */
     private void updateList() {
         grid.setItems(libroService.findAll());
-        grid.setPageSize(libroService.findAll().size());
+        if (libroService.findAll().size() < 50) {
+            grid.setPageSize(50);
+        } else {
+            grid.setPageSize(libroService.findAll().size());
+        }
         grid.deselectAll();
     }
 

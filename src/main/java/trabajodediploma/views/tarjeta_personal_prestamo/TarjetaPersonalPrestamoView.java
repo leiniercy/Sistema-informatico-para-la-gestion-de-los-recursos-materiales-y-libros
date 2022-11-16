@@ -235,7 +235,12 @@ public class TarjetaPersonalPrestamoView extends Div {
         headerRow.getCell(fechaDevolucionColumn).setComponent(devolucionFilter);
 
         gridListDataView = grid.setItems(prestamos);
-        grid.setPageSize(prestamos.size());
+        grid.setItems(prestamos);
+        if (prestamos.size() < 50) {
+            grid.setPageSize(50);
+        } else {
+            grid.setPageSize(prestamos.size());
+        }
         grid.setSizeFull();
         grid.setWidthFull();
         grid.setHeightFull();
@@ -345,7 +350,11 @@ public class TarjetaPersonalPrestamoView extends Div {
             }
         });
         grid.setItems(prestamos);
-        grid.setPageSize(prestamos.size());
+        if (prestamos.size() < 50) {
+            grid.setPageSize(50);
+        } else {
+            grid.setPageSize(prestamos.size());
+        }
     }
     /* Fin -> Estudiante */
 }

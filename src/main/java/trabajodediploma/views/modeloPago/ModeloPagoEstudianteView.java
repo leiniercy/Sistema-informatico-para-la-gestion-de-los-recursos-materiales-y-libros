@@ -213,7 +213,11 @@ public class ModeloPagoEstudianteView extends Div {
         headerRow.getCell(estudianteColumn).setComponent(estudianteFilter);
 
         gridListDataView = grid.setItems(listModelosPago);
-        grid.setPageSize(listModelosPago.size());
+        if (listModelosPago.size() < 50) {
+            grid.setPageSize(50);
+        } else {
+            grid.setPageSize(listModelosPago.size());
+        }
         grid.setAllRowsVisible(true);
         grid.setSizeFull();
         grid.setWidthFull();
@@ -426,7 +430,12 @@ public class ModeloPagoEstudianteView extends Div {
             }
         }
         grid.setItems(listModelosPago);
-        grid.setPageSize(listModelosPago.size());
+        if (listModelosPago.size() < 50) {
+            grid.setPageSize(50);
+        } else {
+            grid.setPageSize(listModelosPago.size());
+        }
+        grid.deselectAll();
     }
 
     /* Form crear modelo de pago */

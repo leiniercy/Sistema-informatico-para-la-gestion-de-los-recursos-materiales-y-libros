@@ -115,7 +115,7 @@ public class DataGenerator {
 //        services.ObtenerPersonasDadoIdEstructuraResponse grupo4404 = datosUCIWSDL.personasDadoArea(350);
             //5to año
             services.ObtenerPersonasDadoIdEstructuraResponse grupo4501 = datosUCIWSDL.personasDadoArea(377);
-            services.ObtenerPersonasDadoIdEstructuraResponse grupo4502 = datosUCIWSDL.personasDadoArea(430);
+//            services.ObtenerPersonasDadoIdEstructuraResponse grupo4502 = datosUCIWSDL.personasDadoArea(430);
             services.ObtenerPersonasDadoIdEstructuraResponse grupo4503 = datosUCIWSDL.personasDadoArea(440);
 
             //1er año
@@ -171,9 +171,9 @@ public class DataGenerator {
             for (int i = 0; i < grupo4501.getReturn().size(); i++) {
                 lista.add(grupo4501.getReturn().get(i));
             }
-            for (int i = 0; i < grupo4502.getReturn().size(); i++) {
-                lista.add(grupo4502.getReturn().get(i));
-            }
+//            for (int i = 0; i < grupo4502.getReturn().size(); i++) {
+//                lista.add(grupo4502.getReturn().get(i));
+//            }
             for (int i = 0; i < grupo4503.getReturn().size(); i++) {
                 lista.add(grupo4503.getReturn().get(i));
             }
@@ -245,6 +245,7 @@ public class DataGenerator {
                     }
                 }
                 logger.info("...La base de datos fue llenada satisfactoriamente ...");
+                return;
             }
 
         };

@@ -205,7 +205,11 @@ public class ModuloView extends Div {
         headerRow.getCell(nombreColumn).setComponent(filterNombre);
 
         gridListDataView = grid.setItems(moduloService.findAll());
-        grid.setPageSize(moduloService.findAll().size());
+        if (moduloService.findAll().size() < 50) {
+            grid.setPageSize(50);
+        } else {
+            grid.setPageSize(moduloService.findAll().size());
+        }
         grid.setAllRowsVisible(true);
         grid.setSizeFull();
         grid.setWidthFull();
@@ -241,6 +245,11 @@ public class ModuloView extends Div {
         FiltrosGridEstudiante();
 
         gridListDataViewEstudiante = gridEstudiantes.setItems(estudianteService.findAll());
+        if (estudianteService.findAll().size() < 50) {
+            gridEstudiantes.setPageSize(50);
+        } else {
+            gridEstudiantes.setPageSize(estudianteService.findAll().size());
+        }
         gridEstudiantes.setPageSize(estudianteService.findAll().size());
         gridEstudiantes.setSelectionMode(Grid.SelectionMode.MULTI);
         gridEstudiantes.getStyle().set("width", "500px").set("max-width", "100%");
@@ -270,7 +279,11 @@ public class ModuloView extends Div {
         FiltrosGridTrabajador();
 
         gridListDataViewTrabajador = gridTrabajadores.setItems(trabajadorService.findAll());
-        gridTrabajadores.setPageSize(trabajadorService.findAll().size());
+        if (trabajadorService.findAll().size() < 50) {
+            gridTrabajadores.setPageSize(50);
+        } else {
+            gridTrabajadores.setPageSize(trabajadorService.findAll().size());
+        }
         gridTrabajadores.setSelectionMode(Grid.SelectionMode.MULTI);
         gridTrabajadores.getStyle().set("width", "500px").set("max-width", "100%");
     }
@@ -985,7 +998,12 @@ public class ModuloView extends Div {
 
     private void updateList() {
         grid.setItems(moduloService.findAll());
-        grid.setPageSize(moduloService.findAll().size());
+        if (moduloService.findAll().size() < 50) {
+            grid.setPageSize(50);
+        } else {
+            grid.setPageSize(moduloService.findAll().size());
+        }
+        grid.deselectAll();
     }
     /* Fin-Formulario */
 
