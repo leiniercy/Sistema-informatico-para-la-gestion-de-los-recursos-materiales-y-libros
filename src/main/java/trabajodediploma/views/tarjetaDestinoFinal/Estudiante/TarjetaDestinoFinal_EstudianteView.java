@@ -266,7 +266,6 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
         } else {
             gridEstudiantes.setPageSize(estudianteService.findAll().size());
         }
-        gridEstudiantes.setPageSize(estudianteService.findAll().size());
         gridEstudiantes.setSelectionMode(Grid.SelectionMode.MULTI);
         gridEstudiantes.getStyle().set("width", "500px").set("max-width", "100%");
     }

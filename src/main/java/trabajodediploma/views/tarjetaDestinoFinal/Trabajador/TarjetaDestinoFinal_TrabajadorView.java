@@ -266,7 +266,6 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
         } else {
             gridTrabajadores.setPageSize(trabajadorService.findAll().size());
         }
-        gridTrabajadores.setPageSize(trabajadorService.findAll().size());
         gridTrabajadores.setSelectionMode(Grid.SelectionMode.MULTI);
         gridTrabajadores.getStyle().set("width", "500px").set("max-width", "100%");
     }

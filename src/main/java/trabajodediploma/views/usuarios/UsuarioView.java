@@ -9,7 +9,11 @@ import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.contextmenu.HasMenuItems;
+import com.vaadin.flow.component.contextmenu.MenuItem;
+import com.vaadin.flow.component.contextmenu.SubMenu;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
@@ -19,10 +23,13 @@ import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.menubar.MenuBar;
+import com.vaadin.flow.component.menubar.MenuBarVariant;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
@@ -31,6 +38,8 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.shared.Registration;
+import java.util.Collections;
+import java.util.Comparator;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -42,10 +51,19 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import trabajodediploma.data.Rol;
+import trabajodediploma.data.entity.Area;
+import trabajodediploma.data.entity.Estudiante;
+import trabajodediploma.data.entity.Grupo;
+import trabajodediploma.data.entity.Trabajador;
 import trabajodediploma.data.entity.User;
+import trabajodediploma.data.service.AreaService;
+import trabajodediploma.data.service.EstudianteService;
+import trabajodediploma.data.service.GrupoService;
+import trabajodediploma.data.service.TrabajadorService;
 import trabajodediploma.data.service.UserService;
 import trabajodediploma.views.MainLayout;
 import trabajodediploma.views.footer.MyFooter;
+import org.apache.commons.lang3.builder.CompareToBuilder;
 
 /**
  *
@@ -60,6 +78,10 @@ public class UsuarioView extends Div {
     private final MyFooter myFooter;
     private UsuarioForm form;
     private UserService userService;
+    private EstudianteService estudianteService;
+    private GrupoService grupoService;
+    private TrabajadorService trabajadorService;
+    private AreaService areaService;
 
     private GridListDataView<User> gridListDataView;
     Grid.Column<User> profilePictureUrlColumn;
@@ -68,6 +90,9 @@ public class UsuarioView extends Div {
     Grid.Column<User> editColumn;
 
     private Dialog dialog;
+//    private ComboBox<Grupo> grupoFilter;
+//    private ComboBox<Area> areaFilter;
+//    private IntegerField annoAcademicoFilter;
     private TextField filterName;
     private TextField filterUserName;
     private ComboBox<Rol> filterRol;
@@ -75,14 +100,49 @@ public class UsuarioView extends Div {
     private HorizontalLayout buttons;
     private Html total;
     private Div header;
+//    private HorizontalLayout div_filtros;
+//    private List<Estudiante> estudiantes;
+//    private List<Trabajador> trabajadores;
 
-    public UsuarioView(@Autowired UserService userService) {
+    public UsuarioView(
+            @Autowired UserService userService,
+            @Autowired EstudianteService estudianteService,
+            @Autowired GrupoService grupoService,
+            @Autowired TrabajadorService trabajadorService,
+            @Autowired AreaService areaService
+    ) {
         addClassNames("usuario_view");
         this.userService = userService;
+        this.estudianteService = estudianteService;
+        this.trabajadorService = trabajadorService;
+        this.grupoService = grupoService;
+        this.areaService = areaService;
+//        estudiantes = estudianteService.findAll();
+//        Collections.sort(estudiantes, new Comparator<>() {
+//            @Override
+//            public int compare(Estudiante o1, Estudiante o2) {
+//                return new CompareToBuilder()
+//                        .append(o1.getAnno_academico(), o2.getAnno_academico())
+//                        .append(o1.getGrupo().getNumero(), o2.getGrupo().getNumero())
+//                        .toComparison();
+//            }
+//        });
+//        trabajadores = trabajadorService.findAll();
+//        Collections.sort(trabajadores, new Comparator<>() {
+//            @Override
+//            public int compare(Trabajador o1, Trabajador o2) {
+//                return new CompareToBuilder()
+//                        .append(o1.getArea().getNombre(), o2.getArea().getNombre())
+//                        //.compare(o1.getGrupo().getNumero(), o2.getGrupo().getNumero())
+//                        .toComparison();
+//            }
+//        });
+
         configureGrid();
         configureForm();
         myFooter = new MyFooter();
-        add(menuBar(), getContent(), myFooter);
+//        div_filtros = new HorizontalLayout();
+        add(menuBar(), /*div_filtros,*/ getContent(), myFooter);
     }
 
     /* Contenido de la vista */
@@ -214,7 +274,100 @@ public class UsuarioView extends Div {
                 gridListDataView.addFilter(user -> areRolEqual(user.getRoles(), filterRol));
             }
         });
+
+//        grupoFilter = new ComboBox<>();
+//        grupoFilter.setItems(grupoService.findAll());
+//        grupoFilter.setItemLabelGenerator(Grupo::getNumero);
+//        grupoFilter.setPlaceholder("Grupo");
+//        grupoFilter.setWidth("100%");
+//        grupoFilter.addValueChangeListener(event -> {
+//            if (grupoFilter.getValue() == null) {
+//                gridListDataView = grid.setItems(userService.findAll());
+//            } else {
+//                gridListDataView.addFilter(user -> areGrupoEqual(user, grupoFilter));
+//            }
+//        });
+//
+//        areaFilter = new ComboBox<>();
+//        areaFilter.setItems(areaService.findAll());
+//        areaFilter.setItemLabelGenerator(Area::getNombre);
+//        areaFilter.setPlaceholder("Grupo");
+//        areaFilter.setWidth("100%");
+//        areaFilter.addValueChangeListener(event -> {
+//            if (areaFilter.getValue() == null) {
+//                gridListDataView = grid.setItems(userService.findAll());
+//            } else {
+//                gridListDataView.addFilter(user -> areAreaEqual(user, areaFilter));
+//            }
+//        });
+//
+//        annoAcademicoFilter = new IntegerField();
+//        annoAcademicoFilter.setPlaceholder("Filtrar");
+//        annoAcademicoFilter.setClearButtonVisible(true);
+//        annoAcademicoFilter.setMin(1);
+//        annoAcademicoFilter.setMax(5);
+//        annoAcademicoFilter.setWidth("100%");
+//        annoAcademicoFilter.setValueChangeMode(ValueChangeMode.LAZY);
+//        annoAcademicoFilter.addValueChangeListener(event -> {
+//            if (annoAcademicoFilter.getValue() == null) {
+//                gridListDataView = grid.setItems(userService.findAll());
+//            } else {
+//                gridListDataView.addFilter(user -> areAnnoAcademicoEqual(user, annoAcademicoFilter));
+//            }
+//        });
+
     }
+
+//    private Estudiante buscarEstudiante(int x) {
+//
+//        int inicio = 0;
+//        int fin = estudiantes.size() - 1;
+//
+//        while (inicio <= fin) {
+//            int mitad = (inicio + fin) / 2;
+//            if (x == estudiantes.get(mitad).getUser().getId()) {
+//                return estudiantes.get(mitad);
+//            }
+//            if (x > estudiantes.get(mitad).getUser().getId()) {
+//                inicio = mitad + 1;
+//            }
+//            if (x < estudiantes.get(mitad).getUser().getId()) {
+//                fin = mitad - 1;
+//            }
+//
+//            return null;
+//        }
+//
+//        return new Estudiante();
+//    }
+//
+//    private boolean areGrupoEqual(User user, ComboBox<Grupo> grupoFilter) {
+//        String grupoFilterValue = grupoFilter.getValue().getNumero();
+//        List<Estudiante> estudiantes = estudianteService.findAll().stream().filter(e -> e.getUser().getUsername().equals(e.getUser().getUsername())).collect(Collectors.toList());
+//        Estudiante estudiante = estudiantes.get(0);
+//        if (grupoFilterValue != null) {
+//            return StringUtils.equals(estudiante.getGrupo().getNumero(), grupoFilterValue);
+//        }
+//        return true;
+//    }
+//
+//    private boolean areAreaEqual(User user, ComboBox<Area> areaFilter) {
+//        String areaFilterValue = areaFilter.getValue().getNombre();
+//        List<Trabajador> trabajadores = trabajadorService.findAll().stream().filter(e -> e.getUser().getUsername().equals(e.getUser().getUsername())).collect(Collectors.toList());
+//        Trabajador trabajador = trabajadores.get(0);
+//        if (areaFilterValue != null) {
+//            return StringUtils.equals(trabajador.getArea().getNombre(), areaFilterValue);
+//        }
+//        return true;
+//    }
+//
+//    private boolean areAnnoAcademicoEqual(User user, IntegerField annoAcademico) {
+//        Estudiante estudiante = buscarEstudiante(user.getId());
+//        if (annoAcademico.getValue() != null &&  estudiante !=null) {
+//            return estudiante.getAnno_academico() ==  annoAcademico.getValue();
+//        }
+//        return true;
+//    }
 
     private boolean areRolEqual(Set<Rol> roles, ComboBox<Rol> rolFilter) {
         String rolFilterValue = rolFilter.getValue().getRolname();
@@ -242,7 +395,87 @@ public class UsuarioView extends Div {
         deleteButton.addClickListener(click -> deleteLibro());
         deleteButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
-        buttons.add(refreshButton, deleteButton);
+//        /*Menu Filtros*/
+//        MenuBar barraMenu = new MenuBar();
+//        barraMenu.addThemeVariants(MenuBarVariant.LUMO_PRIMARY);
+//        MenuItem filtros = createMenuIconItem(barraMenu, VaadinIcon.FILTER, "Filtros", null, false);
+//        SubMenu filtrosSubMenu = filtros.getSubMenu();
+//
+//        /*Año academico*/
+//        Checkbox annoAcademicoCheckBox = new Checkbox();
+//        annoAcademicoCheckBox.addClickListener(event -> {
+//            if (!annoAcademicoCheckBox.getValue()) {
+//                annoAcademicoCheckBox.setValue(Boolean.TRUE);
+//                div_filtros.add(annoAcademicoFilter);
+//            } else {
+//                div_filtros.remove(annoAcademicoFilter);
+//                annoAcademicoFilter.setValue(null);
+//                annoAcademicoCheckBox.setValue(Boolean.FALSE);
+//            }
+//        });
+//        MenuItem anno_academico = createSubMenuIconItem(filtrosSubMenu, annoAcademicoCheckBox, VaadinIcon.USERS, "Año académico", null, true);
+//        anno_academico.addClickListener(event -> {
+//            if (!annoAcademicoCheckBox.getValue()) {
+//                annoAcademicoCheckBox.setValue(Boolean.TRUE);
+//                div_filtros.add(annoAcademicoFilter);
+//            } else {
+//                div_filtros.remove(annoAcademicoFilter);
+//                annoAcademicoFilter.setValue(null);
+//                annoAcademicoCheckBox.setValue(Boolean.FALSE);
+//            }
+//        });
+//        //FIN -> Año academico
+//        /*Grupo*/
+//        Checkbox grupoCheckBox = new Checkbox();
+//        grupoCheckBox.addClickListener(event -> {
+//            if (!grupoCheckBox.getValue()) {
+//                grupoCheckBox.setValue(Boolean.TRUE);
+//                div_filtros.add(grupoFilter);
+//            } else {
+//                div_filtros.remove(grupoFilter);
+//                grupoFilter.setValue(null);
+//                grupoCheckBox.setValue(Boolean.FALSE);
+//            }
+//        });
+//        MenuItem grupo = createSubMenuIconItem(filtrosSubMenu, grupoCheckBox, VaadinIcon.USERS, "Grupo", null, true);
+//        grupo.addClickListener(event -> {
+//            if (!grupoCheckBox.getValue()) {
+//                grupoCheckBox.setValue(Boolean.TRUE);
+//                div_filtros.add(grupoFilter);
+//            } else {
+//                div_filtros.remove(grupoFilter);
+//                grupoFilter.setValue(null);
+//                grupoCheckBox.setValue(Boolean.FALSE);
+//            }
+//        });
+//        //FIN -> Grupo
+//        /*Area*/
+//        Checkbox areaCheckBox = new Checkbox();
+//        areaCheckBox.addClickListener(event -> {
+//            if (!areaCheckBox.getValue()) {
+//                areaCheckBox.setValue(Boolean.TRUE);
+//                div_filtros.add(areaFilter);
+//            } else {
+//                div_filtros.remove(areaFilter);
+//                areaFilter.setValue(null);
+//                grupoCheckBox.setValue(Boolean.FALSE);
+//            }
+//        });
+//        MenuItem area = createSubMenuIconItem(filtrosSubMenu, areaCheckBox, VaadinIcon.USERS, "Área", null, true);
+//        area.addClickListener(event -> {
+//            if (!areaCheckBox.getValue()) {
+//                areaCheckBox.setValue(Boolean.TRUE);
+//                div_filtros.add(areaFilter);
+//            } else {
+//                div_filtros.remove(areaFilter);
+//                areaFilter.setValue(null);
+//                grupoCheckBox.setValue(Boolean.FALSE);
+//            }
+//        });
+//        //FIN -> Area
+//        /*FIN -> Menu Filtros*/
+
+        buttons.add(refreshButton, deleteButton/*, barraMenu*/);
 
         total = new Html("<span>Total: <b>" + userService.count() + "</b> usuarios</span>");
 
@@ -254,6 +487,55 @@ public class UsuarioView extends Div {
         toolbar.getStyle()
                 .set("padding", "var(--lumo-space-wide-m)");
         return toolbar;
+    }
+
+    //Crear MenuItem
+    private MenuItem createMenuIconItem(HasMenuItems menu, VaadinIcon iconName,
+            String label, String ariaLabel, boolean isChild) {
+        Icon icon = new Icon(iconName);
+
+        if (isChild) {
+            icon.getStyle().set("width", "var(--lumo-icon-size-s)");
+            icon.getStyle().set("height", "var(--lumo-icon-size-s)");
+            icon.getStyle().set("marginRight", "var(--lumo-space-s)");
+        }
+        MenuItem item = menu.addItem(icon, e -> {
+        });
+
+        if (ariaLabel != null) {
+            item.getElement().setAttribute("aria-label", ariaLabel);
+        }
+
+        if (label != null) {
+            item.add(new Text(label));
+        }
+
+        return item;
+    }
+
+    //Crear Submenu Item
+    private MenuItem createSubMenuIconItem(HasMenuItems menu, Checkbox checkBox, VaadinIcon iconName,
+            String label, String ariaLabel, boolean isChild) {
+        Icon icon = new Icon(iconName);
+
+        if (isChild) {
+            icon.getStyle().set("width", "var(--lumo-icon-size-s)");
+            icon.getStyle().set("height", "var(--lumo-icon-size-s)");
+            icon.getStyle().set("marginRight", "var(--lumo-space-s)");
+        }
+        MenuItem item = menu.addItem(checkBox, e -> {
+        });
+        item.add(icon);
+
+        if (ariaLabel != null) {
+            item.getElement().setAttribute("aria-label", ariaLabel);
+        }
+
+        if (label != null) {
+            item.add(new Text(label));
+        }
+
+        return item;
     }
 
     /* Barra de menu */
