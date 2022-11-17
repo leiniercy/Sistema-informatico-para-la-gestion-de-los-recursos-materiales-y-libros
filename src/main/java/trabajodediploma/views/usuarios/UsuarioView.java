@@ -90,9 +90,9 @@ public class UsuarioView extends Div {
     Grid.Column<User> editColumn;
 
     private Dialog dialog;
-//    private ComboBox<Grupo> grupoFilter;
-//    private ComboBox<Area> areaFilter;
-//    private IntegerField annoAcademicoFilter;
+    private ComboBox<Grupo> grupoFilter;
+    private ComboBox<Area> areaFilter;
+    private IntegerField annoAcademicoFilter;
     private TextField filterName;
     private TextField filterUserName;
     private ComboBox<Rol> filterRol;
@@ -100,9 +100,9 @@ public class UsuarioView extends Div {
     private HorizontalLayout buttons;
     private Html total;
     private Div header;
-//    private HorizontalLayout div_filtros;
-//    private List<Estudiante> estudiantes;
-//    private List<Trabajador> trabajadores;
+    private HorizontalLayout div_filtros;
+    private List<Estudiante> estudiantes;
+    private List<Trabajador> trabajadores;
 
     public UsuarioView(
             @Autowired UserService userService,
@@ -117,32 +117,32 @@ public class UsuarioView extends Div {
         this.trabajadorService = trabajadorService;
         this.grupoService = grupoService;
         this.areaService = areaService;
-//        estudiantes = estudianteService.findAll();
-//        Collections.sort(estudiantes, new Comparator<>() {
-//            @Override
-//            public int compare(Estudiante o1, Estudiante o2) {
-//                return new CompareToBuilder()
-//                        .append(o1.getAnno_academico(), o2.getAnno_academico())
-//                        .append(o1.getGrupo().getNumero(), o2.getGrupo().getNumero())
-//                        .toComparison();
-//            }
-//        });
-//        trabajadores = trabajadorService.findAll();
-//        Collections.sort(trabajadores, new Comparator<>() {
-//            @Override
-//            public int compare(Trabajador o1, Trabajador o2) {
-//                return new CompareToBuilder()
-//                        .append(o1.getArea().getNombre(), o2.getArea().getNombre())
-//                        //.compare(o1.getGrupo().getNumero(), o2.getGrupo().getNumero())
-//                        .toComparison();
-//            }
-//        });
+        estudiantes = estudianteService.findAll();
+        Collections.sort(estudiantes, new Comparator<>() {
+            @Override
+            public int compare(Estudiante o1, Estudiante o2) {
+                return new CompareToBuilder()
+                        .append(o1.getAnno_academico(), o2.getAnno_academico())
+                        .append(o1.getGrupo().getNumero(), o2.getGrupo().getNumero())
+                        .toComparison();
+            }
+        });
+        trabajadores = trabajadorService.findAll();
+        Collections.sort(trabajadores, new Comparator<>() {
+            @Override
+            public int compare(Trabajador o1, Trabajador o2) {
+                return new CompareToBuilder()
+                        .append(o1.getArea().getNombre(), o2.getArea().getNombre())
+                        //.compare(o1.getGrupo().getNumero(), o2.getGrupo().getNumero())
+                        .toComparison();
+            }
+        });
 
         configureGrid();
         configureForm();
         myFooter = new MyFooter();
-//        div_filtros = new HorizontalLayout();
-        add(menuBar(), /*div_filtros,*/ getContent(), myFooter);
+        div_filtros = new HorizontalLayout();
+        add(menuBar(), div_filtros, getContent(), myFooter);
     }
 
     /* Contenido de la vista */
@@ -275,99 +275,102 @@ public class UsuarioView extends Div {
             }
         });
 
-//        grupoFilter = new ComboBox<>();
-//        grupoFilter.setItems(grupoService.findAll());
-//        grupoFilter.setItemLabelGenerator(Grupo::getNumero);
-//        grupoFilter.setPlaceholder("Grupo");
-//        grupoFilter.setWidth("100%");
-//        grupoFilter.addValueChangeListener(event -> {
-//            if (grupoFilter.getValue() == null) {
-//                gridListDataView = grid.setItems(userService.findAll());
-//            } else {
-//                gridListDataView.addFilter(user -> areGrupoEqual(user, grupoFilter));
-//            }
-//        });
-//
-//        areaFilter = new ComboBox<>();
-//        areaFilter.setItems(areaService.findAll());
-//        areaFilter.setItemLabelGenerator(Area::getNombre);
-//        areaFilter.setPlaceholder("Grupo");
-//        areaFilter.setWidth("100%");
-//        areaFilter.addValueChangeListener(event -> {
-//            if (areaFilter.getValue() == null) {
-//                gridListDataView = grid.setItems(userService.findAll());
-//            } else {
-//                gridListDataView.addFilter(user -> areAreaEqual(user, areaFilter));
-//            }
-//        });
-//
-//        annoAcademicoFilter = new IntegerField();
-//        annoAcademicoFilter.setPlaceholder("Filtrar");
-//        annoAcademicoFilter.setClearButtonVisible(true);
-//        annoAcademicoFilter.setMin(1);
-//        annoAcademicoFilter.setMax(5);
-//        annoAcademicoFilter.setWidth("100%");
-//        annoAcademicoFilter.setValueChangeMode(ValueChangeMode.LAZY);
-//        annoAcademicoFilter.addValueChangeListener(event -> {
-//            if (annoAcademicoFilter.getValue() == null) {
-//                gridListDataView = grid.setItems(userService.findAll());
-//            } else {
-//                gridListDataView.addFilter(user -> areAnnoAcademicoEqual(user, annoAcademicoFilter));
-//            }
-//        });
+        grupoFilter = new ComboBox<>();
+        grupoFilter.setItems(grupoService.findAll());
+        grupoFilter.setItemLabelGenerator(Grupo::getNumero);
+        grupoFilter.setPlaceholder("Grupo");
+        grupoFilter.setWidth("100%");
+        grupoFilter.addValueChangeListener(event -> {
+            if (grupoFilter.getValue() == null) {
+                gridListDataView = grid.setItems(userService.findAll());
+            } else {
+                //buscar estudiantes por grupo
+                List<User> listUser = new LinkedList<>();
+                for (int i = 0; i < estudiantes.size(); i++) {
+                    if (areGrupoEqual(estudiantes.get(i), grupoFilter)) {
+                        listUser.add(estudiantes.get(i).getUser());
+                    }
+                }
+                gridListDataView = grid.setItems(listUser);
+                if (listUser.size() < 50) {
+                    grid.setPageSize(50);
+                } else {
+                    grid.setPageSize(listUser.size());
+                }
+            }
+        });
+
+        areaFilter = new ComboBox<>();
+        areaFilter.setItems(areaService.findAll());
+        areaFilter.setItemLabelGenerator(Area::getNombre);
+        areaFilter.setPlaceholder("Área");
+        areaFilter.setWidth("100%");
+        areaFilter.addValueChangeListener(event -> {
+            if (areaFilter.getValue() == null) {
+                gridListDataView = grid.setItems(userService.findAll());
+            } else {
+                //buscar trabajadores
+                List<User> listUser = new LinkedList<>();
+                for (int i = 0; i < trabajadores.size(); i++) {
+                    if (areAreaEqual(trabajadores.get(i), areaFilter)) {
+                        listUser.add(trabajadores.get(i).getUser());
+                    }
+                }
+                gridListDataView = grid.setItems(listUser);
+                if (listUser.size() < 50) {
+                    grid.setPageSize(50);
+                } else {
+                    grid.setPageSize(listUser.size());
+                }
+            }
+        });
+
+        annoAcademicoFilter = new IntegerField();
+        annoAcademicoFilter.setPlaceholder("Año Académico");
+        annoAcademicoFilter.setClearButtonVisible(true);
+        annoAcademicoFilter.setHasControls(true);
+        annoAcademicoFilter.setMin(1);
+        annoAcademicoFilter.setMax(5);
+        annoAcademicoFilter.setWidth("100%");
+        annoAcademicoFilter.setValueChangeMode(ValueChangeMode.LAZY);
+        annoAcademicoFilter.addValueChangeListener(event -> {
+            if (annoAcademicoFilter.getValue() == null) {
+                gridListDataView = grid.setItems(userService.findAll());
+            } else {
+                //buscar estudiantes por año academico
+                List<User> listUser = new LinkedList<>();
+                for (int i = 0; i < estudiantes.size(); i++) {
+                    if (annoAcademicoFilter.getValue() == estudiantes.get(i).getAnno_academico()) {
+                        listUser.add(estudiantes.get(i).getUser());
+                    }
+                }
+                gridListDataView = grid.setItems(listUser);
+                if (listUser.size() < 50) {
+                    grid.setPageSize(50);
+                } else {
+                    grid.setPageSize(listUser.size());
+                }
+
+            }
+        });
 
     }
 
-//    private Estudiante buscarEstudiante(int x) {
-//
-//        int inicio = 0;
-//        int fin = estudiantes.size() - 1;
-//
-//        while (inicio <= fin) {
-//            int mitad = (inicio + fin) / 2;
-//            if (x == estudiantes.get(mitad).getUser().getId()) {
-//                return estudiantes.get(mitad);
-//            }
-//            if (x > estudiantes.get(mitad).getUser().getId()) {
-//                inicio = mitad + 1;
-//            }
-//            if (x < estudiantes.get(mitad).getUser().getId()) {
-//                fin = mitad - 1;
-//            }
-//
-//            return null;
-//        }
-//
-//        return new Estudiante();
-//    }
-//
-//    private boolean areGrupoEqual(User user, ComboBox<Grupo> grupoFilter) {
-//        String grupoFilterValue = grupoFilter.getValue().getNumero();
-//        List<Estudiante> estudiantes = estudianteService.findAll().stream().filter(e -> e.getUser().getUsername().equals(e.getUser().getUsername())).collect(Collectors.toList());
-//        Estudiante estudiante = estudiantes.get(0);
-//        if (grupoFilterValue != null) {
-//            return StringUtils.equals(estudiante.getGrupo().getNumero(), grupoFilterValue);
-//        }
-//        return true;
-//    }
-//
-//    private boolean areAreaEqual(User user, ComboBox<Area> areaFilter) {
-//        String areaFilterValue = areaFilter.getValue().getNombre();
-//        List<Trabajador> trabajadores = trabajadorService.findAll().stream().filter(e -> e.getUser().getUsername().equals(e.getUser().getUsername())).collect(Collectors.toList());
-//        Trabajador trabajador = trabajadores.get(0);
-//        if (areaFilterValue != null) {
-//            return StringUtils.equals(trabajador.getArea().getNombre(), areaFilterValue);
-//        }
-//        return true;
-//    }
-//
-//    private boolean areAnnoAcademicoEqual(User user, IntegerField annoAcademico) {
-//        Estudiante estudiante = buscarEstudiante(user.getId());
-//        if (annoAcademico.getValue() != null &&  estudiante !=null) {
-//            return estudiante.getAnno_academico() ==  annoAcademico.getValue();
-//        }
-//        return true;
-//    }
+    private boolean areGrupoEqual(Estudiante estudiante, ComboBox<Grupo> grupoFilter) {
+        String grupoFilterValue = grupoFilter.getValue().getNumero();
+        if (grupoFilterValue != null) {
+            return StringUtils.equals(estudiante.getGrupo().getNumero(), grupoFilterValue);
+        }
+        return true;
+    }
+
+    private boolean areAreaEqual(Trabajador trabajador, ComboBox<Area> areaFilter) {
+        String areaFilterValue = areaFilter.getValue().getNombre();
+        if (areaFilterValue != null) {
+            return StringUtils.equals(trabajador.getArea().getNombre(), areaFilterValue);
+        }
+        return true;
+    }
 
     private boolean areRolEqual(Set<Rol> roles, ComboBox<Rol> rolFilter) {
         String rolFilterValue = rolFilter.getValue().getRolname();
@@ -395,87 +398,86 @@ public class UsuarioView extends Div {
         deleteButton.addClickListener(click -> deleteLibro());
         deleteButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
-//        /*Menu Filtros*/
-//        MenuBar barraMenu = new MenuBar();
-//        barraMenu.addThemeVariants(MenuBarVariant.LUMO_PRIMARY);
-//        MenuItem filtros = createMenuIconItem(barraMenu, VaadinIcon.FILTER, "Filtros", null, false);
-//        SubMenu filtrosSubMenu = filtros.getSubMenu();
-//
-//        /*Año academico*/
-//        Checkbox annoAcademicoCheckBox = new Checkbox();
-//        annoAcademicoCheckBox.addClickListener(event -> {
-//            if (!annoAcademicoCheckBox.getValue()) {
-//                annoAcademicoCheckBox.setValue(Boolean.TRUE);
-//                div_filtros.add(annoAcademicoFilter);
-//            } else {
-//                div_filtros.remove(annoAcademicoFilter);
-//                annoAcademicoFilter.setValue(null);
-//                annoAcademicoCheckBox.setValue(Boolean.FALSE);
-//            }
-//        });
-//        MenuItem anno_academico = createSubMenuIconItem(filtrosSubMenu, annoAcademicoCheckBox, VaadinIcon.USERS, "Año académico", null, true);
-//        anno_academico.addClickListener(event -> {
-//            if (!annoAcademicoCheckBox.getValue()) {
-//                annoAcademicoCheckBox.setValue(Boolean.TRUE);
-//                div_filtros.add(annoAcademicoFilter);
-//            } else {
-//                div_filtros.remove(annoAcademicoFilter);
-//                annoAcademicoFilter.setValue(null);
-//                annoAcademicoCheckBox.setValue(Boolean.FALSE);
-//            }
-//        });
-//        //FIN -> Año academico
-//        /*Grupo*/
-//        Checkbox grupoCheckBox = new Checkbox();
-//        grupoCheckBox.addClickListener(event -> {
-//            if (!grupoCheckBox.getValue()) {
-//                grupoCheckBox.setValue(Boolean.TRUE);
-//                div_filtros.add(grupoFilter);
-//            } else {
-//                div_filtros.remove(grupoFilter);
-//                grupoFilter.setValue(null);
-//                grupoCheckBox.setValue(Boolean.FALSE);
-//            }
-//        });
-//        MenuItem grupo = createSubMenuIconItem(filtrosSubMenu, grupoCheckBox, VaadinIcon.USERS, "Grupo", null, true);
-//        grupo.addClickListener(event -> {
-//            if (!grupoCheckBox.getValue()) {
-//                grupoCheckBox.setValue(Boolean.TRUE);
-//                div_filtros.add(grupoFilter);
-//            } else {
-//                div_filtros.remove(grupoFilter);
-//                grupoFilter.setValue(null);
-//                grupoCheckBox.setValue(Boolean.FALSE);
-//            }
-//        });
-//        //FIN -> Grupo
-//        /*Area*/
-//        Checkbox areaCheckBox = new Checkbox();
-//        areaCheckBox.addClickListener(event -> {
-//            if (!areaCheckBox.getValue()) {
-//                areaCheckBox.setValue(Boolean.TRUE);
-//                div_filtros.add(areaFilter);
-//            } else {
-//                div_filtros.remove(areaFilter);
-//                areaFilter.setValue(null);
-//                grupoCheckBox.setValue(Boolean.FALSE);
-//            }
-//        });
-//        MenuItem area = createSubMenuIconItem(filtrosSubMenu, areaCheckBox, VaadinIcon.USERS, "Área", null, true);
-//        area.addClickListener(event -> {
-//            if (!areaCheckBox.getValue()) {
-//                areaCheckBox.setValue(Boolean.TRUE);
-//                div_filtros.add(areaFilter);
-//            } else {
-//                div_filtros.remove(areaFilter);
-//                areaFilter.setValue(null);
-//                grupoCheckBox.setValue(Boolean.FALSE);
-//            }
-//        });
-//        //FIN -> Area
-//        /*FIN -> Menu Filtros*/
+        /*Menu Filtros*/
+        MenuBar barraMenu = new MenuBar();
+        barraMenu.addThemeVariants(MenuBarVariant.LUMO_PRIMARY);
+        MenuItem filtros = createMenuIconItem(barraMenu, VaadinIcon.FILTER, "Filtros", null, false);
+        SubMenu filtrosSubMenu = filtros.getSubMenu();
 
-        buttons.add(refreshButton, deleteButton/*, barraMenu*/);
+        /*Año academico*/
+        Checkbox annoAcademicoCheckBox = new Checkbox();
+        annoAcademicoCheckBox.addClickListener(event -> {
+            if (!annoAcademicoCheckBox.getValue()) {
+                annoAcademicoCheckBox.setValue(Boolean.TRUE);
+                div_filtros.add(annoAcademicoFilter);
+            } else {
+                div_filtros.remove(annoAcademicoFilter);
+                annoAcademicoFilter.setValue(null);
+                annoAcademicoCheckBox.setValue(Boolean.FALSE);
+            }
+        });
+        MenuItem anno_academico = createSubMenuIconItem(filtrosSubMenu, annoAcademicoCheckBox, VaadinIcon.USERS, "Año académico", null, true);
+        anno_academico.addClickListener(event -> {
+            if (!annoAcademicoCheckBox.getValue()) {
+                annoAcademicoCheckBox.setValue(Boolean.TRUE);
+                div_filtros.add(annoAcademicoFilter);
+            } else {
+                div_filtros.remove(annoAcademicoFilter);
+                annoAcademicoFilter.setValue(null);
+                annoAcademicoCheckBox.setValue(Boolean.FALSE);
+            }
+        });
+        //FIN -> Año academico
+        /*Grupo*/
+        Checkbox grupoCheckBox = new Checkbox();
+        grupoCheckBox.addClickListener(event -> {
+            if (!grupoCheckBox.getValue()) {
+                grupoCheckBox.setValue(Boolean.TRUE);
+                div_filtros.add(grupoFilter);
+            } else {
+                div_filtros.remove(grupoFilter);
+                grupoFilter.setValue(null);
+                grupoCheckBox.setValue(Boolean.FALSE);
+            }
+        });
+        MenuItem grupo = createSubMenuIconItem(filtrosSubMenu, grupoCheckBox, VaadinIcon.USERS, "Grupo", null, true);
+        grupo.addClickListener(event -> {
+            if (!grupoCheckBox.getValue()) {
+                grupoCheckBox.setValue(Boolean.TRUE);
+                div_filtros.add(grupoFilter);
+            } else {
+                div_filtros.remove(grupoFilter);
+                grupoFilter.setValue(null);
+                grupoCheckBox.setValue(Boolean.FALSE);
+            }
+        });
+        //FIN -> Grupo
+        /*Area*/
+        Checkbox areaCheckBox = new Checkbox();
+        areaCheckBox.addClickListener(event -> {
+            if (!areaCheckBox.getValue()) {
+                areaCheckBox.setValue(Boolean.TRUE);
+                div_filtros.add(areaFilter);
+            } else {
+                div_filtros.remove(areaFilter);
+                areaFilter.setValue(null);
+                areaCheckBox.setValue(Boolean.FALSE);
+            }
+        });
+        MenuItem area = createSubMenuIconItem(filtrosSubMenu, areaCheckBox, VaadinIcon.USERS, "Área", null, true);
+        area.addClickListener(event -> {
+            if (!areaCheckBox.getValue()) {
+                areaCheckBox.setValue(Boolean.TRUE);
+                div_filtros.add(areaFilter);
+            } else {
+                div_filtros.remove(areaFilter);
+                areaFilter.setValue(null);
+                areaCheckBox.setValue(Boolean.FALSE);
+            }
+        });
+        //FIN -> Area
+        /*FIN -> Menu Filtros*/
+        buttons.add(refreshButton, deleteButton, barraMenu);
 
         total = new Html("<span>Total: <b>" + userService.count() + "</b> usuarios</span>");
 
@@ -569,9 +571,9 @@ public class UsuarioView extends Div {
         Notification notification;
         userService.deleteAll(users);
         if (cantidad == 1) {
-            notification = Notification.show("El usuario ha sido eliminado", 5000, Notification.Position.BOTTOM_START);
+            notification = Notification.show("El usuario ha sido eliminado", 2000, Notification.Position.BOTTOM_START);
         } else {
-            notification = Notification.show("Han sido eliminados" + cantidad + " usuarios", 5000,
+            notification = Notification.show("Han sido eliminados" + cantidad + " usuarios", 2000,
                     Notification.Position.BOTTOM_START);
         }
         notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
@@ -581,8 +583,10 @@ public class UsuarioView extends Div {
     private void configureForm() {
         form = new UsuarioForm();
         form.setWidth("25em");
-        form.addListener(UsuarioForm.SaveEvent.class, this::saveUsuario);
-        form.addListener(UsuarioForm.CloseEvent.class, e -> closeEditor());
+        form.addListener(UsuarioForm.SaveEvent.class,
+                this::saveUsuario);
+        form.addListener(UsuarioForm.CloseEvent.class,
+                e -> closeEditor());
     }
 
     private void saveUsuario(UsuarioForm.SaveEvent event) {
@@ -593,14 +597,14 @@ public class UsuarioView extends Div {
         if (listUsuarios.size() != 0) {
             Notification notification = Notification.show(
                     "El usuario ya existe",
-                    5000,
+                    2000,
                     Notification.Position.MIDDLE);
             notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
         } else {
             userService.update(event.getUsuario());
             Notification notification = Notification.show(
                     "Usuario modificado",
-                    5000,
+                    2000,
                     Notification.Position.BOTTOM_START);
             notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
         }
@@ -638,6 +642,26 @@ public class UsuarioView extends Div {
             grid.setPageSize(userService.findAll().size());
         }
         grid.deselectAll();
+        estudiantes = estudianteService.findAll();
+        Collections.sort(estudiantes, new Comparator<>() {
+            @Override
+            public int compare(Estudiante o1, Estudiante o2) {
+                return new CompareToBuilder()
+                        .append(o1.getAnno_academico(), o2.getAnno_academico())
+                        .append(o1.getGrupo().getNumero(), o2.getGrupo().getNumero())
+                        .toComparison();
+            }
+        });
+        trabajadores = trabajadorService.findAll();
+        Collections.sort(trabajadores, new Comparator<>() {
+            @Override
+            public int compare(Trabajador o1, Trabajador o2) {
+                return new CompareToBuilder()
+                        .append(o1.getArea().getNombre(), o2.getArea().getNombre())
+                        //.compare(o1.getGrupo().getNumero(), o2.getGrupo().getNumero())
+                        .toComparison();
+            }
+        });
     }
     /* Formulario */
 }
