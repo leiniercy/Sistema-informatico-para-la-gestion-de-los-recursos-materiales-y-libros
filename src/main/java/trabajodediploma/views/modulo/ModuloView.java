@@ -806,7 +806,7 @@ public class ModuloView extends Div {
             }
         });
 
-        buttons.add(refreshButton, watchColumns(), deleteButton, addButton, barraMenu);
+        buttons.add(refreshButton, /*watchColumns(),*/ deleteButton, addButton, barraMenu);
         if (moduloService.count() == 1) {
             total = new Html("<span>Total: <b>" + moduloService.count() + "</b> módulo</span>");
         } else if (moduloService.count() == 0 || moduloService.count() > 1) {
