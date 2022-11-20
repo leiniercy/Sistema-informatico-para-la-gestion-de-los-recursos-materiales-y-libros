@@ -40,7 +40,14 @@ import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.LocalDateRenderer;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import java.security.cert.X509Certificate;
 import java.util.Comparator;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import trabajodediploma.data.entity.DestinoFinal;
 import trabajodediploma.data.entity.DestinoFinalEstudiante;
 import trabajodediploma.data.entity.Estudiante;
@@ -692,6 +699,7 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
             if (event.getDestinoFinal().getId() == null) {
                 try {
                     destinoService.save(event.getDestinoFinal());
+                    AceptAllSSLCertificate();
                     senderService.sendSimpleEmail(
                             /* enviado a: */event.getDestinoFinal().getEstudiante().getEmail(),
                             /* asunto: */ "Entrega de Módulo",
@@ -715,12 +723,31 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
                     notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
                 }
             } else {
-                destinoService.update(event.getDestinoFinal());
-                Notification notification = Notification.show(
-                        "Módulo modificado",
-                        2000,
-                        Notification.Position.BOTTOM_START);
-                notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+                try {
+                    destinoService.update(event.getDestinoFinal());
+                    AceptAllSSLCertificate();
+                    senderService.sendSimpleEmail(
+                            /* enviado a: */event.getDestinoFinal().getEstudiante().getEmail(),
+                            /* asunto: */ "Entrega de Módulo",
+                            /* mensaje: */ "Genius \n"
+                            + "Sistema Informático para la gestión de información de los recursos materiales y libros en la facultad 4. \n"
+                            + "Usted ha recibido el Módulo: "
+                            + event.getDestinoFinal().getModulo().getNombre()
+                            + " el día: "
+                            + formatter.format(event.getDestinoFinal().getFecha()).toString()
+                    );
+                    Notification notification = Notification.show(
+                            "Módulo modificado",
+                            2000,
+                            Notification.Position.BOTTOM_START);
+                    notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+                } catch (Exception e) {
+                    Notification notification = Notification.show(
+                            "Error al enviar correo electrónico a la dirección de correo seleccionada",
+                            2000,
+                            Notification.Position.MIDDLE);
+                    notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+                }
             }
             toolbar.remove(total);
             total = new Html("<span>Total: <b>" + tarjetas.size() + "</b></span>");
@@ -772,6 +799,7 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
             try {
                 for (int i = 0; i < event.getDestinoFinal().size(); i++) {
                     destinoService.save(event.getDestinoFinal().get(i));
+                    AceptAllSSLCertificate();
                     senderService.sendSimpleEmail(
                             /* enviado a: */event.getDestinoFinal().get(i).getEstudiante().getEmail(),
                             /* asunto: */ "Entrega de Módulo",
@@ -802,6 +830,48 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
             updateList();
             closeEditorPorGrupo();
         }
+    }
+
+    private static void AceptAllSSLCertificate() {
+        TrustManager[] trustAllCerts = new TrustManager[]{
+            new X509TrustManager() {
+                @Override
+                public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                    return new X509Certificate[0];
+                }
+
+                @Override
+                public void checkClientTrusted(
+                        java.security.cert.X509Certificate[] certs, String authType) {
+                }
+
+                @Override
+                public void checkServerTrusted(
+                        java.security.cert.X509Certificate[] certs, String authType) {
+                }
+            }
+        };
+
+// Install the all-trusting trust manager
+        try {
+
+            SSLContext sc = SSLContext.getInstance("SSL");
+            sc.init(null, trustAllCerts, new java.security.SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+
+            HostnameVerifier allHostsValid = new HostnameVerifier() {
+                public boolean verify(String hostname, SSLSession session) {
+                    return true;
+                }
+            };
+
+// Install the all-trusting host verifier
+            HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
     }
 
     private void editTarjetaIndividual(DestinoFinalEstudiante tarjeta) {
@@ -875,7 +945,7 @@ public class TarjetaDestinoFinal_EstudianteView extends Div {
         } else {
             gridDestinoFinal.setPageSize(tarjetas.size());
         }
-         gridDestinoFinal.deselectAll();
+        gridDestinoFinal.deselectAll();
     }
     /* Fin-Barra de tarjetas */
 }

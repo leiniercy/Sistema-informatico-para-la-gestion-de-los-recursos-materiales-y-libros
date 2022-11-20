@@ -29,10 +29,17 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.LocalDateRenderer;
+import java.security.cert.X509Certificate;
 import java.time.format.DateTimeFormatter;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import trabajodediploma.data.entity.Trabajador;
@@ -462,6 +469,7 @@ public class TarjetaPrestamoTrabajadorView extends Div {
 
                 try {
                     prestamoService.save(event.getTarjetaPrestamo());
+                    AceptAllSSLCertificate();
                     senderService.sendSimpleEmail(
                             /* enviado a: */trabajador.getEmail(),
                             /* asunto: */ "Entrega de libros",
@@ -472,6 +480,7 @@ public class TarjetaPrestamoTrabajadorView extends Div {
                             + " el día: "
                             + formatter.format(event.getTarjetaPrestamo().getFechaPrestamo()).toString());
                     if (event.getTarjetaPrestamo().getFechaDevolucion() != null) {
+                        AceptAllSSLCertificate();
                         senderService.sendSimpleEmail(
                                 /* enviado a: */trabajador.getEmail(),
                                 /* asunto: */ "Devolución de libros",
@@ -501,6 +510,7 @@ public class TarjetaPrestamoTrabajadorView extends Div {
                 try {
                     prestamoService.update(event.getTarjetaPrestamo());
                     if (event.getTarjetaPrestamo().getFechaDevolucion() != null) {
+                        AceptAllSSLCertificate();
                         senderService.sendSimpleEmail(
                                 /* enviado a: */trabajador.getEmail(),
                                 /* asunto: */ "Devolución de libros",
@@ -539,6 +549,49 @@ public class TarjetaPrestamoTrabajadorView extends Div {
 
     }
 
+    private static void AceptAllSSLCertificate() {
+        TrustManager[] trustAllCerts = new TrustManager[]{
+            new X509TrustManager() {
+                @Override
+                public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                    return new X509Certificate[0];
+                }
+
+                @Override
+                public void checkClientTrusted(
+                        java.security.cert.X509Certificate[] certs, String authType) {
+                }
+
+                @Override
+                public void checkServerTrusted(
+                        java.security.cert.X509Certificate[] certs, String authType) {
+                }
+            }
+        };
+
+// Install the all-trusting trust manager
+        try {
+
+            SSLContext sc = SSLContext.getInstance("SSL");
+            sc.init(null, trustAllCerts, new java.security.SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+
+            HostnameVerifier allHostsValid = new HostnameVerifier() {
+                public boolean verify(String hostname, SSLSession session) {
+                    return true;
+                }
+            };
+
+// Install the all-trusting host verifier
+            HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+    }
+
+    
     public void editLibro(TarjetaPrestamoTrabajador tarjeta) {
         if (tarjeta == null) {
             closeEditor();

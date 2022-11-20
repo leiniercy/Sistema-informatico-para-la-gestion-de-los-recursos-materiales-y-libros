@@ -21,33 +21,36 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+import org.springframework.beans.factory.annotation.Value;
 
 /**
  *
  * @author leinier
  */
 @Service
-public class EmailSenderService{
+public class EmailSenderService {
 
     @Autowired
     private JavaMailSender mailSender;
+    @Value("${spring.mail.username}")
+    private String sender;
 
     public EmailSenderService() {
-        
+
     }
-    
+
     public void sendSimpleEmail(String toEmail,
             String subject,
             String body
     ) {
 //        AceptAllSSLCertificate();
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("lcaraballo98@nauta.cu");
+        message.setFrom(sender);
         message.setTo(toEmail);
         message.setText(body);
         message.setSubject(subject);
         mailSender.send(message);
-        System.out.println("Email enviado con éxito...");
+//        System.out.println("Email enviado con éxito...");
 
     }
 
@@ -84,7 +87,7 @@ public class EmailSenderService{
                 }
             };
 
-        // Install the all-trusting host verifier
+            // Install the all-trusting host verifier
             HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
 
         } catch (Exception e) {
