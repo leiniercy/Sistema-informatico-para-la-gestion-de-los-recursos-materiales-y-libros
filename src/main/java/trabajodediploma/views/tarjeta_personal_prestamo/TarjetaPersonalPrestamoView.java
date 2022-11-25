@@ -33,6 +33,9 @@ import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.LocalDateRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import java.util.Collections;
+import java.util.Comparator;
+import org.apache.commons.lang3.builder.CompareToBuilder;
 
 import trabajodediploma.data.entity.Estudiante;
 import trabajodediploma.data.entity.Libro;
@@ -71,6 +74,7 @@ public class TarjetaPersonalPrestamoView extends Div {
     private EstudianteService estudiantService;
     private TrabajadorService trabajadorService;
     private LibroService libroService;
+    private int cantPrestamos = 0;
     private MyFooter footer;
     private ComboBox<Libro> libroFilter;
     private DatePicker entregaFilter;
@@ -146,11 +150,10 @@ public class TarjetaPersonalPrestamoView extends Div {
     private Div informacionTabla() {
         info = new Div();
         info.addClassName("container__div_info");
-
-        if (prestamos.size() == 1) {
-            total = new Html("<span>Total: <b>" + prestamos.size() + "</b> libro</span>");
-        } else if (prestamos.size() == 0 || prestamos.size() > 1) {
-            total = new Html("<span>Total: <b>" + prestamos.size() + "</b> libros</span>");
+        if (cantPrestamos == 1) {
+            total = new Html("<span>Total: <b>" + cantPrestamos + "</b> libro</span>");
+        } else if (cantPrestamos == 0 || cantPrestamos > 1) {
+            total = new Html("<span>Total: <b>" + cantPrestamos + "</b> libros</span>");
         }
         info.add(total);
         return info;
@@ -234,13 +237,13 @@ public class TarjetaPersonalPrestamoView extends Div {
         headerRow.getCell(fechaEntregaColumn).setComponent(entregaFilter);
         headerRow.getCell(fechaDevolucionColumn).setComponent(devolucionFilter);
 
-        gridListDataView = grid.setItems(prestamos);
-        grid.setItems(prestamos);
-        if (prestamos.size() < 50) {
-            grid.setPageSize(50);
-        } else {
-            grid.setPageSize(prestamos.size());
-        }
+//        gridListDataView = grid.setItems(prestamos);
+//        grid.setItems(prestamos);
+//        if (prestamos.size() < 50) {
+//            grid.setPageSize(50);
+//        } else {
+//            grid.setPageSize(prestamos.size());
+//        }
         grid.setSizeFull();
         grid.setWidthFull();
         grid.setHeightFull();
@@ -333,8 +336,21 @@ public class TarjetaPersonalPrestamoView extends Div {
                 }
             }
         });
-        grid.setItems(prestamos);
-        grid.setPageSize(prestamos.size());
+        cantPrestamos = prestamos.size();
+        Collections.sort(prestamos, new Comparator<>() {
+            @Override
+            public int compare(TarjetaPrestamo o1, TarjetaPrestamo o2) {
+                return new CompareToBuilder()
+                        .append(o1.getFechaPrestamo(), o2.getFechaPrestamo())
+                        .toComparison();
+            }
+        });
+        gridListDataView = grid.setItems(prestamos);
+        if (cantPrestamos < 50) {
+            grid.setPageSize(50);
+        } else {
+            grid.setPageSize(cantPrestamos);
+        }
     }
 
     /* Fin -> Trabajador */
@@ -349,11 +365,20 @@ public class TarjetaPersonalPrestamoView extends Div {
                 }
             }
         });
-        grid.setItems(prestamos);
-        if (prestamos.size() < 50) {
+        cantPrestamos = prestamos.size();
+        Collections.sort(prestamos, new Comparator<>() {
+            @Override
+            public int compare(TarjetaPrestamo o1, TarjetaPrestamo o2) {
+                return new CompareToBuilder()
+                        .append(o1.getFechaPrestamo(), o2.getFechaPrestamo())
+                        .toComparison();
+            }
+        });
+        gridListDataView = grid.setItems(prestamos);
+        if (cantPrestamos < 50) {
             grid.setPageSize(50);
         } else {
-            grid.setPageSize(prestamos.size());
+            grid.setPageSize(cantPrestamos);
         }
     }
     /* Fin -> Estudiante */
