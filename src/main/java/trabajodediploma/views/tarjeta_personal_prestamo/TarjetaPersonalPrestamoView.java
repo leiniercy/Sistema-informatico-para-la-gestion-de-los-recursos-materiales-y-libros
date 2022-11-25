@@ -237,13 +237,6 @@ public class TarjetaPersonalPrestamoView extends Div {
         headerRow.getCell(fechaEntregaColumn).setComponent(entregaFilter);
         headerRow.getCell(fechaDevolucionColumn).setComponent(devolucionFilter);
 
-//        gridListDataView = grid.setItems(prestamos);
-//        grid.setItems(prestamos);
-//        if (prestamos.size() < 50) {
-//            grid.setPageSize(50);
-//        } else {
-//            grid.setPageSize(prestamos.size());
-//        }
         grid.setSizeFull();
         grid.setWidthFull();
         grid.setHeightFull();

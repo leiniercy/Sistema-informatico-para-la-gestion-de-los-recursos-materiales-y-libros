@@ -32,6 +32,8 @@ import com.vaadin.flow.data.renderer.LocalDateRenderer;
 import java.security.cert.X509Certificate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -43,6 +45,7 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import trabajodediploma.data.entity.Estudiante;
 import trabajodediploma.data.entity.Libro;
@@ -86,6 +89,7 @@ public class TarjetaPrestamoEstudianteView extends Div {
     private Div header;
     private Dialog dialog;
     private TarjetaPrestamoEstudiante tarjetaEstudiante;
+    private int cantPrestamos = 0;
 
     public TarjetaPrestamoEstudianteView(
             Estudiante estudiante,
@@ -138,11 +142,10 @@ public class TarjetaPrestamoEstudianteView extends Div {
     private HorizontalLayout informacionTabla() {
         info = new HorizontalLayout();
         info.addClassName("table_info");
-
-        if (prestamos.size() == 1) {
-            total = new Html("<span>Total: <b>" + prestamos.size() + "</b> libro</span>");
-        } else if (prestamos.size() == 0 || prestamos.size() > 1) {
-            total = new Html("<span>Total: <b>" + prestamos.size() + "</b> libros</span>");
+        if (cantPrestamos == 1) {
+            total = new Html("<span>Total: <b>" + cantPrestamos + "</b> libro</span>");
+        } else if (cantPrestamos == 0 || cantPrestamos > 1) {
+            total = new Html("<span>Total: <b>" + cantPrestamos + "</b> libros</span>");
         }
         info.add(total);
         return info;
@@ -236,12 +239,6 @@ public class TarjetaPrestamoEstudianteView extends Div {
         headerRow.getCell(fechaEntregaColumn).setComponent(entregaFilter);
         headerRow.getCell(fechaDevolucionColumn).setComponent(devolucionFilter);
 
-        gridListDataView = grid.setItems(prestamos);
-        if (prestamos.size() < 50) {
-            grid.setPageSize(50);
-        } else {
-            grid.setPageSize(prestamos.size());
-        }
         grid.setAllRowsVisible(true);
         grid.setSizeFull();
         grid.setWidthFull();
@@ -377,10 +374,10 @@ public class TarjetaPrestamoEstudianteView extends Div {
                 deleteItems(grid.getSelectedItems().size(), grid.getSelectedItems());
                 updateList();
                 info.remove(total);
-                if (prestamos.size() == 1) {
-                    total = new Html("<span>Total: <b>" + prestamos.size() + "</b> libro</span>");
-                } else if (prestamos.size() == 0 || prestamos.size() > 1) {
-                    total = new Html("<span>Total: <b>" + prestamos.size() + "</b> libros</span>");
+                if (cantPrestamos == 1) {
+                    total = new Html("<span>Total: <b>" + cantPrestamos + "</b> libro</span>");
+                } else if (cantPrestamos == 0 || cantPrestamos > 1) {
+                    total = new Html("<span>Total: <b>" + cantPrestamos + "</b> libros</span>");
                 }
                 info.add(total);
             }
@@ -533,10 +530,10 @@ public class TarjetaPrestamoEstudianteView extends Div {
             }
             updateList();
             info.remove(total);
-            if (prestamos.size() == 1) {
-                total = new Html("<span>Total: <b>" + prestamos.size() + "</b> libro</span>");
-            } else if (prestamos.size() == 0 || prestamos.size() > 1) {
-                total = new Html("<span>Total: <b>" + prestamos.size() + "</b> libros</span>");
+            if (cantPrestamos == 1) {
+                total = new Html("<span>Total: <b>" + cantPrestamos + "</b> libro</span>");
+            } else if (cantPrestamos == 0 || cantPrestamos > 1) {
+                total = new Html("<span>Total: <b>" + cantPrestamos + "</b> libros</span>");
             }
             info.add(total);
             closeEditor();
@@ -619,11 +616,20 @@ public class TarjetaPrestamoEstudianteView extends Div {
                 }
             }
         });
-        grid.setItems(prestamos);
-        if (prestamos.size() < 50) {
+        cantPrestamos = prestamos.size();
+        Collections.sort(prestamos, new Comparator<>() {
+            @Override
+            public int compare(TarjetaPrestamo o1, TarjetaPrestamo o2) {
+                return new CompareToBuilder()
+                        .append(o1.getFechaPrestamo(), o2.getFechaPrestamo())
+                        .toComparison();
+            }
+        });
+        gridListDataView = grid.setItems(prestamos);
+        if (cantPrestamos < 50) {
             grid.setPageSize(50);
         } else {
-            grid.setPageSize(prestamos.size());
+            grid.setPageSize(cantPrestamos);
         }
         grid.deselectAll();
     }
