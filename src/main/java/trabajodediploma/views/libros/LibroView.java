@@ -27,6 +27,8 @@ import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 
 import java.util.List;
@@ -35,6 +37,7 @@ import java.util.stream.Collectors;
 import javax.annotation.security.RolesAllowed;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import trabajodediploma.data.entity.Asignatura;
@@ -86,19 +89,21 @@ public class LibroView extends Div {
     private ComboBox<Asignatura> filterAsignatura;
     private Div header;
     private TextField filterCodigo;
+    private List<Libro> libros;
+    private int cantLibros = 0;
 
     public LibroView(
             @Autowired LibroService libroService,
             @Autowired AsignaturaService asignaturaService) {
         this.libroService = libroService;
         this.asignaturaService = asignaturaService;
+        updateList();
         addClassNames("libros_view");
         setSizeFull();
         configureGrid();
         configureForm();
         myFooter = new MyFooter();
         add(menuBar(), getContent(), myFooter);
-        updateList();
         closeEditor();
     }
 
@@ -179,12 +184,6 @@ public class LibroView extends Div {
         headerRow.getCell(annoAcademicoColumn).setComponent(filterAnnoAcademico);
         headerRow.getCell(asignaturaColumn).setComponent(filterAsignatura);
 
-        gridListDataView = grid.setItems(libroService.findAll());
-        if (libroService.findAll().size() < 50) {
-            grid.setPageSize(50);
-        } else {
-            grid.setPageSize(libroService.findAll().size());
-        }
         grid.setSizeFull();
         grid.setWidthFull();
         grid.setHeightFull();
@@ -334,7 +333,7 @@ public class LibroView extends Div {
         addButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         buttons.add(refreshButton, watchColumns(), deleteButton, addButton);
 
-        total = new Html("<span>Total: <b>" + libroService.count() + "</b> libros</span>");
+        total = new Html("<span>Total: <b>" + cantLibros + "</b> libros</span>");
 
         toolbar = new HorizontalLayout(buttons, total);
         toolbar.addClassName("toolbar");
@@ -360,7 +359,7 @@ public class LibroView extends Div {
                 deleteItems(grid.getSelectedItems().size(), grid.getSelectedItems());
                 updateList();
                 toolbar.remove(total);
-                total = new Html("<span>Total: <b>" + libroService.count() + "</b> libros</span>");
+                total = new Html("<span>Total: <b>" + cantLibros + "</b> libros</span>");
                 toolbar.addComponentAtIndex(1, total);
                 toolbar.setFlexGrow(1, buttons);
             }
@@ -497,7 +496,7 @@ public class LibroView extends Div {
                 notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
             }
             toolbar.remove(total);
-            total = new Html("<span>Total: <b>" + libroService.count() + "</b> libros</span>");
+            total = new Html("<span>Total: <b>" + cantLibros + "</b> libros</span>");
             toolbar.addComponentAtIndex(1, total);
             toolbar.setFlexGrow(1, buttons);
             updateList();
@@ -537,11 +536,23 @@ public class LibroView extends Div {
 
     /* Actualizar lista de  Libro */
     private void updateList() {
-        grid.setItems(libroService.findAll());
-        if (libroService.findAll().size() < 50) {
+        libros = libroService.findAll();
+        cantLibros = libros.size();
+        Collections.sort(libros, new Comparator<>() {
+            @Override
+            public int compare(Libro o1, Libro o2) {
+                return new CompareToBuilder()
+                        .append(o1.getTitulo(), o2.getTitulo())
+                        .append(o1.getAnno_academico(), o2.getAnno_academico())
+                        .append(o1.getAsignatura(), o2.getAsignatura())
+                        .toComparison();
+            }
+        });
+        gridListDataView = grid.setItems(libros);
+        if (cantLibros< 50) {
             grid.setPageSize(50);
         } else {
-            grid.setPageSize(libroService.findAll().size());
+            grid.setPageSize(cantLibros);
         }
         grid.deselectAll();
     }
