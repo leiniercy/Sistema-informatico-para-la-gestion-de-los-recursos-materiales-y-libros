@@ -103,6 +103,8 @@ public class UsuarioView extends Div {
     private HorizontalLayout div_filtros;
     private List<Estudiante> estudiantes;
     private List<Trabajador> trabajadores;
+    private List<User> usuarios;
+    private int cantUsuarios = 0;
 
     public UsuarioView(
             @Autowired UserService userService,
@@ -117,27 +119,7 @@ public class UsuarioView extends Div {
         this.trabajadorService = trabajadorService;
         this.grupoService = grupoService;
         this.areaService = areaService;
-        estudiantes = estudianteService.findAll();
-        Collections.sort(estudiantes, new Comparator<>() {
-            @Override
-            public int compare(Estudiante o1, Estudiante o2) {
-                return new CompareToBuilder()
-                        .append(o1.getAnno_academico(), o2.getAnno_academico())
-                        .append(o1.getGrupo().getNumero(), o2.getGrupo().getNumero())
-                        .toComparison();
-            }
-        });
-        trabajadores = trabajadorService.findAll();
-        Collections.sort(trabajadores, new Comparator<>() {
-            @Override
-            public int compare(Trabajador o1, Trabajador o2) {
-                return new CompareToBuilder()
-                        .append(o1.getArea().getNombre(), o2.getArea().getNombre())
-                        //.compare(o1.getGrupo().getNumero(), o2.getGrupo().getNumero())
-                        .toComparison();
-            }
-        });
-
+        updateList();
         configureGrid();
         configureForm();
         myFooter = new MyFooter();
@@ -217,12 +199,12 @@ public class UsuarioView extends Div {
         headerRow.getCell(profilePictureUrlColumn).setComponent(filterName);
         headerRow.getCell(rolColumn).setComponent(filterRol);
 
-        gridListDataView = grid.setItems(userService.findAll());
-        if (userService.findAll().size() < 50) {
-            grid.setPageSize(50);
-        } else {
-            grid.setPageSize(userService.findAll().size());
-        }
+//        gridListDataView = grid.setItems(userService.findAll());
+//        if (userService.findAll().size() < 50) {
+//            grid.setPageSize(50);
+//        } else {
+//            grid.setPageSize(userService.findAll().size());
+//        }
         grid.setAllRowsVisible(true);
         grid.setSizeFull();
         grid.setWidthFull();
@@ -269,7 +251,7 @@ public class UsuarioView extends Div {
         filterRol.setWidth("100%");
         filterRol.addValueChangeListener(event -> {
             if (filterRol.getValue() == null) {
-                gridListDataView = grid.setItems(userService.findAll());
+                gridListDataView = grid.setItems(usuarios);
             } else {
                 gridListDataView.addFilter(user -> areRolEqual(user.getRoles(), filterRol));
             }
@@ -282,7 +264,7 @@ public class UsuarioView extends Div {
         grupoFilter.setWidth("100%");
         grupoFilter.addValueChangeListener(event -> {
             if (grupoFilter.getValue() == null) {
-                gridListDataView = grid.setItems(userService.findAll());
+                gridListDataView = grid.setItems(usuarios);
             } else {
                 //buscar estudiantes por grupo
                 List<User> listUser = new LinkedList<>();
@@ -307,7 +289,7 @@ public class UsuarioView extends Div {
         areaFilter.setWidth("100%");
         areaFilter.addValueChangeListener(event -> {
             if (areaFilter.getValue() == null) {
-                gridListDataView = grid.setItems(userService.findAll());
+                gridListDataView = grid.setItems(usuarios);
             } else {
                 //buscar trabajadores
                 List<User> listUser = new LinkedList<>();
@@ -335,7 +317,7 @@ public class UsuarioView extends Div {
         annoAcademicoFilter.setValueChangeMode(ValueChangeMode.LAZY);
         annoAcademicoFilter.addValueChangeListener(event -> {
             if (annoAcademicoFilter.getValue() == null) {
-                gridListDataView = grid.setItems(userService.findAll());
+                gridListDataView = grid.setItems(usuarios);
             } else {
                 //buscar estudiantes por año academico
                 List<User> listUser = new LinkedList<>();
@@ -479,7 +461,7 @@ public class UsuarioView extends Div {
         /*FIN -> Menu Filtros*/
         buttons.add(refreshButton, deleteButton, barraMenu);
 
-        total = new Html("<span>Total: <b>" + userService.count() + "</b> usuarios</span>");
+        total = new Html("<span>Total: <b>" + cantUsuarios + "</b> usuarios</span>");
 
         toolbar = new HorizontalLayout(buttons, total);
         toolbar.addClassName("toolbar");
@@ -552,7 +534,7 @@ public class UsuarioView extends Div {
                 deleteItems(grid.getSelectedItems().size(), grid.getSelectedItems());
                 updateList();
                 toolbar.remove(total);
-                total = new Html("<span>Total: <b>" + userService.count() + "</b> usuarios</span>");
+                total = new Html("<span>Total: <b>" + cantUsuarios + "</b> usuarios</span>");
                 toolbar.addComponentAtIndex(1, total);
                 toolbar.setFlexGrow(1, buttons);
             }
@@ -635,13 +617,30 @@ public class UsuarioView extends Div {
     }
 
     private void updateList() {
-        grid.setItems(userService.findAll());
-        if (userService.findAll().size() < 50) {
+        sortList();
+        cantUsuarios = usuarios.size();
+        gridListDataView = grid.setItems(usuarios);
+        if (cantUsuarios < 50) {
             grid.setPageSize(50);
         } else {
-            grid.setPageSize(userService.findAll().size());
+            grid.setPageSize(cantUsuarios);
         }
         grid.deselectAll();
+    }
+
+    private void sortList() {
+//        lista de usuarios
+        usuarios = userService.findAll();
+        Collections.sort(usuarios, new Comparator<>() {
+            @Override
+            public int compare(User o1, User o2) {
+                return new CompareToBuilder()
+                        .append(o1.getName(), o2.getName())
+                        .append(o1.getUsername(), o2.getUsername())
+                        .toComparison();
+            }
+        });
+//        lista de estudiantes
         estudiantes = estudianteService.findAll();
         Collections.sort(estudiantes, new Comparator<>() {
             @Override
@@ -652,6 +651,7 @@ public class UsuarioView extends Div {
                         .toComparison();
             }
         });
+//        lista de trabajadores
         trabajadores = trabajadorService.findAll();
         Collections.sort(trabajadores, new Comparator<>() {
             @Override
