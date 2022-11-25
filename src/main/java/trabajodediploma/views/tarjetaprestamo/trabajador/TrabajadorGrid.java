@@ -39,6 +39,7 @@ import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import java.security.cert.X509Certificate;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
@@ -50,6 +51,7 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import trabajodediploma.data.entity.Trabajador;
 import trabajodediploma.data.entity.Area;
@@ -77,7 +79,8 @@ public class TrabajadorGrid extends Div {
     private AreaService areaService;
     private LibroService libroService;
     private List<TarjetaPrestamo> prestamos;
-
+    private List<Trabajador>trabajadores;
+    private int cantTrabajadores=0;
     GridListDataView<Trabajador> gridListDataView;
     Grid.Column<Trabajador> nombreColumn;
     Grid.Column<Trabajador> tarjetaColumn;
@@ -104,6 +107,16 @@ public class TrabajadorGrid extends Div {
         this.areaService = areaService;
         this.senderService = senderService;
         prestamos = new LinkedList<>();
+        trabajadores=trabajadorService.findAll();
+        cantTrabajadores = trabajadores.size();
+         Collections.sort(trabajadores, new Comparator<>() {
+            @Override
+            public int compare(Trabajador o1, Trabajador o2) {
+                return new CompareToBuilder()
+                        .append(o1.getArea().getNombre(), o2.getArea().getNombre())
+                        .toComparison();
+            }
+        });
         configureGrid();
         menuBar();
         content = new Div();
@@ -161,12 +174,12 @@ public class TrabajadorGrid extends Div {
 
         Filtros();
 
-        gridListDataView = gridTrabajadores.setItems(trabajadorService.findAll());
+        gridListDataView = gridTrabajadores.setItems(trabajadores);
        
-        if (prestamos.size() < 50) {
+        if (cantTrabajadores < 50) {
           gridTrabajadores.setPageSize(50);
         } else {
-          gridTrabajadores.setPageSize(trabajadorService.findAll().size());
+          gridTrabajadores.setPageSize(cantTrabajadores);
         }
         
         gridTrabajadores.setAllRowsVisible(true);
@@ -313,7 +326,7 @@ public class TrabajadorGrid extends Div {
         div_filtros = new HorizontalLayout();
 
         trabajadorFilter = new ComboBox<>();
-        trabajadorFilter.setItems(trabajadorService.findAll());
+        trabajadorFilter.setItems(trabajadores);
         trabajadorFilter.setItemLabelGenerator(trabajador -> trabajador.getUser().getName());
         trabajadorFilter.setPlaceholder("Trabajador");
         trabajadorFilter.setClearButtonVisible(true);
@@ -337,7 +350,7 @@ public class TrabajadorGrid extends Div {
         );
         trabajadorFilter.addValueChangeListener(event -> {
             if (trabajadorFilter.getValue() == null) {
-                gridListDataView = gridTrabajadores.setItems(trabajadorService.findAll());
+                gridListDataView = gridTrabajadores.setItems(trabajadores);
             } else {
                 gridListDataView.addFilter(trabajador -> areTrabajadorEqual(trabajador, trabajadorFilter));
             }
@@ -350,7 +363,7 @@ public class TrabajadorGrid extends Div {
         areaFilter.setWidth("100%");
         areaFilter.addValueChangeListener(event -> {
             if (areaFilter.getValue() == null) {
-                gridListDataView = gridTrabajadores.setItems(trabajadorService.findAll());
+                gridListDataView = gridTrabajadores.setItems(trabajadores);
             } else {
                 gridListDataView.addFilter(trabajador -> areAreaEqual(trabajador, areaFilter));
             }

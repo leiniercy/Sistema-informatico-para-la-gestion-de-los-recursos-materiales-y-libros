@@ -39,6 +39,7 @@ import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import java.security.cert.X509Certificate;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
@@ -50,6 +51,7 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import trabajodediploma.data.entity.Estudiante;
 import trabajodediploma.data.entity.Grupo;
@@ -77,6 +79,8 @@ public class EstudianteGrid extends Div {
     private GrupoService grupoService;
     private LibroService libroService;
     private List<TarjetaPrestamo> prestamos;
+    private List<Estudiante> estudiantes;
+     private int cantEstudiantes=0;
 
     GridListDataView<Estudiante> gridListDataView;
     Grid.Column<Estudiante> nombreColumn;
@@ -90,7 +94,7 @@ public class EstudianteGrid extends Div {
     private HorizontalLayout div_filtros;
     private Dialog dialog;
     private Div header;
-
+   
     public EstudianteGrid(
             TarjetaPrestamoService prestamoService,
             EstudianteService estudianteService,
@@ -104,6 +108,17 @@ public class EstudianteGrid extends Div {
         this.grupoService = grupoService;
         this.senderService = senderService;
         prestamos = new LinkedList<>();
+        estudiantes = estudianteService.findAll();
+        cantEstudiantes = estudiantes.size();
+        Collections.sort(estudiantes, new Comparator<>() {
+            @Override
+            public int compare(Estudiante o1, Estudiante o2) {
+                return new CompareToBuilder()
+                        .append(o1.getAnno_academico(), o2.getAnno_academico())
+                        .append(o1.getGrupo().getNumero(), o2.getGrupo().getNumero())
+                        .toComparison();
+            }
+        });
         configureGrid();
         menuBar();
         content = new Div();
@@ -161,12 +176,12 @@ public class EstudianteGrid extends Div {
 
         Filtros();
 
-        gridListDataView = gridEstudiantes.setItems(estudianteService.findAll());
+        gridListDataView = gridEstudiantes.setItems(estudiantes);
       
-        if (estudianteService.findAll().size() < 50) {
+        if (cantEstudiantes < 50) {
            gridEstudiantes.setPageSize(50);
         } else {
-           gridEstudiantes.setPageSize(estudianteService.findAll().size());
+           gridEstudiantes.setPageSize(cantEstudiantes);
         }
       
         gridEstudiantes.setAllRowsVisible(true);
@@ -313,7 +328,7 @@ public class EstudianteGrid extends Div {
         div_filtros = new HorizontalLayout();
 
         estudianteFilter = new ComboBox<>();
-        estudianteFilter.setItems(estudianteService.findAll());
+        estudianteFilter.setItems(estudiantes);
         estudianteFilter.setItemLabelGenerator(estudiante -> estudiante.getUser().getName());
         estudianteFilter.setPlaceholder("Estudiante");
         estudianteFilter.setClearButtonVisible(true);
@@ -337,7 +352,7 @@ public class EstudianteGrid extends Div {
         );
         estudianteFilter.addValueChangeListener(event -> {
             if (estudianteFilter.getValue() == null) {
-                gridListDataView = gridEstudiantes.setItems(estudianteService.findAll());
+                gridListDataView = gridEstudiantes.setItems(estudiantes);
             } else {
                 gridListDataView.addFilter(estudiante -> areEstudianteEqual(estudiante, estudianteFilter));
             }
@@ -350,7 +365,7 @@ public class EstudianteGrid extends Div {
         grupoFilter.setWidth("100%");
         grupoFilter.addValueChangeListener(event -> {
             if (grupoFilter.getValue() == null) {
-                gridListDataView = gridEstudiantes.setItems(estudianteService.findAll());
+                gridListDataView = gridEstudiantes.setItems(estudiantes);
             } else {
                 gridListDataView.addFilter(estudiante -> areGrupoEqual(estudiante, grupoFilter));
             }
