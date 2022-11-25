@@ -995,6 +995,7 @@ public class ModuloView extends Div {
                         Notification.Position.BOTTOM_START);
                 notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
             }
+            updateList();
             toolbar.remove(total);
             if (cantModulos == 1) {
                 total = new Html("<span>Total: <b>" + cantModulos + "</b> módulo</span>");
@@ -1003,7 +1004,6 @@ public class ModuloView extends Div {
             }
             toolbar.addComponentAtIndex(1, total);
             toolbar.setFlexGrow(1, buttons);
-            updateList();
             closeEditor();
         }
 

@@ -79,8 +79,8 @@ public class TrabajadorGrid extends Div {
     private AreaService areaService;
     private LibroService libroService;
     private List<TarjetaPrestamo> prestamos;
-    private List<Trabajador>trabajadores;
-    private int cantTrabajadores=0;
+    private List<Trabajador> trabajadores;
+    private int cantTrabajadores = 0;
     GridListDataView<Trabajador> gridListDataView;
     Grid.Column<Trabajador> nombreColumn;
     Grid.Column<Trabajador> tarjetaColumn;
@@ -107,13 +107,15 @@ public class TrabajadorGrid extends Div {
         this.areaService = areaService;
         this.senderService = senderService;
         prestamos = new LinkedList<>();
-        trabajadores=trabajadorService.findAll();
+        trabajadores = trabajadorService.findAll();
         cantTrabajadores = trabajadores.size();
-         Collections.sort(trabajadores, new Comparator<>() {
+        Collections.sort(trabajadores, new Comparator<>() {
             @Override
             public int compare(Trabajador o1, Trabajador o2) {
                 return new CompareToBuilder()
                         .append(o1.getArea().getNombre(), o2.getArea().getNombre())
+                        .append(o1.getUser().getName(), o2.getUser().getName())
+                        .append(o1.getCargo(), o2.getCargo())
                         .toComparison();
             }
         });
@@ -147,7 +149,7 @@ public class TrabajadorGrid extends Div {
     private void configureGrid() {
         gridTrabajadores.setClassName("container___trabajador_grid__div__table");
         gridTrabajadores.getStyle().set("max-height", "550px");
-        
+
         nombreColumn = gridTrabajadores.addColumn(new ComponentRenderer<>(est -> {
             HorizontalLayout hl = new HorizontalLayout();
             hl.getStyle().set("align-items", "center");
@@ -175,13 +177,13 @@ public class TrabajadorGrid extends Div {
         Filtros();
 
         gridListDataView = gridTrabajadores.setItems(trabajadores);
-       
+
         if (cantTrabajadores < 50) {
-          gridTrabajadores.setPageSize(50);
+            gridTrabajadores.setPageSize(50);
         } else {
-          gridTrabajadores.setPageSize(cantTrabajadores);
+            gridTrabajadores.setPageSize(cantTrabajadores);
         }
-        
+
         gridTrabajadores.setAllRowsVisible(true);
         gridTrabajadores.setSelectionMode(Grid.SelectionMode.MULTI);
         gridTrabajadores.setSizeFull();

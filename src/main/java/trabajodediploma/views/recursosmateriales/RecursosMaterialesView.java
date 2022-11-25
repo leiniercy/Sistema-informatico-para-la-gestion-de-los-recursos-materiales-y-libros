@@ -173,7 +173,7 @@ public class RecursosMaterialesView extends Div {
         headerRow.getCell(tipoColumn).setComponent(filterTipo);
 
         gridListDataView = grid.setItems(materialService.findAll());
-        if (materialService.findAll().size()< 50) {
+        if (materialService.findAll().size() < 50) {
             grid.setPageSize(50);
         } else {
             grid.setPageSize(materialService.findAll().size());
@@ -378,6 +378,7 @@ public class RecursosMaterialesView extends Div {
                         Notification.Position.BOTTOM_START);
                 notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
             }
+            updateList();
             toolbar.remove(total);
             if (materialService.count() == 1) {
                 total = new Html("<span>Total: <b>" + materialService.count() + "</b> material</span>");
@@ -388,7 +389,6 @@ public class RecursosMaterialesView extends Div {
             }
             toolbar.addComponentAtIndex(1, total);
             toolbar.setFlexGrow(1, buttons);
-            updateList();
             closeEditor();
         }
 
@@ -420,7 +420,7 @@ public class RecursosMaterialesView extends Div {
 
     private void updateList() {
         grid.setItems(materialService.findAll());
-         if (materialService.findAll().size()< 50) {
+        if (materialService.findAll().size() < 50) {
             grid.setPageSize(50);
         } else {
             grid.setPageSize(materialService.findAll().size());

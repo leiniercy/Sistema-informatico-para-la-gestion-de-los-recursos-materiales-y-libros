@@ -41,6 +41,7 @@ import com.vaadin.flow.data.renderer.LocalDateRenderer;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import java.security.cert.X509Certificate;
+import java.util.Collections;
 import java.util.Comparator;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -48,6 +49,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+import org.apache.commons.lang3.builder.CompareToBuilder;
 import trabajodediploma.data.entity.DestinoFinal;
 import trabajodediploma.data.entity.DestinoFinalTrabajador;
 import trabajodediploma.data.entity.Trabajador;
@@ -74,6 +76,7 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
     Grid.Column<Trabajador> columnaTrabajador;
 
     private List<DestinoFinal> tarjetas;
+    private List<Trabajador> trabajadores;
     private ModuloService moduloService;
     private TrabajadorService trabajadorService;
     private AreaService areaService;
@@ -94,9 +97,10 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
     private Div headerDialogTrabajador;
     private VerticalLayout filtrosContainer;
     private HorizontalLayout buttonsDialogEst;
-
     private ComboBox<Trabajador> filtrarTrabajador;
     private ComboBox<Area> filtrarArea;
+    private int cantTrabajadores = 0;
+    private int cantTarjetas;
 
     public TarjetaDestinoFinal_TrabajadorView(
             ModuloService moduloService,
@@ -227,12 +231,6 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
         headerRow.getCell(moduloColumn).setComponent(moduloFilter);
         headerRow.getCell(fechaEntregaColumn).setComponent(entregaFilter);
 
-        gridListDataViewDestinoFinal = gridDestinoFinal.setItems(tarjetas);
-        if (tarjetas.size() < 50) {
-            gridDestinoFinal.setPageSize(50);
-        } else {
-            gridDestinoFinal.setPageSize(tarjetas.size());
-        }
         gridDestinoFinal.setAllRowsVisible(true);
         gridDestinoFinal.setSizeFull();
         gridDestinoFinal.setWidthFull();
@@ -267,11 +265,23 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
 
         FiltrosGridTrabajador();
 
-        gridTrabajadores.setItems(trabajadorService.findAll());
-        if (trabajadorService.findAll().size() < 50) {
+        trabajadores = trabajadorService.findAll();
+        cantTrabajadores = trabajadores.size();
+        Collections.sort(trabajadores, new Comparator<>() {
+            @Override
+            public int compare(Trabajador o1, Trabajador o2) {
+                return new CompareToBuilder()
+                        .append(o1.getArea().getNombre(), o2.getArea().getNombre())
+                        .append(o1.getUser().getName(), o2.getUser().getName())
+                        .append(o1.getCargo(), o2.getCargo())
+                        .toComparison();
+            }
+        });
+        gridTrabajadores.setItems(trabajadores);
+        if (cantTrabajadores < 50) {
             gridTrabajadores.setPageSize(50);
         } else {
-            gridTrabajadores.setPageSize(trabajadorService.findAll().size());
+            gridTrabajadores.setPageSize(cantTrabajadores);
         }
         gridTrabajadores.setSelectionMode(Grid.SelectionMode.MULTI);
         gridTrabajadores.getStyle().set("width", "500px").set("max-width", "100%");
@@ -535,7 +545,7 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
         SubMenu addButtonSubMenu = addButton.getSubMenu();
         MenuItem individual = createSubMenuIconItem(addButtonSubMenu, VaadinIcon.USER, "Individual", null, true);
         individual.addClickListener(event -> addTarjetaIndividual());
-        MenuItem porArea = createSubMenuIconItem(addButtonSubMenu, VaadinIcon.USERS, "Por Area", null, true);
+        MenuItem porArea = createSubMenuIconItem(addButtonSubMenu, VaadinIcon.USERS, "Por Área", null, true);
         porArea.addClickListener(event -> {
             dialogPorArea.removeAll();
             dialogPorArea.add(headerDialogTrabajador, filtrosContainer, gridTrabajadores, buttonsDialogEst);
@@ -543,7 +553,7 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
         });
         buttons.add(refreshButton, deleteButton/*, addButton*/, barraMenu);
 
-        total = new Html("<span>Total: <b>" + tarjetas.size() + "</b></span>");
+        total = new Html("<span>Total: <b>" + cantTarjetas + "</b></span>");
 
         toolbar = new HorizontalLayout(buttons, total);
         toolbar.addClassName("toolbar");
@@ -615,7 +625,7 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
                 deleteItems(gridDestinoFinal.getSelectedItems().size(), gridDestinoFinal.getSelectedItems());
                 updateList();
                 toolbar.remove(total);
-                total = new Html("<span>Total: <b>" + tarjetas.size() + "</b></span>");
+                total = new Html("<span>Total: <b>" + cantTarjetas + "</b></span>");
                 toolbar.addComponentAtIndex(1, total);
                 toolbar.setFlexGrow(1, buttons);
             }
@@ -750,11 +760,11 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
                     notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
                 }
             }
+            updateList();
             toolbar.remove(total);
-            total = new Html("<span>Total: <b>" + tarjetas.size() + "</b></span>");
+            total = new Html("<span>Total: <b>" + cantTarjetas + "</b></span>");
             toolbar.addComponentAtIndex(1, total);
             toolbar.setFlexGrow(1, buttons);
-            updateList();
             closeEditorIndividual();
         }
 
@@ -824,11 +834,11 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
                         Notification.Position.MIDDLE);
                 notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
             }
+            updateList();
             toolbar.remove(total);
-            total = new Html("<span>Total: <b>" + tarjetas.size() + "</b></span>");
+            total = new Html("<span>Total: <b>" + cantTarjetas + "</b></span>");
             toolbar.addComponentAtIndex(1, total);
             toolbar.setFlexGrow(1, buttons);
-            updateList();
             closeEditorPorArea();
         }
     }
@@ -940,11 +950,21 @@ public class TarjetaDestinoFinal_TrabajadorView extends Div {
                 }
             }
         }
-        gridDestinoFinal.setItems(tarjetas);
-        if (tarjetas.size() < 50) {
+        cantTarjetas = tarjetas.size();
+        Collections.sort(tarjetas, new Comparator<>() {
+            @Override
+            public int compare(DestinoFinal o1, DestinoFinal o2) {
+                return new CompareToBuilder()
+                        .append(o1.getFecha(), o2.getFecha())
+                        .append(o1.getModulo().getNombre(), o2.getModulo().getNombre())
+                        .toComparison();
+            }
+        });
+        gridListDataViewDestinoFinal = gridDestinoFinal.setItems(tarjetas);
+        if (cantTarjetas < 50) {
             gridDestinoFinal.setPageSize(50);
         } else {
-            gridDestinoFinal.setPageSize(tarjetas.size());
+            gridDestinoFinal.setPageSize(cantTarjetas);
         }
         gridDestinoFinal.deselectAll();
     }

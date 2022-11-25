@@ -495,11 +495,11 @@ public class LibroView extends Div {
                         Notification.Position.BOTTOM_START);
                 notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
             }
+            updateList();
             toolbar.remove(total);
             total = new Html("<span>Total: <b>" + cantLibros + "</b> libros</span>");
             toolbar.addComponentAtIndex(1, total);
             toolbar.setFlexGrow(1, buttons);
-            updateList();
             closeEditor();
         }
 
@@ -549,7 +549,7 @@ public class LibroView extends Div {
             }
         });
         gridListDataView = grid.setItems(libros);
-        if (cantLibros< 50) {
+        if (cantLibros < 50) {
             grid.setPageSize(50);
         } else {
             grid.setPageSize(cantLibros);

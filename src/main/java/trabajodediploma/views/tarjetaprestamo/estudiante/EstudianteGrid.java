@@ -116,6 +116,7 @@ public class EstudianteGrid extends Div {
                 return new CompareToBuilder()
                         .append(o1.getAnno_academico(), o2.getAnno_academico())
                         .append(o1.getGrupo().getNumero(), o2.getGrupo().getNumero())
+                        .append(o1.getUser().getName(), o2.getUser().getName())
                         .toComparison();
             }
         });
