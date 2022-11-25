@@ -39,6 +39,8 @@ import com.vaadin.flow.router.Route;
 import java.security.cert.X509Certificate;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -54,6 +56,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import trabajodediploma.data.entity.Area;
 import trabajodediploma.data.entity.Estudiante;
@@ -109,7 +112,8 @@ public class ModuloView extends Div {
     private VerticalLayout filtrosEstudianteContainer;
     private Div headerDialogEstudiante;
     private HorizontalLayout buttonsDialogEst;
-    private List<Estudiante> listEstudiantes;
+    private List<Estudiante> estudiantes;
+    private int cantEstudiantes = 0;
 
     Grid<Trabajador> gridTrabajadores = new Grid<>(Trabajador.class, false);
     GridListDataView<Trabajador> gridListDataViewTrabajador;
@@ -119,7 +123,11 @@ public class ModuloView extends Div {
     private Dialog dialogTrabajador;
     private VerticalLayout filtrosTrabajadorContainer;
     private Div headerDialogTrabajador;
-    private List<Trabajador> listTrabajadores;
+    private List<Trabajador> trabajadores;
+    private int cantTrabajadores = 0;
+
+    private List<Modulo> modulos;
+    private int cantModulos = 0;
 
     public ModuloView(
             @Autowired ModuloService moduloService,
@@ -139,9 +147,8 @@ public class ModuloView extends Div {
         this.senderService = senderService;
         this.grupoService = grupoService;
         this.areaService = areaService;
-        listEstudiantes = new LinkedList<>();
-        listTrabajadores = new LinkedList<>();
-        Filtros();
+        sortList();
+        updateList();
         configureGrid();
         configurarGridEstudiante();
         configurarGridTrabajador();
@@ -150,8 +157,33 @@ public class ModuloView extends Div {
         configureForm();
         footer = new MyFooter();
         add(menuBar(), getContent(), footer);
-        updateList();
         closeEditor();
+    }
+
+    private void sortList() {
+        //        lista de estudiantes
+        estudiantes = estudianteService.findAll();
+        cantEstudiantes = estudiantes.size();
+        Collections.sort(estudiantes, new Comparator<>() {
+            @Override
+            public int compare(Estudiante o1, Estudiante o2) {
+                return new CompareToBuilder()
+                        .append(o1.getAnno_academico(), o2.getAnno_academico())
+                        .append(o1.getGrupo().getNumero(), o2.getGrupo().getNumero())
+                        .toComparison();
+            }
+        });
+//        lista de trabajadores
+        trabajadores = trabajadorService.findAll();
+        cantTrabajadores = trabajadores.size();
+        Collections.sort(trabajadores, new Comparator<>() {
+            @Override
+            public int compare(Trabajador o1, Trabajador o2) {
+                return new CompareToBuilder()
+                        .append(o1.getArea().getNombre(), o2.getArea().getNombre())
+                        .toComparison();
+            }
+        });
     }
 
     /* Contenido de la vista */
@@ -208,15 +240,11 @@ public class ModuloView extends Div {
             return editButton;
         }).setFlexGrow(0);
 
+        Filtros();
+
         HeaderRow headerRow = grid.appendHeaderRow();
         headerRow.getCell(nombreColumn).setComponent(filterNombre);
 
-        gridListDataView = grid.setItems(moduloService.findAll());
-        if (moduloService.findAll().size() < 50) {
-            grid.setPageSize(50);
-        } else {
-            grid.setPageSize(moduloService.findAll().size());
-        }
         grid.setAllRowsVisible(true);
         grid.setSizeFull();
         grid.setWidthFull();
@@ -251,13 +279,12 @@ public class ModuloView extends Div {
 
         FiltrosGridEstudiante();
 
-        gridListDataViewEstudiante = gridEstudiantes.setItems(estudianteService.findAll());
-        if (estudianteService.findAll().size() < 50) {
+        gridListDataViewEstudiante = gridEstudiantes.setItems(estudiantes);
+        if (cantEstudiantes < 50) {
             gridEstudiantes.setPageSize(50);
         } else {
-            gridEstudiantes.setPageSize(estudianteService.findAll().size());
+            gridEstudiantes.setPageSize(cantEstudiantes);
         }
-        gridEstudiantes.setPageSize(estudianteService.findAll().size());
         gridEstudiantes.setSelectionMode(Grid.SelectionMode.MULTI);
         gridEstudiantes.getStyle().set("width", "500px").set("max-width", "100%");
     }
@@ -285,11 +312,11 @@ public class ModuloView extends Div {
 
         FiltrosGridTrabajador();
 
-        gridListDataViewTrabajador = gridTrabajadores.setItems(trabajadorService.findAll());
-        if (trabajadorService.findAll().size() < 50) {
+        gridListDataViewTrabajador = gridTrabajadores.setItems(trabajadores);
+        if (cantTrabajadores < 50) {
             gridTrabajadores.setPageSize(50);
         } else {
-            gridTrabajadores.setPageSize(trabajadorService.findAll().size());
+            gridTrabajadores.setPageSize(cantTrabajadores);
         }
         gridTrabajadores.setSelectionMode(Grid.SelectionMode.MULTI);
         gridTrabajadores.getStyle().set("width", "500px").set("max-width", "100%");
@@ -305,7 +332,7 @@ public class ModuloView extends Div {
         filterNombre.setWidth("100%");
         filterNombre.addValueChangeListener(event -> {
             if (filterNombre.getValue() == null) {
-                gridListDataView = grid.setItems(moduloService.findAll());
+                gridListDataView = grid.setItems(modulos);
             } else {
                 gridListDataView.addFilter(modulo -> StringUtils.containsIgnoreCase(modulo.getNombre(),
                         filterNombre.getValue().getNombre()));
@@ -563,17 +590,17 @@ public class ModuloView extends Div {
         Button addForm = new Button("Notificar", VaadinIcon.BELL_O.create());
         addForm.addClickListener(click -> {
             if (gridEstudiantes.getSelectedItems().size() > 0) {
-                listEstudiantes = new LinkedList<>(gridEstudiantes.getSelectedItems());
+                estudiantes = new LinkedList<>(gridEstudiantes.getSelectedItems());
                 List<Modulo> listModulo = new LinkedList<>(grid.getSelectedItems());
                 List<RecursoMaterial> listMateriales = new LinkedList<>(listModulo.get(0).getRecursosMateriales());
                 String materiales = listMateriales.get(0).getDescripcion();
                 for (int i = 1; i < listMateriales.size(); i++) {
                     materiales += ("," + listMateriales.get(i).getDescripcion());
                 }
-                for (int i = 0; i < listEstudiantes.size(); i++) {
+                for (int i = 0; i < estudiantes.size(); i++) {
                     AceptAllSSLCertificate();
                     senderService.sendSimpleEmail(
-                            /* enviado a: */listEstudiantes.get(i).getEmail(),
+                            /* enviado a: */estudiantes.get(i).getEmail(),
                             /* asunto: */ "Entrega de módulo",
                             /* mensaje: */ "Genius\n"
                             + "Sistema Informático para la gestión de información de los recursos materiales y libros en la facultad 4. \n"
@@ -687,17 +714,17 @@ public class ModuloView extends Div {
         Button addForm = new Button("Notificar", VaadinIcon.BELL_O.create());
         addForm.addClickListener(click -> {
             if (gridTrabajadores.getSelectedItems().size() > 0) {
-                listTrabajadores = new LinkedList<>(gridTrabajadores.getSelectedItems());
+                trabajadores = new LinkedList<>(gridTrabajadores.getSelectedItems());
                 List<Modulo> listModulo = new LinkedList<>(grid.getSelectedItems());
                 List<RecursoMaterial> listMateriales = new LinkedList<>(listModulo.get(0).getRecursosMateriales());
                 String materiales = listMateriales.get(0).getDescripcion();
                 for (int i = 1; i < listMateriales.size(); i++) {
                     materiales += ("," + listMateriales.get(i).getDescripcion());
                 }
-                for (int i = 0; i < listTrabajadores.size(); i++) {
+                for (int i = 0; i < trabajadores.size(); i++) {
                     AceptAllSSLCertificate();
                     senderService.sendSimpleEmail(
-                            /* enviado a: */listTrabajadores.get(i).getEmail(),
+                            /* enviado a: */trabajadores.get(i).getEmail(),
                             /* asunto: */ "Entrega de módulo",
                             /* mensaje: */ "Genius\n"
                             + "Sistema Informático para la gestión de información de los recursos materiales y libros en la facultad 4.\n"
@@ -816,10 +843,10 @@ public class ModuloView extends Div {
         });
 
         buttons.add(refreshButton, /*watchColumns(),*/ deleteButton, addButton, barraMenu);
-        if (moduloService.count() == 1) {
-            total = new Html("<span>Total: <b>" + moduloService.count() + "</b> módulo</span>");
-        } else if (moduloService.count() == 0 || moduloService.count() > 1) {
-            total = new Html("<span>Total: <b>" + moduloService.count() + "</b> módulos</span>");
+        if (cantModulos == 1) {
+            total = new Html("<span>Total: <b>" + cantModulos + "</b> módulo</span>");
+        } else if (cantModulos == 0 || cantModulos > 1) {
+            total = new Html("<span>Total: <b>" + cantModulos + "</b> módulos</span>");
         }
         toolbar = new HorizontalLayout(buttons, total);
         toolbar.addClassName("toolbar");
@@ -868,10 +895,10 @@ public class ModuloView extends Div {
                 deleteItems(grid.getSelectedItems().size(), grid.getSelectedItems());
                 updateList();
                 toolbar.remove(total);
-                if (moduloService.count() == 1) {
-                    total = new Html("<span>Total: <b>" + moduloService.count() + "</b> módulo</span>");
-                } else if (moduloService.count() == 0 || moduloService.count() > 1) {
-                    total = new Html("<span>Total: <b>" + moduloService.count() + "</b> módulos</span>");
+                if (cantModulos == 1) {
+                    total = new Html("<span>Total: <b>" + cantModulos + "</b> módulo</span>");
+                } else if (cantModulos == 0 || cantModulos > 1) {
+                    total = new Html("<span>Total: <b>" + cantModulos + "</b> módulos</span>");
                 }
                 toolbar.addComponentAtIndex(1, total);
                 toolbar.setFlexGrow(1, buttons);
@@ -969,10 +996,10 @@ public class ModuloView extends Div {
                 notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
             }
             toolbar.remove(total);
-            if (moduloService.findAll().size() == 1) {
-                total = new Html("<span>Total: <b>" + moduloService.findAll().size() + "</b> módulo</span>");
-            } else if (moduloService.findAll().size() == 0 || moduloService.findAll().size() > 1) {
-                total = new Html("<span>Total: <b>" + moduloService.findAll().size() + "</b> módulos</span>");
+            if (cantModulos == 1) {
+                total = new Html("<span>Total: <b>" + cantModulos + "</b> módulo</span>");
+            } else if (cantModulos == 0 || cantModulos > 1) {
+                total = new Html("<span>Total: <b>" + cantModulos + "</b> módulos</span>");
             }
             toolbar.addComponentAtIndex(1, total);
             toolbar.setFlexGrow(1, buttons);
@@ -1023,7 +1050,7 @@ public class ModuloView extends Div {
         }
 
     }
-    
+
     private void editModulo(Modulo modulo) {
         if (modulo == null) {
             closeEditor();
@@ -1048,11 +1075,21 @@ public class ModuloView extends Div {
     }
 
     private void updateList() {
-        grid.setItems(moduloService.findAll());
-        if (moduloService.findAll().size() < 50) {
+        modulos = moduloService.findAll();
+        cantModulos = modulos.size();
+        Collections.sort(modulos, new Comparator<>() {
+            @Override
+            public int compare(Modulo o1, Modulo o2) {
+                return new CompareToBuilder()
+                        .append(o1.getNombre(), o2.getNombre())
+                        .toComparison();
+            }
+        });
+        gridListDataView = grid.setItems(modulos);
+        if (cantModulos < 50) {
             grid.setPageSize(50);
         } else {
-            grid.setPageSize(moduloService.findAll().size());
+            grid.setPageSize(cantModulos);
         }
         grid.deselectAll();
     }
