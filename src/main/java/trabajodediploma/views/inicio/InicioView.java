@@ -129,7 +129,7 @@ public class InicioView extends Div {
         Anchor enlace = new Anchor("catalogo-libros", "Ver Cátalogo");
         enlace.addClassName("seccion1-info-enlace");
         Paragraph parrafoInfo = new Paragraph(
-                "Sistema Informático para la gestión de información de los recursos materiales y libros en la facultad 4.");
+                "Sistema Informático para la gestión de recursos materiales y libros.");
         parrafoInfo.addClassName("seccion1-info-parrafo");
         seccion1_info.add(enlace, parrafoInfo);
         /* Enlace */
